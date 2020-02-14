@@ -3,6 +3,7 @@ import Phaser from "phaser";
 import CONSTANTS from "./CST";
 
 import LoadingScene from "./scenes/LoadingScene";
+import GameScene from "./scenes/GameScene";
 
 // set the canvas to be fullscreen, centered and set the parent to the container div
 const scaleConfig: Phaser.Types.Core.ScaleConfig = {
@@ -11,7 +12,8 @@ const scaleConfig: Phaser.Types.Core.ScaleConfig = {
   parent: "canvas-container",
   expandParent: true,
   autoCenter: Phaser.Scale.CENTER_BOTH,
-  mode: Phaser.Scale.ScaleModes.RESIZE
+  mode: Phaser.Scale.ScaleModes.RESIZE,
+  fullscreenTarget: "canvas-container"
 };
 
 const gameConfig: Phaser.Types.Core.GameConfig = {
@@ -24,7 +26,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   title: CONSTANTS.GAME.TITLE,
   version: CONSTANTS.GAME.VERSION,
   // the scenes array
-  scene: [LoadingScene],
+  scene: [LoadingScene, GameScene],
   // prevent right mouse click default behaviour
   disableContextMenu: true,
   scale: scaleConfig,

@@ -20,6 +20,11 @@ export default class LoadingScene extends Phaser.Scene {
 
   preload() {
     this.load.setBaseURL("./game/assets/");
+
+    this.load.setPrefix("GROUND_TILES.");
+    this.load.setPath("image/");
+    this.load.image("floor", "floor.png");
+    this.load.image("wall", "cube.png");
   }
 
   onLoaderProgress(progress) {

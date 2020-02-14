@@ -9,6 +9,12 @@ export default {
     LOAD: "LOAD",
     GAME: "GAME"
   },
+  PLUGINS: {
+    ISO: {
+      FILE_IDENTIFIER: "IsoPlugin",
+      SCENE_KEY: "iso"
+    }
+  },
   ASSETS: {
     AUDIO: "audio",
     IMAGE: "image",
