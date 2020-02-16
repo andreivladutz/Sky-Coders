@@ -1,8 +1,13 @@
-import Point3 from "./Point3";
-import Cube from "./Cube";
+//import Point3 from "./Point3";
+//import Cube from "./Cube";
+import IsoPlugin, { Point3, Cube } from "./IsoPlugin";
 
 export const ISOSPRITE = "IsoSprite";
 const Sprite = Phaser.GameObjects.Sprite;
+
+interface IsoInjectedScene extends Phaser.Scene {
+  iso?: IsoPlugin;
+}
 
 /**
  * @class IsoSprite
@@ -14,11 +19,16 @@ const Sprite = Phaser.GameObjects.Sprite;
  * The IsoSprites retain their 2D position property to prevent any problems and allow you to interact with them as you would a normal Sprite. The upside of this simplicity is that things should behave predictably for those already used to Phaser.
  */
 export default class IsoSprite extends Sprite {
-  _isoPosition: Point3;
+  _position3D: Point3;
   snap: number;
-  private _isoPositionChanged: boolean;
-  private _isoBoundsChanged: boolean;
-  private _isoBounds: Cube;
+  private _position3DChanged: boolean;
+  private _bounds3DChanged: boolean;
+  private _bounds3D: Cube;
+  // projected _bounds3D cube to check pointer hit against
+  private hitPolygon: Phaser.Geom.Polygon;
+
+  // let ts know this scene has an iso property
+  scene: IsoInjectedScene;
 
   body: { [key: string]: any };
 
@@ -49,10 +59,10 @@ export default class IsoSprite extends Sprite {
     this.type = ISOSPRITE;
 
     /**
-     * @property {Point3} _isoPosition - Internal 3D position.
+     * @property {Point3} _position3D - Internal 3D position.
      * @private
      */
-    this._isoPosition = new Point3(x, y, z);
+    this._position3D = new Point3(x, y, z);
 
     /**
      * @property {number} snap - Snap this IsoSprite's position to the specified value; handy for keeping pixel art snapped to whole pixels.
@@ -61,24 +71,35 @@ export default class IsoSprite extends Sprite {
     this.snap = 0;
 
     /**
-     * @property {boolean} _isoPositionChanged - Internal invalidation control for positioning.
+     * @property {boolean} _position3DChanged - Internal invalidation control for positioning.
      * @private
      */
-    this._isoPositionChanged = true;
+    this._position3DChanged = true;
 
     /**
-     * @property {boolean} _isoBoundsChanged - Internal invalidation control for isometric bounds.
+     * @property {boolean} _bounds3DChanged - Internal invalidation control for isometric bounds.
      * @private
      */
-    this._isoBoundsChanged = true;
+    this._bounds3DChanged = true;
 
     this._project();
 
     /**
-     * @property {Cube} _isoBounds - Internal derived 3D bounds.
+     * @property {Cube} _bounds3D - Internal derived 3D bounds.
      * @private
      */
-    this._isoBounds = this.resetIsoBounds();
+    this._bounds3D = this.resetBounds3D();
+
+    this.hitPolygon = this.resetHitArea();
+
+    // when the game resizes, we should reposition all our sprites on the screen
+    this.scene.scale.on(
+      "resize",
+      () => {
+        this._position3DChanged = true;
+      },
+      this
+    );
   }
 
   /**
@@ -88,12 +109,12 @@ export default class IsoSprite extends Sprite {
    * @property {number} isoX - The axonometric position of the IsoSprite on the x axis.
    */
   get isoX(): number {
-    return this._isoPosition.x;
+    return this._position3D.x;
   }
 
   set isoX(value) {
-    this._isoPosition.x = value;
-    this._isoPositionChanged = this._isoBoundsChanged = true;
+    this._position3D.x = value;
+    this._position3DChanged = this._bounds3DChanged = true;
 
     if (this.body) {
       this.body._reset = true;
@@ -107,12 +128,12 @@ export default class IsoSprite extends Sprite {
    * @property {number} isoY - The axonometric position of the IsoSprite on the y axis.
    */
   get isoY(): number {
-    return this._isoPosition.y;
+    return this._position3D.y;
   }
 
   set isoY(value) {
-    this._isoPosition.y = value;
-    this._isoPositionChanged = this._isoBoundsChanged = true;
+    this._position3D.y = value;
+    this._position3DChanged = this._bounds3DChanged = true;
 
     if (this.body) {
       this.body._reset = true;
@@ -126,12 +147,12 @@ export default class IsoSprite extends Sprite {
    * @property {number} isoZ - The axonometric position of the IsoSprite on the z axis.
    */
   get isoZ(): number {
-    return this._isoPosition.z;
+    return this._position3D.z;
   }
 
   set isoZ(value) {
-    this._isoPosition.z = value;
-    this._isoPositionChanged = this._isoBoundsChanged = true;
+    this._position3D.z = value;
+    this._position3DChanged = this._bounds3DChanged = true;
 
     if (this.body) {
       this.body._reset = true;
@@ -141,28 +162,54 @@ export default class IsoSprite extends Sprite {
   /**
    * A Point3 object representing the axonometric position of the IsoSprite.
    *
-   * @name Phaser.Plugin.Isometric.IsoSprite#isoPosition
-   * @property {Point3} isoPosition - The axonometric position of the IsoSprite.
+   * @name Phaser.Plugin.Isometric.IsoSprite#position3D
+   * @property {Point3} position3D - The axonometric position of the IsoSprite.
    * @readonly
    */
-  get isoPosition() {
-    return this._isoPosition;
+  get position3D() {
+    return this._position3D;
   }
 
   /**
    * A Cube object representing the derived boundsof the IsoSprite.
    *
-   * @name Phaser.Plugin.Isometric.IsoSprite#isoBounds
-   * @property {Point3} isoBounds - The derived 3D bounds of the IsoSprite.
+   * @name Phaser.Plugin.Isometric.IsoSprite#bounds3D
+   * @property {Point3} bounds3D - The derived 3D bounds of the IsoSprite.
    * @readonly
    */
-  get isoBounds() {
-    if (this._isoBoundsChanged || !this._isoBounds) {
-      this.resetIsoBounds();
-      this._isoBoundsChanged = false;
+  get bounds3D() {
+    if (this._bounds3DChanged || !this._bounds3D) {
+      this.resetBounds3D();
+      this._bounds3DChanged = false;
     }
 
-    return this._isoBounds;
+    return this._bounds3D;
+  }
+
+  setScale(x: number, y?: number): this {
+    // the bounds become dirty
+    this._bounds3DChanged = true;
+
+    return super.setScale(x, y);
+  }
+
+  setOrigin(x?: number, y?: number): this {
+    // the bounds become dirty
+    this._bounds3DChanged = true;
+
+    return super.setOrigin(x, y);
+  }
+
+  /**
+   * Internal function called by the World update cycle.
+   *
+   * @method IsoSprite#preUpdate
+   * @memberof IsoSprite
+   */
+  preUpdate(time: number, delta: number) {
+    super.preUpdate(time, delta);
+
+    this._project();
   }
 
   /**
@@ -172,141 +219,108 @@ export default class IsoSprite extends Sprite {
    * @private
    */
   private _project() {
-    if (!this._isoPositionChanged) {
+    if (!this._position3DChanged) {
       return;
     }
 
-    const pluginKey = this.scene.sys.settings.map.isoPlugin;
-    const sceneProjector = this.scene[pluginKey].projector;
-    ({ x: this.x, y: this.y } = sceneProjector.project(this._isoPosition));
+    // const pluginKey = this.scene.sys.settings.map.isoPlugin;
+    // const sceneProjector = this.scene[pluginKey].projector;
+    const sceneProjector = this.scene.iso.projector;
+
+    ({ x: this.x, y: this.y } = sceneProjector.project(this._position3D));
 
     // Phaser handles depth sorting automatically
     this.depth =
-      this._isoPosition.x + this._isoPosition.y + this._isoPosition.z * 1.25;
+      this._position3D.x + this._position3D.y + this._position3D.z * 1.25;
 
     if (this.snap > 0) {
       this.x = Phaser.Math.Snap.To(this.x, this.snap);
       this.y = Phaser.Math.Snap.To(this.y, this.snap);
     }
 
-    this._isoPositionChanged = this._isoBoundsChanged = true;
+    this._position3DChanged = false;
+    this._bounds3DChanged = true;
   }
 
-  /**
-   * Internal function called by the World update cycle.
-   *
-   * @method IsoSprite#preUpdate
-   * @memberof IsoSprite
-   */
-  preUpdate(time, delta) {
-    super.preUpdate(time, delta);
-
-    this._project();
-  }
-
-  resetIsoBounds() {
-    if (typeof this._isoBounds === "undefined") {
-      this._isoBounds = new Cube();
+  resetBounds3D(): Cube {
+    if (typeof this._bounds3D === "undefined") {
+      this._bounds3D = new Cube();
     }
 
     var asx = Math.abs(this.scaleX);
     var asy = Math.abs(this.scaleY);
 
-    this._isoBounds.widthX = Math.round(Math.abs(this.width) * 0.5) * asx;
-    this._isoBounds.widthY = Math.round(Math.abs(this.width) * 0.5) * asx;
-    this._isoBounds.height =
+    this._bounds3D.widthX = Math.round(Math.abs(this.width) * 0.5) * asx;
+    this._bounds3D.widthY = Math.round(Math.abs(this.width) * 0.5) * asx;
+    this._bounds3D.height =
       Math.round(Math.abs(this.height) - Math.abs(this.width) * 0.5) * asy;
 
-    this._isoBounds.x =
+    this._bounds3D.x =
       this.isoX +
-      this._isoBounds.widthX * -this.originX +
-      this._isoBounds.widthX * 0.5;
+      this._bounds3D.widthX * -this.originX +
+      this._bounds3D.widthX * 0.5;
 
-    this._isoBounds.y =
+    this._bounds3D.y =
       this.isoY +
-      this._isoBounds.widthY * this.originX -
-      this._isoBounds.widthY * 0.5;
+      this._bounds3D.widthY * this.originX -
+      this._bounds3D.widthY * 0.5;
 
-    this._isoBounds.z =
+    this._bounds3D.z =
       this.isoZ -
       Math.abs(this.height) * (1 - this.originY) +
       Math.abs(this.width * 0.5);
 
-    return this._isoBounds;
+    return this._bounds3D;
+  }
+
+  // recompute the pointer interaction hit area by projecting the bounds3D cube
+  resetHitArea(): Phaser.Geom.Polygon {
+    const sceneProjector = this.scene.iso.projector,
+      // get all the corners of the cube
+      corners = this.bounds3D.getCorners(),
+      points3D: Point3[] = [
+        corners[1],
+        corners[3],
+        corners[2],
+        corners[6],
+        corners[4],
+        corners[5]
+      ],
+      pointsIsoProjected: Phaser.Geom.Point[] = points3D.map(function(p) {
+        // the bounds of the rectangular sprite (image) in the world
+        let rect = this.getBounds(),
+          // project the corners of the cube to screen space (isometric coords)
+          newPos: Phaser.Geom.Point = sceneProjector.project(p);
+
+        // offset the projected point to (0, 0) screen space
+        newPos.x -= rect.x / this.scaleX;
+        newPos.y -= rect.y / this.scaleY;
+
+        return newPos;
+      }, this);
+
+    return (this.hitPolygon = new Phaser.Geom.Polygon(pointsIsoProjected));
+  }
+
+  setInteractive(
+    shape?: Phaser.Types.Input.InputConfiguration | any,
+    callback?: Phaser.Types.Input.HitAreaCallback,
+    dropZone?: boolean
+  ): this {
+    if (shape !== undefined) {
+      return super.setInteractive(shape, callback, dropZone);
+    }
+
+    // overwrite the default behaviour
+    return super.setInteractive(this.hitPolygon, (poly, x, y) => {
+      return Phaser.Geom.Polygon.Contains(poly, x, y);
+    });
+  }
+
+  // Check if this sprite contains the specified screen space point
+  // A z coordinate can be specified for the unprojected 3D point of pt (the default is 0)
+  containsScreenPoint(pt: { x: number; y: number }, z: number = 0): boolean {
+    let pt3D = this.scene.iso.projector.unproject(pt, new Point3(), z);
+    return this.bounds3D.containsXY(pt3D.x, pt3D.y);
   }
 }
-
-// Phaser.Utils.Debug.prototype.isoSprite = function (sprite, color, filled) {
-//
-//   if (!sprite.isoBounds) {
-//     return;
-//   }
-//
-//   if (typeof filled === 'undefined') {
-//     filled = true;
-//   }
-//
-//   color = color || 'rgba(0,255,0,0.4)';
-//
-//
-//   var points = [],
-//     corners = sprite.isoBounds.getCorners();
-//
-//   var posX = -sprite.game.camera.x;
-//   var posY = -sprite.game.camera.y;
-//
-//   this.start();
-//
-//   if (filled) {
-//     points = [corners[1], corners[3], corners[2], corners[6], corners[4], corners[5], corners[1]];
-//
-//     points = points.map(function (p) {
-//       var newPos = sprite.game.iso.project(p);
-//       newPos.x += posX;
-//       newPos.y += posY;
-//       return newPos;
-//     });
-//     this.context.beginPath();
-//     this.context.fillStyle = color;
-//     this.context.moveTo(points[0].x, points[0].y);
-//
-//     for (var i = 1; i < points.length; i++) {
-//       this.context.lineTo(points[i].x, points[i].y);
-//     }
-//     this.context.fill();
-//   } else {
-//     points = corners.slice(0, corners.length);
-//     points = points.map(function (p) {
-//       var newPos = sprite.game.iso.project(p);
-//       newPos.x += posX;
-//       newPos.y += posY;
-//       return newPos;
-//     });
-//
-//     this.context.moveTo(points[0].x, points[0].y);
-//     this.context.beginPath();
-//     this.context.strokeStyle = color;
-//
-//     this.context.lineTo(points[1].x, points[1].y);
-//     this.context.lineTo(points[3].x, points[3].y);
-//     this.context.lineTo(points[2].x, points[2].y);
-//     this.context.lineTo(points[6].x, points[6].y);
-//     this.context.lineTo(points[4].x, points[4].y);
-//     this.context.lineTo(points[5].x, points[5].y);
-//     this.context.lineTo(points[1].x, points[1].y);
-//     this.context.lineTo(points[0].x, points[0].y);
-//     this.context.lineTo(points[4].x, points[4].y);
-//     this.context.moveTo(points[0].x, points[0].y);
-//     this.context.lineTo(points[2].x, points[2].y);
-//     this.context.moveTo(points[3].x, points[3].y);
-//     this.context.lineTo(points[7].x, points[7].y);
-//     this.context.lineTo(points[6].x, points[6].y);
-//     this.context.moveTo(points[7].x, points[7].y);
-//     this.context.lineTo(points[5].x, points[5].y);
-//     this.context.stroke();
-//     this.context.closePath();
-//   }
-//
-//   this.stop();
-//
-// };

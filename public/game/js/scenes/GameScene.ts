@@ -1,5 +1,5 @@
 import CST from "../CST";
-import IsoPlugin, { IsoSprite } from "../IsoPlugin/IsoPlugin";
+import IsoPlugin, { IsoSprite, IsoSpriteBuilder } from "../IsoPlugin/IsoPlugin";
 import { IsoDebugger } from "../utils/debug";
 
 const WALL = 1;
@@ -17,19 +17,23 @@ const groundTiles = [
 const TILE_WIDTH = 103,
   TILE_HEIGHT = 53;
 
-// tell ts that the isometric plugin is going to inject the isoSprite property on the GameObjectFactory
+interface DynamicIsoSprite extends IsoSprite {
+  [key: string]: any;
+}
+
+// tell typescript that the isometric plugin is going to inject the isoSprite property on the GameObjectFactory
 interface GameObjectFactoryIso extends Phaser.GameObjects.GameObjectFactory {
-  isoSprite?: IsoSprite;
+  isoSprite?: IsoSpriteBuilder;
 }
 
 export default class GameScene extends Phaser.Scene {
   groundLayerGroup: Phaser.GameObjects.Group;
-
   // these properties will be changed by injecting the isometric plugin
   iso: IsoPlugin;
   add: GameObjectFactoryIso;
   // the projection angle
   isometricType: number;
+  isoDebug: IsoDebugger;
 
   constructor() {
     const config = {
@@ -72,9 +76,8 @@ export default class GameScene extends Phaser.Scene {
     this.groundLayerGroup = this.add.group();
     this.iso.projector.origin.setTo(0.5, 0.3);
 
-    new IsoDebugger(this, this.iso).debugCoords();
-
-    this.cameras.main.scrollX += 10;
+    this.isoDebug = new IsoDebugger(this, this.iso).debugCoords();
+    //this.cameras.main.scrollX += 100;
 
     //this.generateGroundLayer();
     this.spawnTiles();
@@ -84,44 +87,62 @@ export default class GameScene extends Phaser.Scene {
     let index = 1;
     for (var xx = 0; xx < 256; xx += 40) {
       for (var yy = 0; yy < 256; yy += 40) {
-        let tile = this.add
-          .isoSprite(xx, yy, 0, "tile", this.groundLayerGroup)
-          .setOrigin(0.5, 0);
+        let tile: DynamicIsoSprite = this.add
+          .isoSprite(xx * 2, yy * 2, 0, "tile", this.groundLayerGroup)
+          .setOrigin(0.5, 0)
+          .setScale(2, 2);
 
         this.add
           .text(tile.x, tile.y, String(index++))
           .setDepth(Infinity)
           .setColor("red");
 
-        this.input.on("pointermove", pointer => {
-          let isoPointerLocation = new Phaser.Geom.Point(pointer.x, pointer.y);
-          let pointerLocation3D = this.iso.projector.unproject(
-            isoPointerLocation
-          );
+        // tile.setInteractive().on("pointerover", () => {
+        //   if (!tile.tinted) {
+        //     tile.setTint(0x86bfda);
+        //     tile.isoZ += 5;
 
-          this.groundLayerGroup.getChildren().forEach((tile: IsoSprite) => {
-            let onTile = tile.isoBounds.containsXY(
-              pointerLocation3D.x,
-              pointerLocation3D.y
-            );
+        //     tile.tinted = true;
+        //   }
+        // });
+        // tile.setInteractive().on("pointerout", () => {
+        //   if (tile.tinted) {
+        //     tile.clearTint();
+        //     tile.isoZ -= 5;
 
-            if (onTile) {
-              if (!tile.tinted) {
-                tile.setTint(0x86bfda);
-                tile.isoZ += 5;
-
-                tile.tinted = true;
-              }
-            } else if (tile.tinted) {
-              tile.clearTint();
-              tile.isoZ -= 5;
-
-              tile.tinted = false;
-            }
-          });
-        });
+        //     tile.tinted = false;
+        //   }
+        // });
       }
     }
+
+    this.input.on("pointermove", pointer => {
+      this.groundLayerGroup.getChildren().forEach((tile: DynamicIsoSprite) => {
+        let onTile = tile.containsScreenPoint(pointer);
+
+        if (onTile) {
+          if (!tile.tinted) {
+            tile.setTint(0x86bfda);
+            tile.isoZ += 5;
+
+            tile.tinted = true;
+          }
+        } else if (tile.tinted) {
+          tile.clearTint();
+          tile.isoZ -= 5;
+
+          tile.tinted = false;
+        }
+      });
+    });
+  }
+
+  update() {
+    this.isoDebug.debugIsoSprites(
+      this.groundLayerGroup.getChildren() as Array<IsoSprite>,
+      0xeb4034,
+      false
+    );
   }
 
   generateGroundLayer() {
@@ -134,7 +155,8 @@ export default class GameScene extends Phaser.Scene {
               (j * TILE_WIDTH) / 2,
               i * TILE_HEIGHT,
               -25,
-              "GROUND_TILES.floor"
+              "GROUND_TILES.floor",
+              this.groundLayerGroup
             );
 
             break;
@@ -144,7 +166,8 @@ export default class GameScene extends Phaser.Scene {
               (j * TILE_WIDTH) / 2,
               i * TILE_HEIGHT,
               0,
-              "GROUND_TILES.wall"
+              "GROUND_TILES.wall",
+              this.groundLayerGroup
             );
         }
       }

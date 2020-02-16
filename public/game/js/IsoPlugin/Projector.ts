@@ -94,7 +94,7 @@ class Projector {
     out.y = (point3.x + point3.y) * this._transform[1] - point3.z;
 
     const { width, height } = this.game.scale.gameSize;
-    //this.scene.sys.game.config;
+
     out.x += width * this.origin.x;
     out.y += height * this.origin.y;
 
@@ -124,13 +124,13 @@ class Projector {
   /**
    * Use reverse axonometric projection to transform a 2D Point coordinate to a 3D Point3 coordinate. If given the coordinates will be set into the object, otherwise a brand new Point3 object will be created and returned.
    * @method Projector#unproject
-   * @param {Phaser.Geom.Point} point - The Point to project from.
+   * @param {x: number, y: number} point - The 2D Point to project from.
    * @param {Point3} out - The Point3 to project to.
    * @param {number} [z] - Specified z-plane to project to.
    * @return {Point3} The transformed Point3.
    */
   unproject(
-    point: Phaser.Geom.Point,
+    point: { x: number; y: number },
     out: Point3 = new Point3(),
     z: number = 0
   ): Point3 {

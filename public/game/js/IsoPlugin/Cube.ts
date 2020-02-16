@@ -1,4 +1,13 @@
-import Point3 from './Point3';
+import Point3 from "./Point3";
+
+interface CubeInterface {
+  x: number;
+  y: number;
+  z: number;
+  widthX: number;
+  widthY: number;
+  height: number;
+}
 
 /**
  * @class Cube
@@ -6,7 +15,15 @@ import Point3 from './Point3';
  * @classdesc
  * Creates a new Cube object with the bottom-back corner specified by the x, y and z parameters, with the specified breadth (widthX), depth (widthY) and height parameters. If you call this function without parameters, a Cube with x, y, z, breadth, depth and height properties set to 0 is created.
  */
-class Cube {
+class Cube implements CubeInterface {
+  x: number;
+  y: number;
+  z: number;
+  widthX: number;
+  widthY: number;
+  height: number;
+  private _corners: Array<Point3>;
+
   /**
    * @constructor
    * @param {number} x - The x coordinate of the bottom-back corner of the Cube.
@@ -17,7 +34,14 @@ class Cube {
    * @param {number} height - The Z axis height of the Cube. Should always be either zero or a positive value.
    * @return {Cube} This Cube object.
    */
-  constructor(x = 0, y = 0, z = 0, widthX = 0, widthY = 0, height = 0) {
+  constructor(
+    x: number = 0,
+    y: number = 0,
+    z: number = 0,
+    widthX: number = 0,
+    widthY: number = 0,
+    height: number = 0
+  ) {
     /**
      * @property {number} x - The x coordinate of the bottom-back corner of the Cube.
      */
@@ -49,7 +73,7 @@ class Cube {
     this.height = height;
 
     /**
-     * @property {Array.<Point3>} _corners - The 8 corners of the Cube.
+     * @property {Array<Point3>} _corners - The 8 corners of the Cube.
      * @private
      */
     this._corners = [
@@ -60,7 +84,11 @@ class Cube {
       new Point3(this.x + this.widthX, this.y, this.z),
       new Point3(this.x + this.widthX, this.y, this.z + this.height),
       new Point3(this.x + this.widthX, this.y + this.widthY, this.z),
-      new Point3(this.x + this.widthX, this.y + this.widthY, this.z + this.height)
+      new Point3(
+        this.x + this.widthX,
+        this.y + this.widthY,
+        this.z + this.height
+      )
     ];
   }
 
@@ -75,7 +103,14 @@ class Cube {
    * @param {number} height - The Z axis height of the Cube. This value should never be set to a negative.
    * @return {Cube} This Cube object
    */
-  setTo(x, y, z, widthX, widthY, height) {
+  setTo(
+    x: number,
+    y: number,
+    z: number,
+    widthX: number,
+    widthY: number,
+    height: number
+  ): Cube {
     this.x = x;
     this.y = y;
     this.z = z;
@@ -92,8 +127,24 @@ class Cube {
    * @param {any} source - The object to copy from.
    * @return {Cube} This Cube object.
    */
-  copyFrom(source) {
-    this.setTo(source.x, source.y, source.z, source.widthX, source.widthY, source.height);
+  copyFrom(
+    source: CubeInterface = {
+      x: 0,
+      y: 0,
+      z: 0,
+      widthX: 0,
+      widthY: 0,
+      height: 0
+    }
+  ): Cube {
+    return this.setTo(
+      source.x,
+      source.y,
+      source.z,
+      source.widthX,
+      source.widthY,
+      source.height
+    );
   }
 
   /**
@@ -102,7 +153,7 @@ class Cube {
    * @param {any} dest - The object to copy to.
    * @return {Cube} This Cube object.
    */
-  copyTo(dest) {
+  copyTo(dest: CubeInterface): CubeInterface {
     dest.x = this.x;
     dest.y = this.y;
     dest.z = this.z;
@@ -119,7 +170,7 @@ class Cube {
    * @param {Point3} [output] - Optional Point3 object. If given the values will be set into the object, otherwise a brand new Point3 object will be created and returned.
    * @return {Point3} The size of the Cube object.
    */
-  size(output) {
+  size(output?: Point3): Point3 {
     return Cube.size(this, output);
   }
 
@@ -128,10 +179,10 @@ class Cube {
    * @method Cube#contains
    * @param {number} x - The x coordinate of the point to test.
    * @param {number} y - The y coordinate of the point to test.
-   * @param {number} y - The z coordinate of the point to test.
+   * @param {number} z - The z coordinate of the point to test.
    * @return {boolean} A value of true if the Cube object contains the specified point; otherwise false.
    */
-  contains(x, y, z) {
+  contains(x: number, y: number, z: number): boolean {
     return Cube.contains(this, x, y, z);
   }
 
@@ -142,7 +193,7 @@ class Cube {
    * @param {number} y - The y coordinate of the point to test.
    * @return {boolean} A value of true if this Cube object contains the specified point; otherwise false.
    */
-  containsXY(x, y) {
+  containsXY(x: number, y: number): boolean {
     return Cube.containsXY(this, x, y);
   }
 
@@ -152,7 +203,7 @@ class Cube {
    * @param {Cube} [output] - Optional Cube object. If given the values will be set into the object, otherwise a brand new Cube object will be created and returned.
    * @return {Cube}
    */
-  clone(output) {
+  clone(output?: Cube): Cube {
     return Cube.clone(this, output);
   }
 
@@ -163,16 +214,16 @@ class Cube {
    * @param {Cube} b - The second Cube object.
    * @return {boolean} A value of true if the specified object intersects with this Cube object; otherwise false.
    */
-  intersects(b) {
+  intersects(b: Cube): boolean {
     return Cube.intersects(this, b);
   }
 
   /**
    * Updates and returns an Array of eight Point3 objects containing the corners of this Cube.
    * @method Cube#getCorners
-   * @return {Array.<Point3>} The corners of this Cube expressed as an Array of eight Point3 objects.
+   * @return {Array<Point3>} The corners of this Cube expressed as an Array of eight Point3 objects.
    */
-  getCorners() {
+  getCorners(): Array<Point3> {
     this._corners[0].setTo(this.x, this.y, this.z);
     this._corners[1].setTo(this.x, this.y, this.z + this.height);
     this._corners[2].setTo(this.x, this.y + this.widthY, this.z);
@@ -180,7 +231,11 @@ class Cube {
     this._corners[4].setTo(this.x + this.widthX, this.y, this.z);
     this._corners[5].setTo(this.x + this.widthX, this.y, this.z + this.height);
     this._corners[6].setTo(this.x + this.widthX, this.y + this.widthY, this.z);
-    this._corners[7].setTo(this.x + this.widthX, this.y + this.widthY, this.z + this.height);
+    this._corners[7].setTo(
+      this.x + this.widthX,
+      this.y + this.widthY,
+      this.z + this.height
+    );
 
     return this._corners;
   }
@@ -190,7 +245,7 @@ class Cube {
    * @method Cube#toString
    * @return {string} A string representation of the instance.
    */
-  toString() {
+  toString(): string {
     return `[{Cube (x=${this.x} y=${this.y} z=${this.z} widthX=${this.widthX} widthY=${this.widthY} height=${this.height} empty=${this.empty})}]`;
   }
 
@@ -235,7 +290,7 @@ class Cube {
     if (value >= this.top) {
       this.height = 0;
     } else {
-      this.height = (this.top - value);
+      this.height = this.top - value;
     }
     this.z = value;
   }
@@ -253,7 +308,7 @@ class Cube {
     if (value <= this.z) {
       this.height = 0;
     } else {
-      this.height = (value - this.z);
+      this.height = value - this.z;
     }
   }
 
@@ -270,7 +325,7 @@ class Cube {
     if (value >= this.frontX) {
       this.widthX = 0;
     } else {
-      this.widthX = (this.frontX - value);
+      this.widthX = this.frontX - value;
     }
     this.x = value;
   }
@@ -288,7 +343,7 @@ class Cube {
     if (value >= this.frontY) {
       this.widthY = 0;
     } else {
-      this.widthY = (this.frontY - value);
+      this.widthY = this.frontY - value;
     }
     this.y = value;
   }
@@ -306,7 +361,7 @@ class Cube {
     if (value <= this.x) {
       this.widthX = 0;
     } else {
-      this.widthX = (value - this.x);
+      this.widthX = value - this.x;
     }
   }
 
@@ -323,7 +378,7 @@ class Cube {
     if (value <= this.y) {
       this.widthY = 0;
     } else {
-      this.widthY = (value - this.y);
+      this.widthY = value - this.y;
     }
   }
 
@@ -383,7 +438,7 @@ class Cube {
    * @property {number} randomX - A random value between the frontX and backX values (inclusive) of the Cube.
    */
   get randomX() {
-    return this.x + (Math.random() * this.widthX);
+    return this.x + Math.random() * this.widthX;
   }
 
   /**
@@ -393,7 +448,7 @@ class Cube {
    * @property {number} randomY - A random value between the frontY and backY values (inclusive) of the Cube.
    */
   get randomY() {
-    return this.y + (Math.random() * this.widthY);
+    return this.y + Math.random() * this.widthY;
   }
 
   /**
@@ -403,7 +458,7 @@ class Cube {
    * @property {number} randomZ - A random value between the bottom and top values (inclusive) of the Cube.
    */
   get randomZ() {
-    return this.z + (Math.random() * this.height);
+    return this.z + Math.random() * this.height;
   }
 
   /**
@@ -413,7 +468,7 @@ class Cube {
    * @property {boolean} empty - Gets or sets the Cube's empty state.
    */
   get empty() {
-    return (!this.widthX || !this.widthY || !this.height);
+    return !this.widthX || !this.widthY || !this.height;
   }
 
   set empty(value) {
@@ -429,8 +484,8 @@ class Cube {
    * @param {Point3} [output] - Optional Point3 object. If given the values will be set into the object, otherwise a brand new Point3 object will be created and returned.
    * @return {Point3} The size of the Cube object
    */
-  static size(a, output) {
-    if (typeof output === 'undefined' || output === null) {
+  static size(a: Cube, output?: Point3): Point3 {
+    if (typeof output === "undefined" || output === null) {
       output = new Point3(a.widthX, a.widthY, a.height);
     } else {
       output.setTo(a.widthX, a.widthY, a.height);
@@ -446,8 +501,8 @@ class Cube {
    * @param {Cube} [output] - Optional Cube object. If given the values will be set into the object, otherwise a brand new Cube object will be created and returned.
    * @return {Cube}
    */
-  static clone(a, output) {
-    if (typeof output === 'undefined' || output === null) {
+  static clone(a: Cube, output?: Cube): Cube {
+    if (typeof output === "undefined" || output === null) {
       output = new Cube(a.x, a.y, a.z, a.widthX, a.widthY, a.height);
     } else {
       output.setTo(a.x, a.y, a.z, a.widthX, a.widthY, a.height);
@@ -465,12 +520,19 @@ class Cube {
    * @param {number} z - The z coordinate of the point to test.
    * @return {boolean} A value of true if the Cube object contains the specified point; otherwise false.
    */
-  static contains(a, x, y, z) {
+  static contains(a: Cube, x: number, y: number, z: number): boolean {
     if (a.widthX <= 0 || a.widthY <= 0 || a.height <= 0) {
       return false;
     }
 
-    return (x >= a.x && x <= a.frontX && y >= a.y && y <= a.frontY && z >= a.z && z <= a.top);
+    return (
+      x >= a.x &&
+      x <= a.frontX &&
+      y >= a.y &&
+      y <= a.frontY &&
+      z >= a.z &&
+      z <= a.top
+    );
   }
 
   /**
@@ -481,12 +543,12 @@ class Cube {
    * @param {number} y - The y coordinate of the point to test.
    * @return {boolean} A value of true if the Cube object contains the specified point; otherwise false.
    */
-  static containsXY(a, x, y) {
+  static containsXY(a: Cube, x: number, y: number): boolean {
     if (a.widthX <= 0 || a.widthY <= 0) {
       return false;
     }
 
-    return (x >= a.x && x <= a.frontX && y >= a.y && y <= a.frontY);
+    return x >= a.x && x <= a.frontX && y >= a.y && y <= a.frontY;
   }
 
   /**
@@ -496,7 +558,7 @@ class Cube {
    * @param {Point3} point3 - The Point3 object being checked. Can be Point3 or any object with .x, .y and .z values.
    * @return {boolean} A value of true if the Cube object contains the specified point; otherwise false.
    */
-  static containsPoint3(a, point3) {
+  static containsPoint3(a: Cube, point3: Point3): boolean {
     return Cube.contains(a, point3.x, point3.y, point3.z);
   }
 
@@ -508,11 +570,20 @@ class Cube {
    * @param {Cube} b - The second Cube object.
    * @return {boolean} A value of true if the Cube object contains the specified point; otherwise false.
    */
-  static containsCube(a, b) {
+  static containsCube(a: Cube, b: Cube): boolean {
     //  If the given cube has a larger volume than this one then it can never contain it
-    if (a.volume > b.volume) { return false; }
+    if (a.volume > b.volume) {
+      return false;
+    }
 
-    return (a.x >= b.x && a.y >= b.y && a.z >= b.z && a.frontX <= b.frontX && a.frontY <= b.frontY && a.top <= b.top);
+    return (
+      a.x >= b.x &&
+      a.y >= b.y &&
+      a.z >= b.z &&
+      a.frontX <= b.frontX &&
+      a.frontY <= b.frontY &&
+      a.top <= b.top
+    );
   }
 
   /**
@@ -523,11 +594,25 @@ class Cube {
    * @param {Cube} b - The second Cube object.
    * @return {boolean} A value of true if the specified object intersects with this Cube object; otherwise false.
    */
-  static intersects(a, b) {
-    if (a.widthX <= 0 || a.widthY <= 0 || a.height <= 0 || b.widthX <= 0 || b.widthY <= 0 || b.height <= 0) {
+  static intersects(a: Cube, b: Cube): boolean {
+    if (
+      a.widthX <= 0 ||
+      a.widthY <= 0 ||
+      a.height <= 0 ||
+      b.widthX <= 0 ||
+      b.widthY <= 0 ||
+      b.height <= 0
+    ) {
       return false;
     }
-    return !(a.frontX < b.x || a.frontY < b.y || a.x > b.frontX || a.y > b.frontY || a.z > b.top || a.top < b.z);
+    return !(
+      a.frontX < b.x ||
+      a.frontY < b.y ||
+      a.x > b.frontX ||
+      a.y > b.frontY ||
+      a.z > b.top ||
+      a.top < b.z
+    );
   }
 }
 
