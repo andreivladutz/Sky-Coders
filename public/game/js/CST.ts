@@ -9,6 +9,14 @@ export default {
     LOAD: "LOAD",
     GAME: "GAME"
   },
+  MAP: {
+    WIDTH: 128,
+    HEIGHT: 128,
+    DEFAULT_CFG: {
+      frequency: 1,
+      exponent: 1
+    }
+  },
   PLUGINS: {
     ISO: {
       FILE_IDENTIFIER: "IsoPlugin",

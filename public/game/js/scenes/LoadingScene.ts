@@ -23,8 +23,8 @@ export default class LoadingScene extends Phaser.Scene {
 
     this.load.setPrefix("GROUND_TILES.");
     this.load.setPath("image/");
-    this.load.image("floor", "floor.png");
-    this.load.image("wall", "cube.png");
+    this.load.image("floor", "grass01.png");
+    this.load.image("wall", "isocube_tile.png");
   }
 
   onLoaderProgress(progress) {

@@ -1,23 +1,47 @@
 import IsoPlugin, { IsoSprite } from "../IsoPlugin/IsoPlugin";
 
-interface IsoInjectedScene extends Phaser.Scene {
-  iso?: IsoPlugin;
+// default debugger class
+class Debugger {
+  protected scene: Phaser.Scene;
+  protected graphics: Phaser.GameObjects.Graphics;
+  protected isDebugging: boolean;
+
+  protected readonly LINE_WIDTH = 2;
+  protected readonly STROKE_ALPHA = 1;
+  protected readonly FILL_ALPHA = 0.4;
+
+  constructor(scene: Phaser.Scene) {
+    this.scene = scene;
+    this.graphics = this.scene.add.graphics().setDepth(Infinity);
+  }
+
+  enableDebugging(): this {
+    this.isDebugging = true;
+    return this;
+  }
+
+  disableDebugging(): this {
+    this.isDebugging = false;
+
+    return this;
+  }
 }
 
-export class IsoDebugger {
+export class IsoDebugger extends Debugger {
   coordsText: Phaser.GameObjects.Text;
-  // the scene being debugged
-  scene: IsoInjectedScene;
   iso: IsoPlugin;
-  graphics: Phaser.GameObjects.Graphics;
 
   constructor(scene: Phaser.Scene, isoInjection: IsoPlugin) {
-    this.scene = scene;
+    super(scene);
     this.iso = isoInjection;
   }
 
   // show 3D coords of the pointer (unprojected from the screen space), and iso coords
   debugCoords(): this {
+    if (!this.isDebugging) {
+      return this;
+    }
+
     this.coordsText = this.scene.add.text(0, 0, "");
 
     this.scene.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
@@ -44,6 +68,10 @@ export class IsoDebugger {
     color: number = 0xccff66,
     filled: boolean = true
   ): this {
+    if (!this.isDebugging) {
+      return this;
+    }
+
     this.graphics && this.graphics.clear();
     sprites.forEach(sprite => this.debugIsoSprite(sprite, color, filled));
 
@@ -55,24 +83,12 @@ export class IsoDebugger {
     color: number = 0xccff66,
     filled: boolean = true
   ): this {
-    if (!sprite.bounds3D) {
-      return;
+    if (!sprite.bounds3D || !this.isDebugging) {
+      return this;
     }
-    if (!this.graphics) {
-      this.graphics = this.scene.add
-        .graphics({
-          lineStyle: {
-            width: 2,
-            alpha: 1,
-            color
-          },
-          fillStyle: {
-            alpha: 0.4,
-            color
-          }
-        })
-        .setDepth(Infinity);
-    }
+
+    this.graphics.lineStyle(this.LINE_WIDTH, color, this.STROKE_ALPHA);
+    this.graphics.fillStyle(color, this.FILL_ALPHA);
 
     var points = [],
       corners = sprite.bounds3D.getCorners();
@@ -89,7 +105,7 @@ export class IsoDebugger {
       ];
 
       points = points.map(function(p) {
-        var newPos = this.scene.iso.projector.project(p);
+        var newPos = this.iso.projector.project(p);
 
         return newPos;
       }, this);
@@ -104,7 +120,7 @@ export class IsoDebugger {
     } else {
       points = corners.slice(0, corners.length);
       points = points.map(function(p) {
-        return this.scene.iso.projector.project(p);
+        return this.iso.projector.project(p);
       }, this);
 
       this.graphics.moveTo(points[0].x, points[0].y);
@@ -131,5 +147,42 @@ export class IsoDebugger {
     }
 
     return this;
+  }
+}
+
+export class NoiseMapDebugger extends Debugger {
+  private readonly POINT_SIZE = 10;
+  private readonly NOISE_TEXTURE = "_noiseTexture_";
+
+  private noiseMapImage: Phaser.GameObjects.Image;
+
+  constructor(scene: Phaser.Scene) {
+    super(scene);
+
+    // the width and height of the game
+    let { width, height } = this.scene.game.scale.gameSize;
+
+    this.graphics.setVisible(false);
+    this.noiseMapImage = this.scene.add.image(width / 2, height / 2, "");
+  }
+
+  showNoiseMap(noiseMap: number[][]) {
+    for (let y = 0; y < noiseMap.length; y++) {
+      for (let x = 0; x < noiseMap[y].length; x++) {
+        // get hex color representation
+        let colorField = noiseMap[y][x] * 255;
+        let color = (colorField << 16) + (colorField << 8) + colorField;
+
+        this.graphics.fillStyle(color, 1);
+        this.graphics.fillPoint(
+          x * this.POINT_SIZE,
+          y * this.POINT_SIZE,
+          this.POINT_SIZE
+        );
+      }
+    }
+
+    this.graphics.generateTexture(this.NOISE_TEXTURE);
+    this.noiseMapImage.setTexture(this.NOISE_TEXTURE);
   }
 }

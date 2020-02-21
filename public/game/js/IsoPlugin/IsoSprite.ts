@@ -30,6 +30,9 @@ export default class IsoSprite extends Sprite {
   // let ts know this scene has an iso property
   scene: IsoInjectedScene;
 
+  // if the depth is set manually via setDepth, then it shouldn't be automatically computed anymore
+  private depthOverriden: boolean;
+
   body: { [key: string]: any };
 
   /**
@@ -91,6 +94,7 @@ export default class IsoSprite extends Sprite {
     this._bounds3D = this.resetBounds3D();
 
     this.hitPolygon = this.resetHitArea();
+    this.depthOverriden = false;
 
     // when the game resizes, we should reposition all our sprites on the screen
     this.scene.scale.on(
@@ -200,6 +204,23 @@ export default class IsoSprite extends Sprite {
     return super.setOrigin(x, y);
   }
 
+  setDepth(value?: number): this {
+    // if no value is provided, reset the depth
+    if (value === undefined) {
+      return this.resetDepth();
+    }
+
+    this.depthOverriden = true;
+
+    return super.setDepth(value);
+  }
+
+  // call this method to return to automatically computing the depth of this sprite
+  resetDepth(): this {
+    this.depthOverriden = false;
+    return this;
+  }
+
   /**
    * Internal function called by the World update cycle.
    *
@@ -230,8 +251,10 @@ export default class IsoSprite extends Sprite {
     ({ x: this.x, y: this.y } = sceneProjector.project(this._position3D));
 
     // Phaser handles depth sorting automatically
-    this.depth =
-      this._position3D.x + this._position3D.y + this._position3D.z * 1.25;
+    if (!this.depthOverriden) {
+      this.depth =
+        this._position3D.x + this._position3D.y + this._position3D.z * 1.25;
+    }
 
     if (this.snap > 0) {
       this.x = Phaser.Math.Snap.To(this.x, this.snap);
