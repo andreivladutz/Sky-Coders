@@ -31,12 +31,26 @@
 import Projector from "./Projector";
 import IsoSprite from "./IsoSprite";
 
+// What type the isoSprite property will be on an injected scene
+type IsoSpriteBuilder = (
+  x: number,
+  y: number,
+  z: number,
+  texture: string,
+  group?: Phaser.GameObjects.Group,
+  frame?: string | number
+) => IsoSprite;
+
 export { default as IsoPhysics } from "./physics/IsoPhysics";
 export { default as Point3 } from "./Point3";
-export { IsoSprite };
+export { default as Cube } from "./Cube";
+export { IsoSprite, IsoSpriteBuilder };
 export { CLASSIC, ISOMETRIC, MILITARY } from "./Projector";
 
-//  Type consts
+interface IsometricInjectedScene extends Phaser.Scene {
+  // The angle of the isometric projection
+  isometricType?: number;
+}
 
 /**
  * @class IsometricPlugin
@@ -47,11 +61,15 @@ export { CLASSIC, ISOMETRIC, MILITARY } from "./Projector";
  * Also included is an Arcade-based 3D AABB physics engine, which again is closely equivalent in functionality and its API.
  */
 export default class IsoPlugin {
+  scene: IsometricInjectedScene;
+  systems: Phaser.Scenes.Systems;
+  projector: Projector;
+
   /**
    * @constructor
    * @param {Phaser.Scene} scene The current scene instance
    */
-  constructor(scene) {
+  constructor(scene: IsometricInjectedScene) {
     this.scene = scene;
     this.systems = scene.sys;
 
@@ -73,12 +91,13 @@ export default class IsoPlugin {
      * @returns {IsoSprite} the newly created IsoSprite object.
      */
 
+    // @ts-ignore
     Phaser.GameObjects.GameObjectCreator.register("isoSprite", function(
-      x,
-      y,
-      z,
-      key,
-      frame
+      x: number,
+      y: number,
+      z: number,
+      key: string,
+      frame: string | number
     ) {
       return new IsoSprite(this.scene, x, y, z, key, frame);
     });
@@ -95,13 +114,14 @@ export default class IsoPlugin {
      * @param {Phaser.Group} [group] - Optional Group to add the object to. If not specified it will be added to the World group.
      * @returns {IsoSprite} the newly created IsoSprite object.
      */
+    // @ts-ignore
     Phaser.GameObjects.GameObjectFactory.register("isoSprite", function(
-      x,
-      y,
-      z,
-      key,
-      group,
-      frame = 0
+      x: number,
+      y: number,
+      z: number,
+      key: string,
+      group?: Phaser.GameObjects.Group,
+      frame: number | string = 0
     ) {
       const sprite = new IsoSprite(this.scene, x, y, z, key, frame);
 
@@ -118,7 +138,8 @@ export default class IsoPlugin {
 
   boot() {}
 
-  static register(PluginManager) {
+  static register(PluginManager: Phaser.Plugins.PluginManager) {
+    // @ts-ignore
     PluginManager.register("IsoPlugin", IsoPlugin, "isoPlugin");
   }
 }

@@ -1,5 +1,5 @@
-import Point3 from '../Point3';
-import Cube from '../Cube';
+import Point3 from "../Point3";
+import Cube from "../Cube";
 
 const UP = 0;
 const DOWN = 1;
@@ -7,7 +7,7 @@ const FORWARDX = 2;
 const FORWARDY = 3;
 const BACKWARDX = 4;
 const BACKWARDY = 5;
-export const TYPE = 'IsoPhysics';
+export const TYPE = "IsoPhysics";
 
 /**
  * @class Isometric.Body
@@ -128,7 +128,11 @@ export default class Body {
     /**
      * @property {Point3} center - The center coordinate of the physics body.
      */
-    this.center = new Point3(sprite.isoX + this.halfWidthX, sprite.isoY + this.halfWidthY, sprite.isoZ + this.halfHeight);
+    this.center = new Point3(
+      sprite.isoX + this.halfWidthX,
+      sprite.isoY + this.halfWidthY,
+      sprite.isoZ + this.halfHeight
+    );
 
     /**
      * @property {Point3} velocity - The velocity in pixels per second sq. of the Body.
@@ -404,14 +408,19 @@ export default class Body {
      * @property {Array.<Point3>} _corners - The 8 corners of the bounding cube.
      * @private
      */
-    this._corners = [new Point3(this.x, this.y, this.z),
+    this._corners = [
+      new Point3(this.x, this.y, this.z),
       new Point3(this.x, this.y, this.z + this.height),
       new Point3(this.x, this.y + this.widthY, this.z),
       new Point3(this.x, this.y + this.widthY, this.z + this.height),
       new Point3(this.x + this.widthX, this.y, this.z),
       new Point3(this.x + this.widthX, this.y, this.z + this.height),
       new Point3(this.x + this.widthX, this.y + this.widthY, this.z),
-      new Point3(this.x + this.widthX, this.y + this.widthY, this.z + this.height)
+      new Point3(
+        this.x + this.widthX,
+        this.y + this.widthY,
+        this.z + this.height
+      )
     ];
   }
 
@@ -428,13 +437,17 @@ export default class Body {
     if (asx !== this._sx || asy !== this._sy) {
       this.widthX = Math.ceil(this.sprite.width * 0.5);
       this.widthY = Math.ceil(this.sprite.width * 0.5);
-      this.height = Math.ceil(this.sprite.height - (this.sprite.width * 0.5));
+      this.height = Math.ceil(this.sprite.height - this.sprite.width * 0.5);
       this.halfWidthX = Math.floor(this.widthX * 0.5);
       this.halfWidthY = Math.floor(this.widthY * 0.5);
       this.halfHeight = Math.floor(this.height * 0.5);
       this._sx = asx;
       this._sy = asy;
-      this.center.setTo(this.position.x + this.halfWidthX, this.position.y + this.halfWidthY, this.position.z + this.halfHeight);
+      this.center.setTo(
+        this.position.x + this.halfWidthX,
+        this.position.y + this.halfWidthY,
+        this.position.z + this.halfHeight
+      );
 
       this._reset = true;
     }
@@ -447,7 +460,9 @@ export default class Body {
    * @protected
    */
   update(time, delta) {
-    if (!this.enable) { return; }
+    if (!this.enable) {
+      return;
+    }
 
     this.phase = 1;
 
@@ -480,10 +495,19 @@ export default class Body {
     this.updateBounds();
 
     //  Working out how to incorporate anchors into this was... fun.
-    this.position.x = this.sprite.isoX + ((this.widthX * -this.sprite.originX) + this.widthX * 0.5) + this.offset.x;
-    this.position.y = this.sprite.isoY + ((this.widthY * this.sprite.originX) - this.widthY * 0.5) + this.offset.y;
-    this.position.z = this.sprite.isoZ - (Math.abs(this.sprite.height) * (1 - this.sprite.originY)) + (Math.abs(this.sprite.width * 0.5)) + this.offset.z;
-
+    this.position.x =
+      this.sprite.isoX +
+      (this.widthX * -this.sprite.originX + this.widthX * 0.5) +
+      this.offset.x;
+    this.position.y =
+      this.sprite.isoY +
+      (this.widthY * this.sprite.originX - this.widthY * 0.5) +
+      this.offset.y;
+    this.position.z =
+      this.sprite.isoZ -
+      Math.abs(this.sprite.height) * (1 - this.sprite.originY) +
+      Math.abs(this.sprite.width * 0.5) +
+      this.offset.z;
 
     this.rotation = this.sprite.angle;
 
@@ -501,14 +525,26 @@ export default class Body {
       delta /= 1000;
       world.updateMotion(this, delta);
 
-      this.newVelocity.set(this.velocity.x * delta, this.velocity.y * delta, this.velocity.z * delta);
+      this.newVelocity.set(
+        this.velocity.x * delta,
+        this.velocity.y * delta,
+        this.velocity.z * delta
+      );
 
       this.position.x += this.newVelocity.x;
       this.position.y += this.newVelocity.y;
       this.position.z += this.newVelocity.z;
 
-      if (this.position.x !== this.prev.x || this.position.y !== this.prev.y || this.position.z !== this.prev.z) {
-        this.speed = Math.sqrt(this.velocity.x * this.velocity.x + this.velocity.y * this.velocity.y + this.velocity.z * this.velocity.z);
+      if (
+        this.position.x !== this.prev.x ||
+        this.position.y !== this.prev.y ||
+        this.position.z !== this.prev.z
+      ) {
+        this.speed = Math.sqrt(
+          this.velocity.x * this.velocity.x +
+            this.velocity.y * this.velocity.y +
+            this.velocity.z * this.velocity.z
+        );
         this.angle = Math.atan2(this.velocity.y, this.velocity.x);
       }
 
@@ -519,7 +555,10 @@ export default class Body {
         this.checkWorldBounds();
       }
 
-      if (this.sprite.outOfBoundsKill && !world.bounds.intersects(this.sprite.isoBounds)){
+      if (
+        this.sprite.outOfBoundsKill &&
+        !world.bounds.intersects(this.sprite.bounds3D)
+      ) {
         this.sprite.kill();
       }
     }
@@ -539,24 +578,32 @@ export default class Body {
    */
   postUpdate() {
     //  Only allow postUpdate to be called once per frame
-    if (!this.enable || this.phase === 2) { return; }
+    if (!this.enable || this.phase === 2) {
+      return;
+    }
 
     this.phase = 2;
 
-    // stops sprites flying off if isoPosition is changed during update
+    // stops sprites flying off if position3D is changed during update
     if (this._reset) {
       this.prev.x = this.position.x;
       this.prev.y = this.position.y;
       this.prev.z = this.position.z;
     }
 
-    if (this.deltaAbsX() >= this.deltaAbsY() && this.deltaAbsX() >= this.deltaAbsZ()){
+    if (
+      this.deltaAbsX() >= this.deltaAbsY() &&
+      this.deltaAbsX() >= this.deltaAbsZ()
+    ) {
       if (this.deltaX() < 0) {
         this.facing = BACKWARDX;
       } else if (this.deltaX() > 0) {
         this.facing = FORWARDX;
       }
-    } else if (this.deltaAbsY() >= this.deltaAbsX() && this.deltaAbsY() >= this.deltaAbsZ()){
+    } else if (
+      this.deltaAbsY() >= this.deltaAbsX() &&
+      this.deltaAbsY() >= this.deltaAbsZ()
+    ) {
       if (this.deltaY() < 0) {
         this.facing = BACKWARDY;
       } else if (this.deltaY() > 0) {
@@ -604,7 +651,11 @@ export default class Body {
       this.sprite.isoZ += this._dz;
     }
 
-    this.center.setTo(this.position.x + this.halfWidthX, this.position.y + this.halfWidthY, this.position.z + this.halfHeight);
+    this.center.setTo(
+      this.position.x + this.halfWidthX,
+      this.position.y + this.halfWidthY,
+      this.position.z + this.halfHeight
+    );
 
     if (this.allowRotation) {
       this.sprite.angle += this.deltaR();
@@ -640,7 +691,10 @@ export default class Body {
       this.position.x = world.bounds.x;
       this.velocity.x *= -this.bounce.x;
       this.blocked.backX = true;
-    } else if (this.frontX > world.bounds.frontX && world.checkCollision.frontX) {
+    } else if (
+      this.frontX > world.bounds.frontX &&
+      world.checkCollision.frontX
+    ) {
       this.position.x = world.bounds.frontX - this.widthX;
       this.velocity.x *= -this.bounce.x;
       this.blocked.frontX = true;
@@ -650,7 +704,10 @@ export default class Body {
       this.position.y = world.bounds.y;
       this.velocity.y *= -this.bounce.y;
       this.blocked.backY = true;
-    } else if (this.frontY > world.bounds.frontY && world.checkCollision.frontY) {
+    } else if (
+      this.frontY > world.bounds.frontY &&
+      world.checkCollision.frontY
+    ) {
       this.position.y = world.bounds.frontY - this.widthY;
       this.velocity.y *= -this.bounce.y;
       this.blocked.frontY = true;
@@ -681,28 +738,32 @@ export default class Body {
    * @param {number} [offsetZ] - The Z offset of the Body from the Sprite position.
    */
   setSize(widthX, widthY, height, offsetX, offsetY, offsetZ) {
-    if (typeof offsetX === 'undefined') {
+    if (typeof offsetX === "undefined") {
       offsetX = this.offset.x;
     }
-    if (typeof offsetY === 'undefined') {
+    if (typeof offsetY === "undefined") {
       offsetY = this.offset.y;
     }
-    if (typeof offsetZ === 'undefined') {
+    if (typeof offsetZ === "undefined") {
       offsetZ = this.offset.z;
     }
 
     this.sourceWidthX = widthX;
     this.sourceWidthY = widthY;
     this.sourceHeight = height;
-    this.widthX = (this.sourceWidthX) * this._sx;
-    this.widthY = (this.sourceWidthY) * this._sx;
-    this.height = (this.sourceHeight) * this._sy;
+    this.widthX = this.sourceWidthX * this._sx;
+    this.widthY = this.sourceWidthY * this._sx;
+    this.height = this.sourceHeight * this._sy;
     this.halfWidthX = Math.floor(this.widthX * 0.5);
     this.halfWidthY = Math.floor(this.widthY * 0.5);
     this.halfHeight = Math.floor(this.height * 0.5);
     this.offset.setTo(offsetX, offsetY, offsetZ);
 
-    this.center.setTo(this.position.x + this.halfWidthX, this.position.y + this.halfWidthY, this.position.z + this.halfHeight);
+    this.center.setTo(
+      this.position.x + this.halfWidthX,
+      this.position.y + this.halfWidthY,
+      this.position.z + this.halfHeight
+    );
   }
 
   /**
@@ -720,9 +781,19 @@ export default class Body {
     this.angularVelocity = 0;
     this.angularAcceleration = 0;
 
-    this.position.x = x + ((this.widthX * -this.sprite.anchor.x) + this.widthX * 0.5) + this.offset.x;
-    this.position.y = y + ((this.widthY * this.sprite.anchor.x) - this.widthY * 0.5) + this.offset.y;
-    this.position.z = z - (Math.abs(this.sprite.height) * (1 - this.sprite.anchor.y)) + (Math.abs(this.sprite.width * 0.5)) + this.offset.z;
+    this.position.x =
+      x +
+      (this.widthX * -this.sprite.anchor.x + this.widthX * 0.5) +
+      this.offset.x;
+    this.position.y =
+      y +
+      (this.widthY * this.sprite.anchor.x - this.widthY * 0.5) +
+      this.offset.y;
+    this.position.z =
+      z -
+      Math.abs(this.sprite.height) * (1 - this.sprite.anchor.y) +
+      Math.abs(this.sprite.width * 0.5) +
+      this.offset.z;
 
     this.prev.x = this.position.x;
     this.prev.y = this.position.y;
@@ -734,9 +805,13 @@ export default class Body {
     this._sx = this.sprite.scaleX;
     this._sy = this.sprite.scaleY;
 
-    this.center.setTo(this.position.x + this.halfWidthX, this.position.y + this.halfWidthY, this.position.z + this.halfHeight);
+    this.center.setTo(
+      this.position.x + this.halfWidthX,
+      this.position.y + this.halfWidthY,
+      this.position.z + this.halfHeight
+    );
 
-    this.sprite._isoPositionChanged = true;
+    this.sprite._position3DChanged = true;
   }
 
   /**
@@ -769,7 +844,12 @@ export default class Body {
    * @return {boolean} True if in contact with world bounds.
    */
   onWall() {
-    return (this.blocked.frontX || this.blocked.frontY || this.blocked.backX || this.blocked.backY);
+    return (
+      this.blocked.frontX ||
+      this.blocked.frontY ||
+      this.blocked.backX ||
+      this.blocked.backY
+    );
   }
 
   /**
@@ -779,7 +859,7 @@ export default class Body {
    * @return {number} The absolute delta value.
    */
   deltaAbsX() {
-    return (this.deltaX() > 0 ? this.deltaX() : -this.deltaX());
+    return this.deltaX() > 0 ? this.deltaX() : -this.deltaX();
   }
 
   /**
@@ -789,7 +869,7 @@ export default class Body {
    * @return {number} The absolute delta value.
    */
   deltaAbsY() {
-    return (this.deltaY() > 0 ? this.deltaY() : -this.deltaY());
+    return this.deltaY() > 0 ? this.deltaY() : -this.deltaY();
   }
 
   /**
@@ -799,7 +879,7 @@ export default class Body {
    * @return {number} The absolute delta value.
    */
   deltaAbsZ() {
-    return (this.deltaZ() > 0 ? this.deltaZ() : -this.deltaZ());
+    return this.deltaZ() > 0 ? this.deltaZ() : -this.deltaZ();
   }
 
   /**
@@ -856,7 +936,11 @@ export default class Body {
     this._corners[4].setTo(this.x + this.widthX, this.y, this.z);
     this._corners[5].setTo(this.x + this.widthX, this.y, this.z + this.height);
     this._corners[6].setTo(this.x + this.widthX, this.y + this.widthY, this.z);
-    this._corners[7].setTo(this.x + this.widthX, this.y + this.widthY, this.z + this.height);
+    this._corners[7].setTo(
+      this.x + this.widthX,
+      this.y + this.widthY,
+      this.z + this.height
+    );
 
     return this._corners;
   }
@@ -949,7 +1033,7 @@ export default class Body {
     this.position.z = value;
   }
 
-  debugRender(context, color = 'rgba(0,255,0,0.4)', filled = true) {
+  debugRender(context, color = "rgba(0,255,0,0.4)", filled = true) {
     var points = [];
     var corners = this.getCorners();
 
@@ -960,7 +1044,15 @@ export default class Body {
     const projector = this.scene[pluginKey].projector;
 
     if (filled) {
-      points = [corners[1], corners[3], corners[2], corners[6], corners[4], corners[5], corners[1]];
+      points = [
+        corners[1],
+        corners[3],
+        corners[2],
+        corners[6],
+        corners[4],
+        corners[5],
+        corners[1]
+      ];
 
       points = points.map(p => {
         var newPos = projector.project(p);

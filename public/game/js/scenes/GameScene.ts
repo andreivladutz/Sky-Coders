@@ -1,35 +1,40 @@
 import CST from "../CST";
-import IsoPlugin, { IsoSprite } from "../IsoPlugin/IsoPlugin";
+import IsoPlugin, {
+  IsoSprite,
+  IsoSpriteBuilder,
+  ISOMETRIC
+} from "../IsoPlugin/IsoPlugin";
 import { IsoDebugger } from "../utils/debug";
+import TerrainGenerator from "../terrain/terrainGenerator";
+import CameraController from "../controllers/cameraController";
 
-const WALL = 1;
-const FLOOR = 0;
+const TILE_WIDTH = 256 - 2,
+  TILE_HEIGHT = 148 - 2;
 
-const groundTiles = [
-  [1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 1],
-  [1, 0, 0, 0, 0, 1],
-  [1, 1, 1, 1, 1, 1]
-];
+let groundTiles: number[][];
 
-const TILE_WIDTH = 103,
-  TILE_HEIGHT = 53;
+interface DynamicIsoSprite extends IsoSprite {
+  [key: string]: any;
+}
 
-// tell ts that the isometric plugin is going to inject the isoSprite property on the GameObjectFactory
+// tell typescript that the isometric plugin is going to inject the isoSprite property on the GameObjectFactory
 interface GameObjectFactoryIso extends Phaser.GameObjects.GameObjectFactory {
-  isoSprite?: IsoSprite;
+  isoSprite?: IsoSpriteBuilder;
 }
 
 export default class GameScene extends Phaser.Scene {
   groundLayerGroup: Phaser.GameObjects.Group;
-
   // these properties will be changed by injecting the isometric plugin
   iso: IsoPlugin;
   add: GameObjectFactoryIso;
+
   // the projection angle
   isometricType: number;
+  isoDebug: IsoDebugger;
+
+  // class helpers
+  terrainGen: TerrainGenerator;
+  cameraControl: CameraController;
 
   constructor() {
     const config = {
@@ -41,13 +46,21 @@ export default class GameScene extends Phaser.Scene {
     };
 
     super(config);
+    // set the isometric projection to true isometric
+    this.isometricType = ISOMETRIC;
 
-    //this.isometricType = ISOMETRIC;
+    this.terrainGen = TerrainGenerator.getInstance({
+      seed: "nice",
+      width: CST.MAP.WIDTH,
+      height: CST.MAP.HEIGHT,
+      frequency: 0.025
+      // pass along for debugging the noise map
+      //debug: true,
+      //scene: this
+    }); //.addMoreNoiseMaps([{ f: 0.01, w: 0.3 }]);
   }
 
   preload() {
-    this.load.image("tile", "./game/assets/image/tile.png");
-
     // load the isometric plugin
     this.load.scenePlugin({
       key: CST.PLUGINS.ISO.FILE_IDENTIFIER,
@@ -69,84 +82,100 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.cameraControl = new CameraController(this.cameras.main, this, {
+      enablePan: true,
+      enableZoom: true
+    });
+    //this.cameras.main.setBounds(-Infinity, -Infinity, Infinity, Infinity);
+
+    // this.cameras.main.setZoom(0.3);
+
     this.groundLayerGroup = this.add.group();
-    this.iso.projector.origin.setTo(0.5, 0.3);
+    this.iso.projector.origin.setTo(0.5, 0.2);
 
-    new IsoDebugger(this, this.iso).debugCoords();
+    groundTiles = this.terrainGen.generateIslandTerrain([0, 1, 1]);
 
-    this.cameras.main.scrollX += 10;
+    //this.terrainGen.getPrimaryIsle(groundTiles);
 
-    //this.generateGroundLayer();
-    this.spawnTiles();
+    this.isoDebug = new IsoDebugger(this, this.iso)
+      //.enableDebugging()
+      .debugCoords();
+
+    // this.cameras.main.scrollX += 100;
+
+    this.generateGroundLayer();
   }
 
-  spawnTiles() {
-    let index = 1;
-    for (var xx = 0; xx < 256; xx += 40) {
-      for (var yy = 0; yy < 256; yy += 40) {
-        let tile = this.add
-          .isoSprite(xx, yy, 0, "tile", this.groundLayerGroup)
-          .setOrigin(0.5, 0);
-
-        this.add
-          .text(tile.x, tile.y, String(index++))
-          .setDepth(Infinity)
-          .setColor("red");
-
-        this.input.on("pointermove", pointer => {
-          let isoPointerLocation = new Phaser.Geom.Point(pointer.x, pointer.y);
-          let pointerLocation3D = this.iso.projector.unproject(
-            isoPointerLocation
-          );
-
-          this.groundLayerGroup.getChildren().forEach((tile: IsoSprite) => {
-            let onTile = tile.isoBounds.containsXY(
-              pointerLocation3D.x,
-              pointerLocation3D.y
-            );
-
-            if (onTile) {
-              if (!tile.tinted) {
-                tile.setTint(0x86bfda);
-                tile.isoZ += 5;
-
-                tile.tinted = true;
-              }
-            } else if (tile.tinted) {
-              tile.clearTint();
-              tile.isoZ -= 5;
-
-              tile.tinted = false;
-            }
-          });
-        });
-      }
-    }
+  update() {
+    this.isoDebug.debugIsoSprites(
+      this.groundLayerGroup.getChildren() as Array<IsoSprite>,
+      0xeb4034,
+      false
+    );
   }
 
   generateGroundLayer() {
     for (let i = 0; i < groundTiles.length; i++) {
       for (let j = 0; j < groundTiles[i].length; j++) {
-        switch (groundTiles[i][j]) {
-          case FLOOR:
-            // @ts-ignore
-            this.add.isoSprite(
-              (j * TILE_WIDTH) / 2,
-              i * TILE_HEIGHT,
-              -25,
-              "GROUND_TILES.floor"
-            );
-
-            break;
-          case WALL:
-            // @ts-ignore
-            this.add.isoSprite(
-              (j * TILE_WIDTH) / 2,
-              i * TILE_HEIGHT,
-              0,
-              "GROUND_TILES.wall"
-            );
+        let tile: DynamicIsoSprite;
+        if (groundTiles[i][j] !== 1) {
+          continue;
         }
+        // @ts-ignore
+        tile = groundTiles[i][j] = this.add
+          .isoSprite(
+            j * TILE_HEIGHT,
+            i * TILE_HEIGHT,
+            -145,
+            "GROUND_TILES.floor",
+            this.groundLayerGroup
+          )
+          .setScale(0.5, 0.5);
+
+        tile.setOrigin(0.5, 0);
+
+        tile.setInteractive().on("pointerover", () => {
+          if (!tile.tinted) {
+            tile.setTint(0x86bfda);
+            //tile.isoZ += 5;
+
+            tile.tinted = true;
+          }
+        });
+        tile.setInteractive().on("pointerout", () => {
+          if (tile.tinted) {
+            tile.clearTint();
+            //tile.isoZ -= 5;
+
+            tile.tinted = false;
+          }
+        });
+
+        // this.input.on("pointermove", pointer => {
+        //   this.groundLayerGroup
+        //     .getChildren()
+        //     .forEach((tile: DynamicIsoSprite) => {
+        //       let onTile = tile.containsScreenPoint(pointer);
+
+        //       if (onTile) {
+        //         if (!tile.tinted) {
+        //           tile.setTint(0x86bfda);
+        //           tile.isoZ += 5;
+
+        //           tile.tinted = true;
+        //           tile._depthBefore = tile.depth;
+        //           tile.setDepth(Infinity);
+        //         }
+        //       } else if (tile.tinted) {
+        //         tile.clearTint();
+        //         tile.isoZ -= 5;
+
+        //         tile.tinted = false;
+
+        //         tile.setDepth();
+        //       }
+        //     });
+        // });
       }
     }
   }
