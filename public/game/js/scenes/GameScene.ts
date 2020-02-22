@@ -6,6 +6,7 @@ import IsoPlugin, {
 } from "../IsoPlugin/IsoPlugin";
 import { IsoDebugger } from "../utils/debug";
 import TerrainGenerator from "../terrain/terrainGenerator";
+import CameraController from "../controllers/cameraController";
 
 const TILE_WIDTH = 256 - 2,
   TILE_HEIGHT = 148 - 2;
@@ -26,11 +27,14 @@ export default class GameScene extends Phaser.Scene {
   // these properties will be changed by injecting the isometric plugin
   iso: IsoPlugin;
   add: GameObjectFactoryIso;
+
   // the projection angle
   isometricType: number;
   isoDebug: IsoDebugger;
 
+  // class helpers
   terrainGen: TerrainGenerator;
+  cameraControl: CameraController;
 
   constructor() {
     const config = {
@@ -78,22 +82,13 @@ export default class GameScene extends Phaser.Scene {
   }
 
   create() {
+    this.cameraControl = new CameraController(this.cameras.main, this, {
+      enablePan: true,
+      enableZoom: true
+    });
     //this.cameras.main.setBounds(-Infinity, -Infinity, Infinity, Infinity);
 
-    let { width, height } = this.game.scale.gameSize;
-    let window = this.add
-      .zone(width / 2, height / 2, width, height)
-      .setVisible(false)
-      .setOrigin(0.5);
-    this.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
-      if (!pointer.isDown) {
-        return;
-      }
-      window.x -= ((pointer.x - pointer.downX) / width) * 150;
-      window.y -= ((pointer.y - pointer.downY) / height) * 150;
-    });
-    this.cameras.main.setZoom(0.3);
-    this.cameras.main.startFollow(window, true, 0.8, 0.8);
+    // this.cameras.main.setZoom(0.3);
 
     this.groundLayerGroup = this.add.group();
     this.iso.projector.origin.setTo(0.5, 0.2);

@@ -16,6 +16,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "phaser": "^3.21.0",
+    "phaser3-rex-plugins": "^1.1.8",
     "simplex-noise": "^2.4.0"
   },
   "devDependencies": {
