@@ -25,11 +25,6 @@ export default {
       SCENE_KEY: "iso"
     }
   },
-  ASSETS: {
-    AUDIO: "audio",
-    IMAGE: "image",
-    SPRITE: "sprite"
-  },
   // camera controller params
   CAMERA: {
     MAX_ZOOM: 3,

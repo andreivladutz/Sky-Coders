@@ -70,7 +70,7 @@ export default class CameraController {
 
     this.camera.startFollow(
       window,
-      true,
+      false,
       CST.CAMERA.PAN_LERP,
       CST.CAMERA.PAN_LERP
     );

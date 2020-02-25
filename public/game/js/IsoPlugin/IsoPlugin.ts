@@ -46,6 +46,7 @@ export { default as Point3 } from "./Point3";
 export { default as Cube } from "./Cube";
 export { IsoSprite, IsoSpriteBuilder };
 export { CLASSIC, ISOMETRIC, MILITARY } from "./Projector";
+export { default as IsoScene } from "./IsoScene";
 
 interface IsometricInjectedScene extends Phaser.Scene {
   // The angle of the isometric projection

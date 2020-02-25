@@ -1,4 +1,5 @@
 import CONSTANTS from "../CST";
+import ActorsController from "../controllers/ActorsController";
 
 export default class LoadingScene extends Phaser.Scene {
   graphics: Phaser.GameObjects.Graphics;
@@ -21,13 +22,15 @@ export default class LoadingScene extends Phaser.Scene {
   preload() {
     this.load.setBaseURL("./game/assets/");
 
+    // load the resources for the actors
+    ActorsController.getInstance().loadResources(this.load);
+
     this.load.setPrefix("GROUND_TILES.");
     this.load.setPath("image/");
     this.load.image("floor", "grass01.png");
-    this.load.image("wall", "isocube_tile.png");
   }
 
-  onLoaderProgress(progress) {
+  onLoaderProgress(progress: number) {
     const MARGIN_OFFSET = 20,
       BAR_HEIGHT = 40,
       LINE_WIDTH = 2;
