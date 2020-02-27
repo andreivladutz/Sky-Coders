@@ -19,6 +19,9 @@ export default class CameraController {
   // utility for camera zooming
   pinch: Pinch;
 
+  // are we taking a break from emitting the move event?
+  debouncingMoveEvent: boolean = false;
+
   constructor(
     camera: Camera,
     scene: Phaser.Scene,
@@ -54,8 +57,26 @@ export default class CameraController {
     this.pan.on(
       "pan",
       (pan: Pan) => {
-        window.x -= pan.dx;
-        window.y -= pan.dy;
+        // using the inverse of the zoom so when the camera is zoomed out
+        // the player can pan the camera faster
+        window.x -= (pan.dx * 1) / this.camera.zoom;
+        window.y -= (pan.dy * 1) / this.camera.zoom;
+
+        if (this.debouncingMoveEvent) {
+          return;
+        }
+
+        this.debouncingMoveEvent = true;
+        this.camera.emit(CST.CAMERA.MOVE_EVENT);
+
+        // after debounce time, deactivate the debounce so we can emit the move event again
+        setTimeout(
+          self => {
+            self.debouncingMoveEvent = false;
+          },
+          CST.CAMERA.MOVE_EVENT_DEBOUNCE,
+          this
+        );
       },
       this
     );
@@ -84,16 +105,29 @@ export default class CameraController {
       enable: true
     });
 
-    this.pinch.on(
-      "pinch",
-      (pinch: Pinch) => {
-        this.camera.zoom *= pinch.scaleFactor;
+    // made a function so code doesn't get dupplicated
+    let zoomCamera = (zoomFactor: number) => {
+      let oldZoom = this.camera.zoom;
+      this.camera.setZoom(this.camera.zoom * zoomFactor);
 
-        this.camera.zoom = Phaser.Math.Clamp(
+      // don't let the zoom exceed this values
+      this.camera.setZoom(
+        Phaser.Math.Clamp(
           this.camera.zoom,
           CST.CAMERA.MIN_ZOOM,
           CST.CAMERA.MAX_ZOOM
-        );
+        )
+      );
+
+      // emit the camera zoom event with the actual zoom factor the camera scaled
+      let actualZoomFactor = this.camera.zoom / oldZoom;
+      this.camera.emit(CST.CAMERA.ZOOM_EVENT, actualZoomFactor);
+    };
+
+    this.pinch.on(
+      "pinch",
+      (pinch: Pinch) => {
+        zoomCamera(pinch.scaleFactor);
       },
       this
     );
@@ -102,18 +136,12 @@ export default class CameraController {
     this.scene.input.on("wheel", (pointer, currentlyOver, dx, dy) => {
       // scrolling down
       if (dy > 0) {
-        this.camera.zoom *= CST.CAMERA.ZOOM_FACTOR;
+        zoomCamera(CST.CAMERA.ZOOM_FACTOR);
       }
       // scrolling up
       if (dy < 0) {
-        this.camera.zoom *= 1 / CST.CAMERA.ZOOM_FACTOR;
+        zoomCamera(1 / CST.CAMERA.ZOOM_FACTOR);
       }
-
-      this.camera.zoom = Phaser.Math.Clamp(
-        this.camera.zoom,
-        CST.CAMERA.MIN_ZOOM,
-        CST.CAMERA.MAX_ZOOM
-      );
     });
     return this;
   }

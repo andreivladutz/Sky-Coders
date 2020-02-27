@@ -4,6 +4,8 @@ import CONSTANTS from "./CST";
 
 import LoadingScene from "./scenes/LoadingScene";
 import GameScene from "./scenes/GameScene";
+// enable await loader
+import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js";
 
 // set the canvas to be fullscreen, centered and set the parent to the container div
 const scaleConfig: Phaser.Types.Core.ScaleConfig = {
@@ -35,6 +37,15 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   // },
   physics: {
     default: "arcade"
+  },
+  plugins: {
+    global: [
+      {
+        key: "rexAwaitLoader",
+        plugin: AwaitLoaderPlugin,
+        start: true
+      }
+    ]
   }
 };
 
