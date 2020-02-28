@@ -1,8 +1,10 @@
-import { Board, QuadGrid } from "phaser3-rex-plugins/plugins/board-components";
-import IsoPlugin, { IsoSprite, IsoScene, Point3 } from "../IsoPlugin/IsoPlugin";
+import { IsoSprite, IsoScene, Point3 } from "../IsoPlugin/IsoPlugin";
 import IsoBoard, { TileXY } from "./IsoBoard";
+import IsoTile from "./IsoTile";
 
 import { IsoDebugger } from "../utils/debug";
+
+import List, { Node } from "../utils/List";
 
 import CST from "../CST";
 import Phaser from "phaser";
@@ -44,10 +46,14 @@ export default class TileMap {
 
   // the map data of tile indices
   mapMatrix: number[][];
-  // the real tiles i.e. real isoSprites
-  tilesMatrix: DynamicIsoSprite[][] = [];
+  // for each (y, x) tilesInPlace[y][x] represents if the tile at (x, y) coords
+  // is already in place, otherwise a tile should be instanced and placed at those coords
+  tilesInPlace: boolean[][] = [];
 
-  tileLayerGroup: Phaser.GameObjects.Group;
+  // tile pools
+  unusedPool: List;
+  usedPool: List;
+
   // always remember the last tinted tile so we can clear its tint when we leave the tile
   lastTintedTile: DynamicIsoSprite;
 
@@ -62,6 +68,8 @@ export default class TileMap {
 
     this.tileWidth = config.tileWidth;
     this.tileHeight = config.tileHeight;
+    this.mapWidth = config.mapWidth;
+    this.mapHeight = config.mapHeight;
 
     this.isoBoard = IsoBoard.getInstance({
       scene: this.scene,
@@ -70,7 +78,8 @@ export default class TileMap {
       tileWidth: config.tileWidth,
       tileHeight: config.tileHeight,
       mapWidth: config.mapWidth,
-      mapHeight: config.mapHeight
+      mapHeight: config.mapHeight,
+      mapMatrix: config.mapMatrix
     }).showGrid();
 
     this.isoDebug = new IsoDebugger(
@@ -80,13 +89,17 @@ export default class TileMap {
 
     // the map data with tile indices
     this.mapMatrix = config.mapMatrix;
-    // the phaser group of tile spritesheet
-    this.tileLayerGroup = this.scene.add.group();
-    this.initTilesMatrix();
+
+    // init the pools of used and unused tiles
+    this.usedPool = new List();
+    this.unusedPool = new List();
+
+    // no tile is in place at first
+    this.initTilesInPlace();
 
     // check every update cycle if the viewport moved
     // if so, redraw all tiles
-    this.scene.events.on("update", () => {
+    this.scene.events.on("preupdate", () => {
       if (this.isoBoard.viewRectangleDirty) {
         this.redrawTiles();
       }
@@ -97,25 +110,34 @@ export default class TileMap {
   }
 
   setBoardInteractive() {
-    this.isoBoard.board
-      .setInteractive()
-      .on("tilemove", (pointer, tileXY: TileXY) => {
-        let x = tileXY.x,
-          y = tileXY.y;
+    this.isoBoard.board.setInteractive();
+    //   .on("tilemove", (pointer, tileXY: TileXY) => {
+    //     let x = tileXY.x,
+    //       y = tileXY.y;
+    //     if (this.lastTintedTile && this.lastTintedTile.tinted) {
+    //       this.lastTintedTile.clearTint();
+    //       this.lastTintedTile.tinted = false;
+    //     }
+    //     if (this.tilesMatrix[y][x] && !this.tilesMatrix[y][x].tinted) {
+    //       this.tilesMatrix[y][x].setTint(0x86bfda);
+    //       this.tilesMatrix[y][x].tinted = true;
+    //       this.lastTintedTile = this.tilesMatrix[y][x];
+    //     }
+    //   });
 
-        if (this.lastTintedTile && this.lastTintedTile.tinted) {
-          this.lastTintedTile.clearTint();
+    // when the game resizes, we should reposition all the tiles
+    this.scene.scale.on(
+      "resize",
+      () => {
+        this.initTilesInPlace();
 
-          this.lastTintedTile.tinted = false;
+        let usedTile: Node;
+        while ((usedTile = this.usedPool.pop())) {
+          this.unusedPool.push(usedTile);
         }
-
-        if (this.tilesMatrix[y][x] && !this.tilesMatrix[y][x].tinted) {
-          this.tilesMatrix[y][x].setTint(0x86bfda);
-
-          this.tilesMatrix[y][x].tinted = true;
-          this.lastTintedTile = this.tilesMatrix[y][x];
-        }
-      });
+      },
+      this
+    );
   }
 
   /**
@@ -127,65 +149,86 @@ export default class TileMap {
     // only redraw the visible tiles
     let visibleTiles = this.isoBoard.getTilesInView();
 
-    // the already defined tiles
-    let tilePool = this.tileLayerGroup.getChildren(),
-      // we need the index of the last tile reused, so we hide and deactivate the rest of the unused tiles
-      lastIndex = 0;
+    // check each tile in the usedPool if it is still visible
+    this.usedPool.each((tileNode: Node) => {
+      let tile = tileNode.value;
 
-    visibleTiles.forEach(({ x, y }, index: number) => {
+      // this tile isn't in view anymore
+      if (!tile.inView(this.isoBoard)) {
+        // push the tile in the unused pool
+        this.usedPool.remove(tileNode);
+        this.unusedPool.push(tile);
+
+        tile.setVisible(false);
+
+        this.tilesInPlace[tile.tileY][tile.tileX] = false;
+      }
+    });
+
+    visibleTiles.forEach(({ x, y }) => {
       // there is no tile to be drawn
       if (!this.mapMatrix[y] || this.mapMatrix[y][x] === 0) {
         return;
       }
+      // also if this tile is already in place, don't reposition it
+      if (this.tilesInPlace[y][x]) {
+        return;
+      }
 
-      // get this nth tile from the tile pool
-      let tile: DynamicIsoSprite = tilePool[index] as DynamicIsoSprite;
+      // get this last tile from the unused pool
+      let tile = this.unusedPool.pop();
 
       // if no tile is found, create a new one
       if (!tile) {
-        tile = this.scene.add
-          .isoSprite(
-            x * this.tileHeight,
-            y * this.tileHeight,
-            0,
-            "GROUND_TILES.floor",
-            this.tileLayerGroup
-          )
-          .setOrigin(0.5, 0.5);
+        tile = new IsoTile(
+          this.scene,
+          x * this.tileHeight,
+          y * this.tileHeight,
+          x,
+          y,
+          "GROUND_TILES.floor"
+        ).setOrigin(0.5, 0.5);
+
+        this.scene.add.existing(tile);
       }
-      // tile already exists, reuse this one
+      // an unused tile already exists, reuse this one
       else {
-        tile.isoX = x * this.tileHeight;
-        tile.isoY = y * this.tileHeight;
+        tile
+          .set3DPosition(x * this.tileHeight, y * this.tileHeight, 0)
+          .setTilePosition(x, y)
+          .setVisible(true);
+
+        //// HERE SHOULD BE CHECKED IF THE TEXTURE IS THE CORRECT ONE. OTHERWISE CHANGE IT!!!
       }
 
-      this.tilesMatrix[y][x] = tile.setVisible(true).setActive(true);
-      lastIndex = index;
+      // push this tile in the pool of used tiles and mark it as being in place
+      this.usedPool.push(tile);
+      this.tilesInPlace[y][x] = true;
     });
-
-    // deactivate and hide the rest of the tiles
-    for (let i = lastIndex + 1; i < tilePool.length; i++) {
-      (tilePool[i] as DynamicIsoSprite).setActive(false).setVisible(false);
-    }
 
     // redrew tiles, this viewRectangle is not dirty anymore
     this.isoBoard.viewRectangleDirty = false;
     return this;
   }
 
-  // make the tiles matrix as "tall" as the mapMatrix
-  private initTilesMatrix() {
+  // no tile is in place at first, so init a matrix of false values
+  private initTilesInPlace() {
     for (let i = 0; i < this.mapMatrix.length; i++) {
-      this.tilesMatrix[i] = [];
+      // init this row if it is undefined
+      this.tilesInPlace[i] || (this.tilesInPlace[i] = []);
+
+      for (let j = 0; j < this.mapMatrix[i].length; j++) {
+        this.tilesInPlace[i][j] = false;
+      }
     }
   }
 
   drawTilesDebug(): this {
-    this.isoDebug.debugIsoSprites(
-      this.tileLayerGroup.getChildren() as Array<IsoSprite>,
-      0xeb4034,
-      false
-    );
+    // this.isoDebug.debugIsoSprites(
+    //   this.tileLayerGroup.getChildren() as Array<IsoSprite>,
+    //   0xeb4034,
+    //   false
+    // );
 
     return this;
   }

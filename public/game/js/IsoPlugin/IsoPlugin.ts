@@ -44,7 +44,7 @@ type IsoSpriteBuilder = (
 export { default as IsoPhysics } from "./physics/IsoPhysics";
 export { default as Point3 } from "./Point3";
 export { default as Cube } from "./Cube";
-export { IsoSprite, IsoSpriteBuilder };
+export { IsoSprite, IsoSpriteBuilder, Projector };
 export { CLASSIC, ISOMETRIC, MILITARY } from "./Projector";
 export { default as IsoScene } from "./IsoScene";
 

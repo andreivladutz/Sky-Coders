@@ -2,6 +2,7 @@ import { Board, QuadGrid } from "phaser3-rex-plugins/plugins/board-components";
 import { IsoScene } from "./IsoPlugin";
 
 import CST from "../CST";
+import KDBush from "kdbush";
 
 const QUAD_GRID = "quadGrid",
   ISO_GRID_TYPE = "isometric";
@@ -19,9 +20,12 @@ interface IsoBoardConfig {
   tileHeight: number;
   mapWidth: number;
   mapHeight: number;
+  // the map matrix is needed for initing the RTree
+  // and drawing the grid
+  mapMatrix: number[][];
 }
 
-let DEBUG_GRAPHICS: Phaser.GameObjects.Graphics;
+// let DEBUG_GRAPHICS: Phaser.GameObjects.Graphics;
 
 /*
  * Singleton class that handles tile and grid logic
@@ -35,6 +39,17 @@ export default class IsoBoard {
   private gridBufferTexture: Phaser.GameObjects.RenderTexture;
   // the rectangles that contains the tiles currently in view
   private viewRectangle: Phaser.Geom.Rectangle;
+  // a KD-tree which hold the mid points of all the tiles,
+  // this way we can easily get the viewable tiles for drawing
+  tilesIndex: KDBush;
+  // array of tiles with their corresponding midPoints
+  tilesWithMidPoints: Array<{
+    x: number;
+    y: number;
+    tileX: number;
+    tileY: number;
+  }>;
+
   // if the view rectangle changed we should redraw the tiles on the screen
   public viewRectangleDirty: boolean = true;
 
@@ -119,13 +134,13 @@ export default class IsoBoard {
     // when the real camera moves, the grid should move with it
     this.camera = config.scene.cameras.main;
 
-    DEBUG_GRAPHICS = this.board.scene.add.graphics({
-      lineStyle: {
-        width: 10,
-        color: 0xff0000,
-        alpha: 1
-      }
-    });
+    // DEBUG_GRAPHICS = this.board.scene.add.graphics({
+    //   lineStyle: {
+    //     width: 10,
+    //     color: 0xff0000,
+    //     alpha: 1
+    //   }
+    // });
     this.updateViewRectangle();
 
     this.camera
@@ -142,7 +157,8 @@ export default class IsoBoard {
       this.updateViewRectangle();
     });
 
-    this.drawGrid();
+    this.drawGrid(config.mapMatrix);
+    this.initKDBush(config.mapMatrix);
   }
 
   private updateViewRectangle() {
@@ -151,6 +167,8 @@ export default class IsoBoard {
       padX = CST.CAMERA.VIEWRECT_TILE_PAD * this.mapSize.tileW,
       padY = CST.CAMERA.VIEWRECT_TILE_PAD * this.mapSize.tileH;
 
+    let oldRect = this.viewRectangle;
+
     this.viewRectangle = new Phaser.Geom.Rectangle(
       view.x - padX,
       view.y - padY,
@@ -158,22 +176,37 @@ export default class IsoBoard {
       view.height + padY * 2
     );
 
-    DEBUG_GRAPHICS.clear().strokeRect(
-      this.viewRectangle.x,
-      this.viewRectangle.y,
-      this.viewRectangle.width,
-      this.viewRectangle.height
-    );
+    if (
+      !oldRect ||
+      oldRect.x !== this.viewRectangle.x ||
+      oldRect.y !== this.viewRectangle.y ||
+      oldRect.width !== this.viewRectangle.width ||
+      oldRect.height !== this.viewRectangle.height
+    ) {
+      this.viewRectangleDirty = true;
+    }
+
+    // DEBUG_GRAPHICS.clear().strokeRect(
+    //   this.viewRectangle.x,
+    //   this.viewRectangle.y,
+    //   this.viewRectangle.width,
+    //   this.viewRectangle.height
+    // );
   }
 
   // draw the grid once on the gridBufferTexture
-  private drawGrid() {
+  private drawGrid(mapMatrix: number[][]) {
     this.graphics.clear();
 
     let scale = Math.min(this.ZOOM_FACTOR.x, this.ZOOM_FACTOR.y);
 
     // draw the board so it fills the whole grid buffer texture
     this.board.forEachTileXY((tileXY: TileXY) => {
+      // if there's no tile here no point in drawing grid stroke
+      if (!mapMatrix[tileXY.y] || !mapMatrix[tileXY.y][tileXY.x]) {
+        return;
+      }
+
       // get the corners of this tile
       let tilePoints = this.board
         .getGridPoints(tileXY.x, tileXY.y, true)
@@ -212,23 +245,67 @@ export default class IsoBoard {
     return this;
   }
 
-  // returns an array of (x, y) pairs that are the tile coordinates of the viewable tiles
-  public getTilesInView(): TileXY[] {
-    let inView = [];
+  public initKDBush(mapMatrix: number[][]) {
+    this.tilesWithMidPoints = [];
 
+    const BOTTOM = 1,
+      RIGHT = 0;
+
+    // take the mid point of each tile
     this.board.forEachTileXY((tileXY: TileXY) => {
-      // get the corners of this tile
+      // if there's no tile here no point in drawing grid stroke
+      if (!mapMatrix[tileXY.y] || !mapMatrix[tileXY.y][tileXY.x]) {
+        return;
+      }
+
+      // get the midPoint of this tile
       let tilePoints = this.board.getGridPoints(tileXY.x, tileXY.y, true);
 
-      let midX = tilePoints[1].x,
-        midY = tilePoints[0].y;
+      let midX = tilePoints[BOTTOM].x,
+        midY = tilePoints[RIGHT].y;
 
-      if (this.viewRectangle.contains(midX, midY)) {
-        inView.push({ x: tileXY.x, y: tileXY.y });
-      }
+      this.tilesWithMidPoints.push({
+        x: midX,
+        y: midY,
+        tileX: tileXY.x,
+        tileY: tileXY.y
+      });
     });
 
-    return inView;
+    this.tilesIndex = new KDBush(
+      this.tilesWithMidPoints,
+      p => p.x,
+      p => p.y
+    );
+  }
+
+  public isTileInView(tileXY: TileXY): boolean {
+    // get the corners of this tile
+    let tilePoints = this.board.getGridPoints(tileXY.x, tileXY.y, true);
+
+    let midX = tilePoints[1].x,
+      midY = tilePoints[0].y;
+    return this.viewRectangle.contains(midX, midY);
+  }
+
+  // returns an array of (x, y) pairs that are the tile coordinates of the viewable tiles
+  public getTilesInView(): TileXY[] {
+    // let inView = [];
+
+    // search in the KDBush what midPoints are within the view area
+    const rect = this.viewRectangle,
+      results = this.tilesIndex
+        .range(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height)
+        .map((id: number) => this.tilesWithMidPoints[id])
+        .map(({ tileX, tileY }) => ({ x: tileX, y: tileY }));
+
+    // this.board.forEachTileXY((tileXY: TileXY) => {
+    //   if (this.isTileInView(tileXY)) {
+    //     inView.push({ x: tileXY.x, y: tileXY.y });
+    //   }
+    // });
+
+    return results;
   }
 
   public static getInstance(config?: IsoBoardConfig) {

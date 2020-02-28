@@ -19,9 +19,6 @@ export default class CameraController {
   // utility for camera zooming
   pinch: Pinch;
 
-  // are we taking a break from emitting the move event?
-  debouncingMoveEvent: boolean = false;
-
   constructor(
     camera: Camera,
     scene: Phaser.Scene,
@@ -62,21 +59,7 @@ export default class CameraController {
         window.x -= (pan.dx * 1) / this.camera.zoom;
         window.y -= (pan.dy * 1) / this.camera.zoom;
 
-        if (this.debouncingMoveEvent) {
-          return;
-        }
-
-        this.debouncingMoveEvent = true;
         this.camera.emit(CST.CAMERA.MOVE_EVENT);
-
-        // after debounce time, deactivate the debounce so we can emit the move event again
-        setTimeout(
-          self => {
-            self.debouncingMoveEvent = false;
-          },
-          CST.CAMERA.MOVE_EVENT_DEBOUNCE,
-          this
-        );
       },
       this
     );

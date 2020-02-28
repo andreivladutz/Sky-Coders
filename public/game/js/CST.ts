@@ -36,10 +36,8 @@ export default {
     ZOOM_FACTOR: 0.8,
     MOVE_EVENT: "camera.moved",
     ZOOM_EVENT: "camera.zoomed",
-    // time in milliseconds to debounce. not emitting the move event for this time
-    MOVE_EVENT_DEBOUNCE: 50,
     // how many tiles around the view area to add when computing which tiles are visible
-    VIEWRECT_TILE_PAD: 50
+    VIEWRECT_TILE_PAD: 10
   },
   // options for the board grid
   GRID: {
@@ -51,5 +49,9 @@ export default {
       // how much the grid buffer will be scaled in proportion to the real game size
       SCALE: 15
     }
+  },
+  TILEMAP: {
+    OFFSCR_BUFF_KEY: "tileMapOffscreenCanvas",
+    OFFSCR_BUFF_ID: "offscren-buffer"
   }
 };
