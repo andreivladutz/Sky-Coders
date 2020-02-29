@@ -1,0 +1,5740 @@
+{
+	"textures": [
+		{
+			"image": "mallack-hd-0.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1936,
+				"h": 1728
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/east/mallack10024",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 140,
+						"w": 464,
+						"h": 580
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 464,
+						"h": 580
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10023",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 148,
+						"w": 472,
+						"h": 576
+					},
+					"frame": {
+						"x": 0,
+						"y": 580,
+						"w": 472,
+						"h": 576
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10025",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 140,
+						"w": 456,
+						"h": 576
+					},
+					"frame": {
+						"x": 464,
+						"y": 0,
+						"w": 456,
+						"h": 576
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10020",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 160,
+						"w": 504,
+						"h": 572
+					},
+					"frame": {
+						"x": 0,
+						"y": 1156,
+						"w": 504,
+						"h": 572
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10014",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 64,
+						"y": 144,
+						"w": 492,
+						"h": 568
+					},
+					"frame": {
+						"x": 472,
+						"y": 576,
+						"w": 492,
+						"h": 568
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10021",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 160,
+						"w": 492,
+						"h": 568
+					},
+					"frame": {
+						"x": 920,
+						"y": 0,
+						"w": 492,
+						"h": 568
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00013",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 140,
+						"w": 524,
+						"h": 560
+					},
+					"frame": {
+						"x": 1412,
+						"y": 0,
+						"w": 524,
+						"h": 560
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00029",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 140,
+						"w": 524,
+						"h": 556
+					},
+					"frame": {
+						"x": 1412,
+						"y": 560,
+						"w": 524,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 448,
+						"h": 500
+					},
+					"frame": {
+						"x": 964,
+						"y": 568,
+						"w": 448,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 24,
+						"y": 48,
+						"w": 444,
+						"h": 556
+					},
+					"frame": {
+						"x": 964,
+						"y": 1068,
+						"w": 444,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10026",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 140,
+						"w": 460,
+						"h": 568
+					},
+					"frame": {
+						"x": 504,
+						"y": 1144,
+						"w": 460,
+						"h": 568
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 144,
+						"w": 524,
+						"h": 552
+					},
+					"frame": {
+						"x": 1408,
+						"y": 1116,
+						"w": 524,
+						"h": 552
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-1.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2048,
+				"h": 1696
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/se/mallack00012",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 140,
+						"w": 524,
+						"h": 552
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 524,
+						"h": 552
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00014",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 144,
+						"w": 524,
+						"h": 552
+					},
+					"frame": {
+						"x": 0,
+						"y": 552,
+						"w": 524,
+						"h": 552
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00015",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 148,
+						"w": 524,
+						"h": 552
+					},
+					"frame": {
+						"x": 0,
+						"y": 1104,
+						"w": 524,
+						"h": 552
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00020",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 164,
+						"w": 524,
+						"h": 552
+					},
+					"frame": {
+						"x": 524,
+						"y": 0,
+						"w": 524,
+						"h": 552
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00028",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 140,
+						"w": 524,
+						"h": 552
+					},
+					"frame": {
+						"x": 1048,
+						"y": 0,
+						"w": 524,
+						"h": 552
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10012",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 144,
+						"w": 472,
+						"h": 568
+					},
+					"frame": {
+						"x": 1572,
+						"y": 0,
+						"w": 472,
+						"h": 568
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10019",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 160,
+						"w": 504,
+						"h": 564
+					},
+					"frame": {
+						"x": 524,
+						"y": 552,
+						"w": 504,
+						"h": 564
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10016",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 152,
+						"w": 504,
+						"h": 560
+					},
+					"frame": {
+						"x": 1028,
+						"y": 552,
+						"w": 504,
+						"h": 560
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10018",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 156,
+						"w": 504,
+						"h": 560
+					},
+					"frame": {
+						"x": 1532,
+						"y": 568,
+						"w": 504,
+						"h": 560
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10015",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 148,
+						"w": 496,
+						"h": 564
+					},
+					"frame": {
+						"x": 1028,
+						"y": 1112,
+						"w": 496,
+						"h": 564
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10013",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 64,
+						"y": 144,
+						"w": 484,
+						"h": 568
+					},
+					"frame": {
+						"x": 524,
+						"y": 1116,
+						"w": 484,
+						"h": 568
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10022",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 156,
+						"w": 480,
+						"h": 568
+					},
+					"frame": {
+						"x": 1524,
+						"y": 1128,
+						"w": 480,
+						"h": 568
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-2.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2008,
+				"h": 1680
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/east/mallack10027",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 140,
+						"w": 480,
+						"h": 560
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 480,
+						"h": 560
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 144,
+						"w": 468,
+						"h": 560
+					},
+					"frame": {
+						"x": 0,
+						"y": 560,
+						"w": 468,
+						"h": 560
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 32,
+						"w": 428,
+						"h": 560
+					},
+					"frame": {
+						"x": 0,
+						"y": 1120,
+						"w": 428,
+						"h": 560
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 520,
+						"h": 556
+					},
+					"frame": {
+						"x": 428,
+						"y": 1120,
+						"w": 520,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00030",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 144,
+						"w": 520,
+						"h": 556
+					},
+					"frame": {
+						"x": 468,
+						"y": 560,
+						"w": 520,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10017",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 156,
+						"w": 504,
+						"h": 556
+					},
+					"frame": {
+						"x": 480,
+						"y": 0,
+						"w": 504,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10028",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 140,
+						"w": 500,
+						"h": 556
+					},
+					"frame": {
+						"x": 984,
+						"y": 0,
+						"w": 500,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 160,
+						"w": 524,
+						"h": 548
+					},
+					"frame": {
+						"x": 1484,
+						"y": 0,
+						"w": 524,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 140,
+						"w": 524,
+						"h": 548
+					},
+					"frame": {
+						"x": 1484,
+						"y": 548,
+						"w": 524,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 144,
+						"w": 496,
+						"h": 532
+					},
+					"frame": {
+						"x": 988,
+						"y": 556,
+						"w": 496,
+						"h": 532
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30032",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 164,
+						"w": 496,
+						"h": 528
+					},
+					"frame": {
+						"x": 988,
+						"y": 1088,
+						"w": 496,
+						"h": 528
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00019",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 164,
+						"w": 524,
+						"h": 548
+					},
+					"frame": {
+						"x": 1484,
+						"y": 1096,
+						"w": 524,
+						"h": 548
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-3.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1928,
+				"h": 1664
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/se/mallack00031",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 152,
+						"w": 524,
+						"h": 548
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 524,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 48,
+						"w": 456,
+						"h": 556
+					},
+					"frame": {
+						"x": 524,
+						"y": 0,
+						"w": 456,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 24,
+						"y": 44,
+						"w": 440,
+						"h": 556
+					},
+					"frame": {
+						"x": 0,
+						"y": 548,
+						"w": 440,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00032",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 156,
+						"w": 524,
+						"h": 548
+					},
+					"frame": {
+						"x": 440,
+						"y": 556,
+						"w": 524,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 40,
+						"w": 432,
+						"h": 556
+					},
+					"frame": {
+						"x": 964,
+						"y": 556,
+						"w": 432,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10030",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 140,
+						"w": 524,
+						"h": 544
+					},
+					"frame": {
+						"x": 0,
+						"y": 1104,
+						"w": 524,
+						"h": 544
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 28,
+						"w": 428,
+						"h": 556
+					},
+					"frame": {
+						"x": 524,
+						"y": 1104,
+						"w": 428,
+						"h": 556
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 520,
+						"h": 552
+					},
+					"frame": {
+						"x": 980,
+						"y": 0,
+						"w": 520,
+						"h": 552
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 520,
+						"h": 552
+					},
+					"frame": {
+						"x": 952,
+						"y": 1112,
+						"w": 520,
+						"h": 552
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 144,
+						"w": 476,
+						"h": 552
+					},
+					"frame": {
+						"x": 1396,
+						"y": 552,
+						"w": 476,
+						"h": 552
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70029",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 32,
+						"w": 428,
+						"h": 552
+					},
+					"frame": {
+						"x": 1500,
+						"y": 0,
+						"w": 428,
+						"h": 552
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 28,
+						"w": 424,
+						"h": 552
+					},
+					"frame": {
+						"x": 1472,
+						"y": 1104,
+						"w": 424,
+						"h": 552
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-4.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2048,
+				"h": 2048
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/se/mallack00006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 160,
+						"w": 520,
+						"h": 548
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 520,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 152,
+						"w": 520,
+						"h": 548
+					},
+					"frame": {
+						"x": 0,
+						"y": 548,
+						"w": 520,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00024",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 144,
+						"w": 520,
+						"h": 548
+					},
+					"frame": {
+						"x": 0,
+						"y": 1096,
+						"w": 520,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00021",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 164,
+						"w": 524,
+						"h": 544
+					},
+					"frame": {
+						"x": 520,
+						"y": 0,
+						"w": 524,
+						"h": 544
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00022",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 160,
+						"w": 524,
+						"h": 544
+					},
+					"frame": {
+						"x": 1044,
+						"y": 0,
+						"w": 524,
+						"h": 544
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30026",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 160,
+						"w": 480,
+						"h": 520
+					},
+					"frame": {
+						"x": 1568,
+						"y": 0,
+						"w": 480,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 168,
+						"w": 480,
+						"h": 516
+					},
+					"frame": {
+						"x": 1568,
+						"y": 520,
+						"w": 480,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00025",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 140,
+						"w": 520,
+						"h": 548
+					},
+					"frame": {
+						"x": 520,
+						"y": 1036,
+						"w": 520,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40029",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 168,
+						"w": 524,
+						"h": 492
+					},
+					"frame": {
+						"x": 520,
+						"y": 544,
+						"w": 524,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00023",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 152,
+						"w": 524,
+						"h": 544
+					},
+					"frame": {
+						"x": 1044,
+						"y": 544,
+						"w": 524,
+						"h": 544
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40025",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 168,
+						"w": 524,
+						"h": 464
+					},
+					"frame": {
+						"x": 520,
+						"y": 1584,
+						"w": 524,
+						"h": 464
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40014",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 168,
+						"w": 524,
+						"h": 496
+					},
+					"frame": {
+						"x": 1040,
+						"y": 1088,
+						"w": 524,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 168,
+						"w": 520,
+						"h": 464
+					},
+					"frame": {
+						"x": 1044,
+						"y": 1584,
+						"w": 520,
+						"h": 464
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 44,
+						"w": 476,
+						"h": 540
+					},
+					"frame": {
+						"x": 1568,
+						"y": 1036,
+						"w": 476,
+						"h": 540
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50026",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 56,
+						"w": 432,
+						"h": 472
+					},
+					"frame": {
+						"x": 1564,
+						"y": 1576,
+						"w": 432,
+						"h": 472
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-5.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1984,
+				"h": 1640
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/east/mallack10029",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 140,
+						"w": 516,
+						"h": 548
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 516,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 160,
+						"w": 520,
+						"h": 544
+					},
+					"frame": {
+						"x": 516,
+						"y": 0,
+						"w": 520,
+						"h": 544
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00033",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 160,
+						"w": 520,
+						"h": 544
+					},
+					"frame": {
+						"x": 1036,
+						"y": 0,
+						"w": 520,
+						"h": 544
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70028",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 32,
+						"w": 428,
+						"h": 548
+					},
+					"frame": {
+						"x": 1556,
+						"y": 0,
+						"w": 428,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 140,
+						"w": 524,
+						"h": 540
+					},
+					"frame": {
+						"x": 0,
+						"y": 548,
+						"w": 524,
+						"h": 540
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00016",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 156,
+						"w": 524,
+						"h": 540
+					},
+					"frame": {
+						"x": 0,
+						"y": 1088,
+						"w": 524,
+						"h": 540
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00017",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 160,
+						"w": 524,
+						"h": 540
+					},
+					"frame": {
+						"x": 524,
+						"y": 544,
+						"w": 524,
+						"h": 540
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 144,
+						"w": 488,
+						"h": 544
+					},
+					"frame": {
+						"x": 524,
+						"y": 1084,
+						"w": 488,
+						"h": 544
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 48,
+						"w": 464,
+						"h": 548
+					},
+					"frame": {
+						"x": 1048,
+						"y": 544,
+						"w": 464,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70030",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 36,
+						"w": 440,
+						"h": 548
+					},
+					"frame": {
+						"x": 1012,
+						"y": 1092,
+						"w": 440,
+						"h": 548
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70031",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 24,
+						"y": 40,
+						"w": 456,
+						"h": 544
+					},
+					"frame": {
+						"x": 1512,
+						"y": 548,
+						"w": 456,
+						"h": 544
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70027",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 32,
+						"w": 424,
+						"h": 544
+					},
+					"frame": {
+						"x": 1452,
+						"y": 1092,
+						"w": 424,
+						"h": 544
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-6.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1992,
+				"h": 2048
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/south/mallack70011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 28,
+						"w": 420,
+						"h": 544
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 420,
+						"h": 544
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00018",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 164,
+						"w": 524,
+						"h": 540
+					},
+					"frame": {
+						"x": 0,
+						"y": 544,
+						"w": 524,
+						"h": 540
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00027",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 140,
+						"w": 520,
+						"h": 540
+					},
+					"frame": {
+						"x": 420,
+						"y": 0,
+						"w": 520,
+						"h": 540
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70033",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 44,
+						"w": 476,
+						"h": 540
+					},
+					"frame": {
+						"x": 0,
+						"y": 1084,
+						"w": 476,
+						"h": 540
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 48,
+						"w": 472,
+						"h": 540
+					},
+					"frame": {
+						"x": 476,
+						"y": 1084,
+						"w": 472,
+						"h": 540
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70032",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 44,
+						"w": 468,
+						"h": 540
+					},
+					"frame": {
+						"x": 524,
+						"y": 540,
+						"w": 468,
+						"h": 540
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 140,
+						"w": 524,
+						"h": 536
+					},
+					"frame": {
+						"x": 940,
+						"y": 0,
+						"w": 524,
+						"h": 536
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40016",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 160,
+						"w": 524,
+						"h": 504
+					},
+					"frame": {
+						"x": 1464,
+						"y": 0,
+						"w": 524,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 164,
+						"w": 524,
+						"h": 500
+					},
+					"frame": {
+						"x": 1464,
+						"y": 504,
+						"w": 524,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30030",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 64,
+						"y": 160,
+						"w": 472,
+						"h": 536
+					},
+					"frame": {
+						"x": 992,
+						"y": 536,
+						"w": 472,
+						"h": 536
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 164,
+						"w": 524,
+						"h": 500
+					},
+					"frame": {
+						"x": 1464,
+						"y": 1004,
+						"w": 524,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 160,
+						"w": 516,
+						"h": 516
+					},
+					"frame": {
+						"x": 948,
+						"y": 1080,
+						"w": 516,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50029",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 56,
+						"w": 424,
+						"h": 452
+					},
+					"frame": {
+						"x": 948,
+						"y": 1596,
+						"w": 424,
+						"h": 452
+					}
+				},
+				{
+					"filename": "Mallack/se/mallack00026",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 140,
+						"w": 520,
+						"h": 536
+					},
+					"frame": {
+						"x": 1464,
+						"y": 1504,
+						"w": 520,
+						"h": 536
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-7.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1968,
+				"h": 2048
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/north/mallack30031",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 160,
+						"w": 488,
+						"h": 536
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 488,
+						"h": 536
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70026",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 32,
+						"w": 424,
+						"h": 536
+					},
+					"frame": {
+						"x": 0,
+						"y": 536,
+						"w": 424,
+						"h": 536
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70012",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 28,
+						"w": 420,
+						"h": 536
+					},
+					"frame": {
+						"x": 0,
+						"y": 1072,
+						"w": 420,
+						"h": 536
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10031",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 148,
+						"w": 520,
+						"h": 532
+					},
+					"frame": {
+						"x": 420,
+						"y": 1072,
+						"w": 520,
+						"h": 532
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30029",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 64,
+						"y": 160,
+						"w": 456,
+						"h": 532
+					},
+					"frame": {
+						"x": 424,
+						"y": 536,
+						"w": 456,
+						"h": 532
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70013",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 28,
+						"w": 416,
+						"h": 532
+					},
+					"frame": {
+						"x": 488,
+						"y": 0,
+						"w": 416,
+						"h": 532
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 164,
+						"w": 504,
+						"h": 528
+					},
+					"frame": {
+						"x": 880,
+						"y": 532,
+						"w": 504,
+						"h": 528
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 164,
+						"w": 504,
+						"h": 528
+					},
+					"frame": {
+						"x": 904,
+						"y": 0,
+						"w": 504,
+						"h": 528
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40031",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 524,
+						"h": 500
+					},
+					"frame": {
+						"x": 1408,
+						"y": 0,
+						"w": 524,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40033",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 164,
+						"w": 524,
+						"h": 500
+					},
+					"frame": {
+						"x": 1408,
+						"y": 500,
+						"w": 524,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40019",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 164,
+						"w": 524,
+						"h": 496
+					},
+					"frame": {
+						"x": 1384,
+						"y": 1000,
+						"w": 524,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50014",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 52,
+						"w": 444,
+						"h": 516
+					},
+					"frame": {
+						"x": 940,
+						"y": 1060,
+						"w": 444,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40024",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 168,
+						"w": 524,
+						"h": 472
+					},
+					"frame": {
+						"x": 940,
+						"y": 1576,
+						"w": 524,
+						"h": 472
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30033",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 164,
+						"w": 504,
+						"h": 528
+					},
+					"frame": {
+						"x": 1464,
+						"y": 1496,
+						"w": 504,
+						"h": 528
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-8.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2048,
+				"h": 2048
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/north/mallack30028",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 160,
+						"w": 460,
+						"h": 528
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 460,
+						"h": 528
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 164,
+						"w": 500,
+						"h": 524
+					},
+					"frame": {
+						"x": 0,
+						"y": 528,
+						"w": 500,
+						"h": 524
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30027",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 160,
+						"w": 472,
+						"h": 524
+					},
+					"frame": {
+						"x": 460,
+						"y": 0,
+						"w": 472,
+						"h": 524
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70014",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 32,
+						"w": 420,
+						"h": 524
+					},
+					"frame": {
+						"x": 0,
+						"y": 1052,
+						"w": 420,
+						"h": 524
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40026",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 168,
+						"w": 524,
+						"h": 472
+					},
+					"frame": {
+						"x": 0,
+						"y": 1576,
+						"w": 524,
+						"h": 472
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70025",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 32,
+						"w": 420,
+						"h": 524
+					},
+					"frame": {
+						"x": 420,
+						"y": 1052,
+						"w": 420,
+						"h": 524
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 168,
+						"w": 520,
+						"h": 472
+					},
+					"frame": {
+						"x": 524,
+						"y": 1576,
+						"w": 520,
+						"h": 472
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10032",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 92,
+						"y": 156,
+						"w": 520,
+						"h": 520
+					},
+					"frame": {
+						"x": 500,
+						"y": 524,
+						"w": 520,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 92,
+						"y": 160,
+						"w": 508,
+						"h": 520
+					},
+					"frame": {
+						"x": 932,
+						"y": 0,
+						"w": 508,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 152,
+						"w": 500,
+						"h": 520
+					},
+					"frame": {
+						"x": 840,
+						"y": 1044,
+						"w": 500,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40023",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 168,
+						"w": 524,
+						"h": 484
+					},
+					"frame": {
+						"x": 1044,
+						"y": 1564,
+						"w": 524,
+						"h": 484
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70015",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 24,
+						"y": 36,
+						"w": 424,
+						"h": 520
+					},
+					"frame": {
+						"x": 1020,
+						"y": 520,
+						"w": 424,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20029",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 44,
+						"w": 380,
+						"h": 520
+					},
+					"frame": {
+						"x": 1440,
+						"y": 0,
+						"w": 380,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20028",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 44,
+						"w": 356,
+						"h": 520
+					},
+					"frame": {
+						"x": 1340,
+						"y": 1040,
+						"w": 356,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50024",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 56,
+						"w": 444,
+						"h": 488
+					},
+					"frame": {
+						"x": 1568,
+						"y": 1560,
+						"w": 444,
+						"h": 488
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20024",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 44,
+						"w": 348,
+						"h": 520
+					},
+					"frame": {
+						"x": 1444,
+						"y": 520,
+						"w": 348,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60032",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 44,
+						"w": 352,
+						"h": 512
+					},
+					"frame": {
+						"x": 1696,
+						"y": 1040,
+						"w": 352,
+						"h": 512
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-9.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2048,
+				"h": 2008
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/nw/mallack40015",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 520,
+						"h": 504
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 520,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40017",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 164,
+						"w": 520,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 504,
+						"w": 520,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40018",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 164,
+						"w": 520,
+						"h": 500
+					},
+					"frame": {
+						"x": 520,
+						"y": 0,
+						"w": 520,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40032",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 164,
+						"w": 520,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 1004,
+						"w": 520,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 164,
+						"w": 520,
+						"h": 496
+					},
+					"frame": {
+						"x": 520,
+						"y": 500,
+						"w": 520,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40013",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 168,
+						"w": 520,
+						"h": 496
+					},
+					"frame": {
+						"x": 1040,
+						"y": 0,
+						"w": 520,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 168,
+						"w": 488,
+						"h": 516
+					},
+					"frame": {
+						"x": 1560,
+						"y": 0,
+						"w": 488,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40030",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 168,
+						"w": 520,
+						"h": 496
+					},
+					"frame": {
+						"x": 1040,
+						"y": 496,
+						"w": 520,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30025",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 160,
+						"w": 488,
+						"h": 516
+					},
+					"frame": {
+						"x": 1560,
+						"y": 516,
+						"w": 488,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40020",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 168,
+						"w": 520,
+						"h": 492
+					},
+					"frame": {
+						"x": 0,
+						"y": 1504,
+						"w": 520,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40028",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 168,
+						"w": 524,
+						"h": 488
+					},
+					"frame": {
+						"x": 520,
+						"y": 996,
+						"w": 524,
+						"h": 488
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 168,
+						"w": 520,
+						"h": 488
+					},
+					"frame": {
+						"x": 520,
+						"y": 1484,
+						"w": 520,
+						"h": 488
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50017",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 52,
+						"w": 476,
+						"h": 512
+					},
+					"frame": {
+						"x": 1044,
+						"y": 992,
+						"w": 476,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40027",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 168,
+						"w": 524,
+						"h": 480
+					},
+					"frame": {
+						"x": 1520,
+						"y": 1032,
+						"w": 524,
+						"h": 480
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50018",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 56,
+						"w": 476,
+						"h": 504
+					},
+					"frame": {
+						"x": 1040,
+						"y": 1504,
+						"w": 476,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 168,
+						"w": 520,
+						"h": 488
+					},
+					"frame": {
+						"x": 1516,
+						"y": 1512,
+						"w": 520,
+						"h": 488
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-10.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2040,
+				"h": 2032
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/north/mallack30011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 476,
+						"h": 484
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 476,
+						"h": 484
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40012",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 168,
+						"w": 520,
+						"h": 488
+					},
+					"frame": {
+						"x": 476,
+						"y": 0,
+						"w": 520,
+						"h": 488
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40021",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 168,
+						"w": 520,
+						"h": 488
+					},
+					"frame": {
+						"x": 996,
+						"y": 0,
+						"w": 520,
+						"h": 488
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40022",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 168,
+						"w": 520,
+						"h": 488
+					},
+					"frame": {
+						"x": 1516,
+						"y": 0,
+						"w": 520,
+						"h": 488
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 56,
+						"w": 392,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 484,
+						"w": 392,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50019",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 56,
+						"w": 476,
+						"h": 504
+					},
+					"frame": {
+						"x": 392,
+						"y": 488,
+						"w": 476,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30023",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 496,
+						"h": 504
+					},
+					"frame": {
+						"x": 868,
+						"y": 488,
+						"w": 496,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 52,
+						"w": 436,
+						"h": 504
+					},
+					"frame": {
+						"x": 1364,
+						"y": 488,
+						"w": 436,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 56,
+						"w": 408,
+						"h": 504
+					},
+					"frame": {
+						"x": 0,
+						"y": 992,
+						"w": 408,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 160,
+						"w": 516,
+						"h": 516
+					},
+					"frame": {
+						"x": 408,
+						"y": 992,
+						"w": 516,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10033",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 160,
+						"w": 516,
+						"h": 516
+					},
+					"frame": {
+						"x": 924,
+						"y": 992,
+						"w": 516,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20025",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 44,
+						"w": 332,
+						"h": 520
+					},
+					"frame": {
+						"x": 1440,
+						"y": 992,
+						"w": 332,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 44,
+						"w": 268,
+						"h": 520
+					},
+					"frame": {
+						"x": 1772,
+						"y": 992,
+						"w": 268,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20027",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 44,
+						"w": 324,
+						"h": 520
+					},
+					"frame": {
+						"x": 0,
+						"y": 1496,
+						"w": 324,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20026",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 44,
+						"w": 320,
+						"h": 520
+					},
+					"frame": {
+						"x": 324,
+						"y": 1508,
+						"w": 320,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60013",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 44,
+						"w": 296,
+						"h": 520
+					},
+					"frame": {
+						"x": 644,
+						"y": 1508,
+						"w": 296,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60012",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 44,
+						"w": 272,
+						"h": 520
+					},
+					"frame": {
+						"x": 940,
+						"y": 1508,
+						"w": 272,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 44,
+						"w": 268,
+						"h": 520
+					},
+					"frame": {
+						"x": 1212,
+						"y": 1512,
+						"w": 268,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 44,
+						"w": 264,
+						"h": 520
+					},
+					"frame": {
+						"x": 1480,
+						"y": 1512,
+						"w": 264,
+						"h": 520
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 44,
+						"w": 264,
+						"h": 520
+					},
+					"frame": {
+						"x": 1744,
+						"y": 1512,
+						"w": 264,
+						"h": 520
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-11.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2048,
+				"h": 2048
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/north/mallack30015",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 160,
+						"w": 520,
+						"h": 484
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 520,
+						"h": 484
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 168,
+						"w": 520,
+						"h": 480
+					},
+					"frame": {
+						"x": 520,
+						"y": 0,
+						"w": 520,
+						"h": 480
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 168,
+						"w": 520,
+						"h": 480
+					},
+					"frame": {
+						"x": 1040,
+						"y": 0,
+						"w": 520,
+						"h": 480
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 168,
+						"w": 472,
+						"h": 516
+					},
+					"frame": {
+						"x": 1560,
+						"y": 0,
+						"w": 472,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 168,
+						"w": 520,
+						"h": 472
+					},
+					"frame": {
+						"x": 520,
+						"y": 480,
+						"w": 520,
+						"h": 472
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 92,
+						"y": 160,
+						"w": 516,
+						"h": 512
+					},
+					"frame": {
+						"x": 0,
+						"y": 484,
+						"w": 516,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30016",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 92,
+						"y": 160,
+						"w": 516,
+						"h": 488
+					},
+					"frame": {
+						"x": 1040,
+						"y": 480,
+						"w": 516,
+						"h": 488
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30024",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 160,
+						"w": 492,
+						"h": 512
+					},
+					"frame": {
+						"x": 1556,
+						"y": 516,
+						"w": 492,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/nw/mallack40006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 168,
+						"w": 516,
+						"h": 484
+					},
+					"frame": {
+						"x": 516,
+						"y": 952,
+						"w": 516,
+						"h": 484
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30017",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 160,
+						"w": 512,
+						"h": 492
+					},
+					"frame": {
+						"x": 0,
+						"y": 996,
+						"w": 512,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30018",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 160,
+						"w": 512,
+						"h": 492
+					},
+					"frame": {
+						"x": 1032,
+						"y": 968,
+						"w": 512,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 160,
+						"w": 504,
+						"h": 516
+					},
+					"frame": {
+						"x": 1544,
+						"y": 1028,
+						"w": 504,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 52,
+						"w": 352,
+						"h": 504
+					},
+					"frame": {
+						"x": 0,
+						"y": 1544,
+						"w": 352,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60018",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 56,
+						"y": 56,
+						"w": 344,
+						"h": 504
+					},
+					"frame": {
+						"x": 352,
+						"y": 1544,
+						"w": 344,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 56,
+						"y": 48,
+						"w": 336,
+						"h": 512
+					},
+					"frame": {
+						"x": 696,
+						"y": 1436,
+						"w": 336,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30014",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 164,
+						"w": 512,
+						"h": 476
+					},
+					"frame": {
+						"x": 1032,
+						"y": 1460,
+						"w": 512,
+						"h": 476
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30019",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 164,
+						"w": 504,
+						"h": 492
+					},
+					"frame": {
+						"x": 1544,
+						"y": 1544,
+						"w": 504,
+						"h": 492
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-12.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2040,
+				"h": 2048
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/north/mallack30022",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 164,
+						"w": 492,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 492,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50020",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 16,
+						"y": 56,
+						"w": 472,
+						"h": 500
+					},
+					"frame": {
+						"x": 492,
+						"y": 0,
+						"w": 472,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50021",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 56,
+						"w": 468,
+						"h": 500
+					},
+					"frame": {
+						"x": 964,
+						"y": 0,
+						"w": 468,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 56,
+						"w": 372,
+						"h": 500
+					},
+					"frame": {
+						"x": 1432,
+						"y": 0,
+						"w": 372,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20013",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 48,
+						"w": 376,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 500,
+						"w": 376,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20021",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 52,
+						"w": 372,
+						"h": 508
+					},
+					"frame": {
+						"x": 376,
+						"y": 500,
+						"w": 372,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/east/mallack10006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 160,
+						"w": 500,
+						"h": 512
+					},
+					"frame": {
+						"x": 748,
+						"y": 500,
+						"w": 500,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50016",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 12,
+						"y": 52,
+						"w": 472,
+						"h": 512
+					},
+					"frame": {
+						"x": 1248,
+						"y": 500,
+						"w": 472,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60014",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 60,
+						"y": 44,
+						"w": 320,
+						"h": 516
+					},
+					"frame": {
+						"x": 1720,
+						"y": 500,
+						"w": 320,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20023",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 48,
+						"w": 356,
+						"h": 516
+					},
+					"frame": {
+						"x": 0,
+						"y": 1000,
+						"w": 356,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20020",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 48,
+						"w": 384,
+						"h": 512
+					},
+					"frame": {
+						"x": 356,
+						"y": 1008,
+						"w": 384,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50013",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 52,
+						"w": 436,
+						"h": 512
+					},
+					"frame": {
+						"x": 740,
+						"y": 1012,
+						"w": 436,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70024",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 36,
+						"w": 416,
+						"h": 512
+					},
+					"frame": {
+						"x": 1176,
+						"y": 1012,
+						"w": 416,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20031",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 48,
+						"w": 408,
+						"h": 512
+					},
+					"frame": {
+						"x": 1592,
+						"y": 1016,
+						"w": 408,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 48,
+						"w": 276,
+						"h": 516
+					},
+					"frame": {
+						"x": 0,
+						"y": 1516,
+						"w": 276,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 464,
+						"h": 516
+					},
+					"frame": {
+						"x": 276,
+						"y": 1520,
+						"w": 464,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50015",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 52,
+						"w": 460,
+						"h": 516
+					},
+					"frame": {
+						"x": 740,
+						"y": 1524,
+						"w": 460,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20018",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 44,
+						"w": 404,
+						"h": 516
+					},
+					"frame": {
+						"x": 1200,
+						"y": 1528,
+						"w": 404,
+						"h": 516
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20030",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 44,
+						"w": 396,
+						"h": 516
+					},
+					"frame": {
+						"x": 1604,
+						"y": 1528,
+						"w": 396,
+						"h": 516
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-13.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1944,
+				"h": 2048
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/north/mallack30013",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 84,
+						"y": 164,
+						"w": 508,
+						"h": 472
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 508,
+						"h": 472
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50022",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 24,
+						"y": 56,
+						"w": 460,
+						"h": 500
+					},
+					"frame": {
+						"x": 508,
+						"y": 0,
+						"w": 460,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 72,
+						"y": 52,
+						"w": 312,
+						"h": 508
+					},
+					"frame": {
+						"x": 968,
+						"y": 0,
+						"w": 312,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60017",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 52,
+						"y": 52,
+						"w": 348,
+						"h": 508
+					},
+					"frame": {
+						"x": 1280,
+						"y": 0,
+						"w": 348,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 52,
+						"w": 296,
+						"h": 512
+					},
+					"frame": {
+						"x": 1628,
+						"y": 0,
+						"w": 296,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 456,
+						"h": 508
+					},
+					"frame": {
+						"x": 0,
+						"y": 472,
+						"w": 456,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50012",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 52,
+						"w": 436,
+						"h": 508
+					},
+					"frame": {
+						"x": 456,
+						"y": 500,
+						"w": 436,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70016",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 24,
+						"y": 44,
+						"w": 424,
+						"h": 508
+					},
+					"frame": {
+						"x": 892,
+						"y": 508,
+						"w": 424,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 92,
+						"y": 52,
+						"w": 288,
+						"h": 512
+					},
+					"frame": {
+						"x": 1316,
+						"y": 508,
+						"w": 288,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60015",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 52,
+						"y": 48,
+						"w": 332,
+						"h": 512
+					},
+					"frame": {
+						"x": 1604,
+						"y": 512,
+						"w": 332,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 52,
+						"w": 412,
+						"h": 508
+					},
+					"frame": {
+						"x": 0,
+						"y": 980,
+						"w": 412,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20032",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 52,
+						"w": 412,
+						"h": 508
+					},
+					"frame": {
+						"x": 412,
+						"y": 1008,
+						"w": 412,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20033",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 52,
+						"w": 412,
+						"h": 508
+					},
+					"frame": {
+						"x": 824,
+						"y": 1016,
+						"w": 412,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20022",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 52,
+						"w": 360,
+						"h": 512
+					},
+					"frame": {
+						"x": 1236,
+						"y": 1020,
+						"w": 360,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 44,
+						"w": 348,
+						"h": 512
+					},
+					"frame": {
+						"x": 1596,
+						"y": 1024,
+						"w": 348,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20016",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 44,
+						"w": 404,
+						"h": 512
+					},
+					"frame": {
+						"x": 0,
+						"y": 1488,
+						"w": 404,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20017",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 44,
+						"w": 404,
+						"h": 512
+					},
+					"frame": {
+						"x": 404,
+						"y": 1516,
+						"w": 404,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20019",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 48,
+						"w": 396,
+						"h": 512
+					},
+					"frame": {
+						"x": 808,
+						"y": 1524,
+						"w": 396,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 44,
+						"w": 356,
+						"h": 512
+					},
+					"frame": {
+						"x": 1204,
+						"y": 1532,
+						"w": 356,
+						"h": 512
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60033",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 44,
+						"w": 356,
+						"h": 512
+					},
+					"frame": {
+						"x": 1560,
+						"y": 1536,
+						"w": 356,
+						"h": 512
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-14.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1976,
+				"h": 2032
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/north/mallack30010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 76,
+						"y": 164,
+						"w": 456,
+						"h": 492
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 456,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50023",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 56,
+						"w": 452,
+						"h": 496
+					},
+					"frame": {
+						"x": 0,
+						"y": 492,
+						"w": 452,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 52,
+						"w": 432,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 988,
+						"w": 432,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70017",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 24,
+						"y": 48,
+						"w": 420,
+						"h": 500
+					},
+					"frame": {
+						"x": 0,
+						"y": 1488,
+						"w": 420,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70023",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 40,
+						"w": 412,
+						"h": 500
+					},
+					"frame": {
+						"x": 456,
+						"y": 0,
+						"w": 412,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20015",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 44,
+						"w": 404,
+						"h": 508
+					},
+					"frame": {
+						"x": 868,
+						"y": 0,
+						"w": 404,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 56,
+						"w": 404,
+						"h": 500
+					},
+					"frame": {
+						"x": 1272,
+						"y": 0,
+						"w": 404,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20014",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 44,
+						"w": 396,
+						"h": 500
+					},
+					"frame": {
+						"x": 452,
+						"y": 500,
+						"w": 396,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60016",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 52,
+						"y": 52,
+						"w": 344,
+						"h": 508
+					},
+					"frame": {
+						"x": 848,
+						"y": 508,
+						"w": 344,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 48,
+						"w": 340,
+						"h": 508
+					},
+					"frame": {
+						"x": 432,
+						"y": 1000,
+						"w": 340,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60031",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 48,
+						"w": 336,
+						"h": 504
+					},
+					"frame": {
+						"x": 420,
+						"y": 1508,
+						"w": 336,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60023",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 100,
+						"y": 52,
+						"w": 284,
+						"h": 504
+					},
+					"frame": {
+						"x": 1676,
+						"y": 0,
+						"w": 284,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60019",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 56,
+						"w": 332,
+						"h": 500
+					},
+					"frame": {
+						"x": 772,
+						"y": 1016,
+						"w": 332,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20011",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 48,
+						"w": 324,
+						"h": 508
+					},
+					"frame": {
+						"x": 756,
+						"y": 1516,
+						"w": 324,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 52,
+						"y": 48,
+						"w": 320,
+						"h": 508
+					},
+					"frame": {
+						"x": 1192,
+						"y": 508,
+						"w": 320,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60030",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 60,
+						"y": 48,
+						"w": 320,
+						"h": 504
+					},
+					"frame": {
+						"x": 1104,
+						"y": 1016,
+						"w": 320,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20010",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 48,
+						"w": 308,
+						"h": 508
+					},
+					"frame": {
+						"x": 1080,
+						"y": 1520,
+						"w": 308,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60024",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 48,
+						"w": 276,
+						"h": 508
+					},
+					"frame": {
+						"x": 1512,
+						"y": 504,
+						"w": 276,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60025",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 48,
+						"w": 276,
+						"h": 508
+					},
+					"frame": {
+						"x": 1424,
+						"y": 1016,
+						"w": 276,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60026",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 48,
+						"w": 272,
+						"h": 508
+					},
+					"frame": {
+						"x": 1388,
+						"y": 1524,
+						"w": 272,
+						"h": 508
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60027",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 48,
+						"w": 272,
+						"h": 504
+					},
+					"frame": {
+						"x": 1700,
+						"y": 1012,
+						"w": 272,
+						"h": 504
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60028",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 104,
+						"y": 48,
+						"w": 272,
+						"h": 504
+					},
+					"frame": {
+						"x": 1660,
+						"y": 1524,
+						"w": 272,
+						"h": 504
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-15.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 2048,
+				"h": 1992
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/west/mallack50027",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 56,
+						"w": 432,
+						"h": 464
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 432,
+						"h": 464
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30012",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 164,
+						"w": 492,
+						"h": 476
+					},
+					"frame": {
+						"x": 432,
+						"y": 0,
+						"w": 492,
+						"h": 476
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50025",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 56,
+						"w": 432,
+						"h": 480
+					},
+					"frame": {
+						"x": 924,
+						"y": 0,
+						"w": 432,
+						"h": 480
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50007",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 52,
+						"w": 424,
+						"h": 488
+					},
+					"frame": {
+						"x": 1356,
+						"y": 0,
+						"w": 424,
+						"h": 488
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50008",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 52,
+						"w": 428,
+						"h": 492
+					},
+					"frame": {
+						"x": 0,
+						"y": 464,
+						"w": 428,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30020",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 96,
+						"y": 164,
+						"w": 496,
+						"h": 492
+					},
+					"frame": {
+						"x": 428,
+						"y": 476,
+						"w": 496,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70018",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 52,
+						"w": 416,
+						"h": 492
+					},
+					"frame": {
+						"x": 924,
+						"y": 480,
+						"w": 416,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70019",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 52,
+						"w": 408,
+						"h": 492
+					},
+					"frame": {
+						"x": 1340,
+						"y": 488,
+						"w": 408,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60029",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 80,
+						"y": 48,
+						"w": 296,
+						"h": 500
+					},
+					"frame": {
+						"x": 1748,
+						"y": 488,
+						"w": 296,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70022",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 48,
+						"w": 408,
+						"h": 492
+					},
+					"frame": {
+						"x": 0,
+						"y": 956,
+						"w": 408,
+						"h": 492
+					}
+				},
+				{
+					"filename": "Mallack/north/mallack30021",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 768,
+						"h": 768
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 164,
+						"w": 496,
+						"h": 496
+					},
+					"frame": {
+						"x": 408,
+						"y": 968,
+						"w": 496,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50009",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 36,
+						"y": 52,
+						"w": 428,
+						"h": 496
+					},
+					"frame": {
+						"x": 904,
+						"y": 972,
+						"w": 428,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70021",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 52,
+						"w": 404,
+						"h": 496
+					},
+					"frame": {
+						"x": 1332,
+						"y": 980,
+						"w": 404,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60021",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 88,
+						"y": 56,
+						"w": 312,
+						"h": 500
+					},
+					"frame": {
+						"x": 1736,
+						"y": 988,
+						"w": 312,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/south/mallack70020",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 52,
+						"w": 396,
+						"h": 496
+					},
+					"frame": {
+						"x": 0,
+						"y": 1448,
+						"w": 396,
+						"h": 496
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 48,
+						"y": 56,
+						"w": 360,
+						"h": 500
+					},
+					"frame": {
+						"x": 396,
+						"y": 1464,
+						"w": 360,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/ne/mallack20012",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 44,
+						"y": 48,
+						"w": 356,
+						"h": 500
+					},
+					"frame": {
+						"x": 756,
+						"y": 1468,
+						"w": 356,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60020",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 68,
+						"y": 56,
+						"w": 332,
+						"h": 500
+					},
+					"frame": {
+						"x": 1112,
+						"y": 1476,
+						"w": 332,
+						"h": 500
+					}
+				},
+				{
+					"filename": "Mallack/sw/mallack60022",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 92,
+						"y": 56,
+						"w": 304,
+						"h": 500
+					},
+					"frame": {
+						"x": 1444,
+						"y": 1488,
+						"w": 304,
+						"h": 500
+					}
+				}
+			]
+		},
+		{
+			"image": "mallack-hd-16.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1264,
+				"h": 1880
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Mallack/west/mallack50001",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 48,
+						"w": 424,
+						"h": 476
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 424,
+						"h": 476
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50033",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 48,
+						"w": 424,
+						"h": 476
+					},
+					"frame": {
+						"x": 0,
+						"y": 476,
+						"w": 424,
+						"h": 476
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50028",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 56,
+						"w": 432,
+						"h": 456
+					},
+					"frame": {
+						"x": 0,
+						"y": 952,
+						"w": 432,
+						"h": 456
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50006",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 56,
+						"w": 416,
+						"h": 476
+					},
+					"frame": {
+						"x": 424,
+						"y": 0,
+						"w": 416,
+						"h": 476
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50032",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 52,
+						"w": 428,
+						"h": 472
+					},
+					"frame": {
+						"x": 424,
+						"y": 476,
+						"w": 428,
+						"h": 472
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50002",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 24,
+						"y": 52,
+						"w": 424,
+						"h": 472
+					},
+					"frame": {
+						"x": 840,
+						"y": 0,
+						"w": 424,
+						"h": 472
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50003",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 28,
+						"y": 52,
+						"w": 420,
+						"h": 472
+					},
+					"frame": {
+						"x": 432,
+						"y": 948,
+						"w": 420,
+						"h": 472
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50031",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 24,
+						"y": 52,
+						"w": 428,
+						"h": 468
+					},
+					"frame": {
+						"x": 0,
+						"y": 1408,
+						"w": 428,
+						"h": 468
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50030",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 32,
+						"y": 52,
+						"w": 424,
+						"h": 460
+					},
+					"frame": {
+						"x": 428,
+						"y": 1420,
+						"w": 424,
+						"h": 460
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50004",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 52,
+						"w": 412,
+						"h": 472
+					},
+					"frame": {
+						"x": 852,
+						"y": 472,
+						"w": 412,
+						"h": 472
+					}
+				},
+				{
+					"filename": "Mallack/west/mallack50005",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 640
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 56,
+						"w": 412,
+						"h": 472
+					},
+					"frame": {
+						"x": 852,
+						"y": 944,
+						"w": 412,
+						"h": 472
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:16e91b59d4d6ca46440c28caeef2c333:7d5fa6f4f3c5ede6c25e6382f1a78492:8b590f0e3522c10bc0d27d221dc76374$"
+	}
+}

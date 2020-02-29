@@ -78,7 +78,8 @@ export class IsoDebugger extends Debugger {
     return this;
   }
 
-  debugIsoSprite(
+  // debug isoSprites should be called even for single sprites with [oneSprite]
+  private debugIsoSprite(
     sprite: IsoSprite,
     color: number = 0xccff66,
     filled: boolean = true

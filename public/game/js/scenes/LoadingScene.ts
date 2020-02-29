@@ -1,7 +1,17 @@
 import CONSTANTS from "../CST";
+import ActorsController from "../controllers/ActorsController";
+
+import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js";
+import MapController from "../controllers/MapController";
+import IsoScene from "../IsoPlugin/IsoScene";
+
+interface rexAwaitLoader extends Phaser.Loader.LoaderPlugin {
+  rexAwait: AwaitLoaderPlugin;
+}
 
 export default class LoadingScene extends Phaser.Scene {
   graphics: Phaser.GameObjects.Graphics;
+  load: rexAwaitLoader;
 
   constructor() {
     super({
@@ -21,13 +31,22 @@ export default class LoadingScene extends Phaser.Scene {
   preload() {
     this.load.setBaseURL("./game/assets/");
 
+    // load the resources for the actors
+    ActorsController.getInstance().loadResources(this.load);
+
     this.load.setPrefix("GROUND_TILES.");
     this.load.setPath("image/");
-    this.load.image("floor", "grass01.png");
-    this.load.image("wall", "isocube_tile.png");
+    this.load.image("floor", "tile.png");
+
+    this.load.rexAwait((succesCb: () => void) => {
+      // fire the terrain generation
+      MapController.getInstance().preloadInit();
+
+      succesCb();
+    });
   }
 
-  onLoaderProgress(progress) {
+  onLoaderProgress(progress: number) {
     const MARGIN_OFFSET = 20,
       BAR_HEIGHT = 40,
       LINE_WIDTH = 2;
