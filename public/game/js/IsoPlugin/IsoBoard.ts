@@ -1,5 +1,5 @@
 import { Board, QuadGrid } from "phaser3-rex-plugins/plugins/board-components";
-import { IsoScene } from "./IsoPlugin";
+import { IsoScene, Point3 } from "./IsoPlugin";
 
 import CST from "../CST";
 import KDBush from "kdbush";
@@ -35,9 +35,9 @@ export default class IsoBoard {
 
   // the graphics object used to draw the board grid
   private graphics: Phaser.GameObjects.Graphics;
-  // this texture holds the whole drawn grid for efficiency purposes
-  private gridBufferTexture: Phaser.GameObjects.RenderTexture;
-  // the rectangles that contains the tiles currently in view
+  private visibleGrid: boolean = false;
+
+  // the rectangle that contains the tiles currently in view
   private viewRectangle: Phaser.Geom.Rectangle;
   // a KD-tree which hold the mid points of all the tiles,
   // this way we can easily get the viewable tiles for drawing
@@ -60,15 +60,11 @@ export default class IsoBoard {
   gameSize: { width: number; height: number };
   // the map position and size in world space
   mapSize: {
-    x: number;
-    y: number;
     w: number;
     h: number;
     tileW: number;
     tileH: number;
   };
-
-  ZOOM_FACTOR: { x: number; y: number };
 
   private constructor(config: IsoBoardConfig) {
     const boardConfig = {
@@ -91,33 +87,12 @@ export default class IsoBoard {
     // the real gameSize
     this.gameSize = config.scene.game.scale.gameSize;
 
-    // how much the buffer should be scaled compared to the gameSize
-    const SCALE = CST.GRID.BUFFER.SCALE;
-
-    this.gridBufferTexture = config.scene.add
-      .renderTexture(
-        0,
-        0,
-        this.gameSize.width * SCALE,
-        this.gameSize.height * SCALE
-      )
-      .setVisible(true)
-      .setDepth(Infinity);
-
     // the width and height of the board in px
     this.mapSize = {
-      x: config.x,
-      y: config.y,
       w: config.tileWidth * config.mapWidth,
       h: config.tileHeight * config.mapHeight,
       tileW: config.tileWidth,
       tileH: config.tileHeight
-    };
-
-    // the scale used to draw the whole grid on the grid buffer
-    this.ZOOM_FACTOR = {
-      x: (this.gameSize.width * SCALE) / this.mapSize.w,
-      y: (this.gameSize.height * SCALE) / this.mapSize.h
     };
 
     // the graphics used to draw the grid on the buffer texture
@@ -129,10 +104,12 @@ export default class IsoBoard {
           alpha: CST.GRID.LINE_ALPHA
         }
       })
-      .setVisible(false);
+      .setDepth(CST.GRID.GRID_DEPTH);
 
     // when the real camera moves, the grid should move with it
     this.camera = config.scene.cameras.main;
+
+    this.initListeners();
 
     // DEBUG_GRAPHICS = this.board.scene.add.graphics({
     //   lineStyle: {
@@ -142,23 +119,43 @@ export default class IsoBoard {
     //   }
     // });
     this.updateViewRectangle();
+    this.initKDBush(config.mapMatrix);
+  }
 
+  private initListeners() {
     this.camera
       .on(CST.CAMERA.MOVE_EVENT, () => {
-        //this.updateViewRectangle();
         this.viewRectangleDirty = true;
       })
       .on(CST.CAMERA.ZOOM_EVENT, (actualZoomFactor: number) => {
-        //this.updateViewRectangle();
         this.viewRectangleDirty = true;
+
+        // if the game is zoomed out too much, the grid will hide
+        if (this.camera.zoom <= CST.GRID.ZOOM_DEACTIVATE) {
+          this.hideGrid();
+        }
       });
 
+    // update the view rect every update cycle
     this.board.scene.events.on("preupdate", () => {
       this.updateViewRectangle();
+      this.drawGrid();
     });
 
-    this.drawGrid(config.mapMatrix);
-    this.initKDBush(config.mapMatrix);
+    // when the game screen resizes, the board has to be repositioned according to the projector
+    this.board.scene.scale.on(
+      "resize",
+      () => {
+        // determine the position of the map corner
+        let { x: mapX, y: mapY } = this.board.scene.iso.projector.project(
+          new Point3(0, 0, 0)
+        );
+
+        this.board.grid.x = mapX;
+        this.board.grid.y = mapY;
+      },
+      this
+    );
   }
 
   private updateViewRectangle() {
@@ -195,52 +192,42 @@ export default class IsoBoard {
   }
 
   // draw the grid once on the gridBufferTexture
-  private drawGrid(mapMatrix: number[][]) {
-    this.graphics.clear();
+  private drawGrid() {
+    // grid not visible, return
+    if (!this.visibleGrid) {
+      this.graphics.setVisible(false);
 
-    let scale = Math.min(this.ZOOM_FACTOR.x, this.ZOOM_FACTOR.y);
-
-    // draw the board so it fills the whole grid buffer texture
-    this.board.forEachTileXY((tileXY: TileXY) => {
-      // if there's no tile here no point in drawing grid stroke
-      if (!mapMatrix[tileXY.y] || !mapMatrix[tileXY.y][tileXY.x]) {
+      return;
+    } else {
+      // the grid was invisible until now
+      if (!this.graphics.visible) {
+        this.graphics.setVisible(true);
+      }
+      // the grid was already visible and the camera view didn't change
+      else if (!this.viewRectangleDirty) {
         return;
       }
+    }
 
+    this.graphics.clear();
+
+    // draw the board so it fills the whole grid buffer texture
+    this.getTilesInView().forEach((tileXY: TileXY) => {
       // get the corners of this tile
-      let tilePoints = this.board
-        .getGridPoints(tileXY.x, tileXY.y, true)
-        .map((pt: TileXY) => {
-          // translate the tile at (0, 0) to (screenMiddle, 0) so the whole
-          // board can be drawn on this buffer RenderTexture
-          pt.x -= this.mapSize.x - this.mapSize.w / 2;
-          pt.y -= this.mapSize.y - this.mapSize.tileH / 2;
-
-          // scale the points so the whole board fits
-          return { x: pt.x * scale, y: pt.y * scale };
-        });
+      let tilePoints = this.board.getGridPoints(tileXY.x, tileXY.y, true);
 
       this.graphics.strokePoints(tilePoints, true);
     });
-
-    // buffer the grid lines
-    this.gridBufferTexture.draw(this.graphics);
-
-    // reverse the translation and scale so we get the real world sized grid
-    this.gridBufferTexture
-      .setX(this.mapSize.x - this.mapSize.w / 2)
-      .setY(this.mapSize.y - this.mapSize.tileH / 2)
-      .setScale(1 / scale);
   }
 
   showGrid(): this {
-    this.gridBufferTexture.setVisible(true);
+    this.visibleGrid = true;
 
     return this;
   }
 
   hideGrid(): this {
-    this.gridBufferTexture.setVisible(false);
+    this.visibleGrid = false;
 
     return this;
   }
@@ -272,10 +259,11 @@ export default class IsoBoard {
       });
     });
 
+    // index the midPoints of each tile so they are easily found within the viewRect
     this.tilesIndex = new KDBush(
       this.tilesWithMidPoints,
-      p => p.x,
-      p => p.y
+      (p: TileXY) => p.x,
+      (p: TileXY) => p.y
     );
   }
 
@@ -290,20 +278,12 @@ export default class IsoBoard {
 
   // returns an array of (x, y) pairs that are the tile coordinates of the viewable tiles
   public getTilesInView(): TileXY[] {
-    // let inView = [];
-
-    // search in the KDBush what midPoints are within the view area
+    // search in the KD-Tree what midPoints are within the view area
     const rect = this.viewRectangle,
       results = this.tilesIndex
         .range(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height)
         .map((id: number) => this.tilesWithMidPoints[id])
         .map(({ tileX, tileY }) => ({ x: tileX, y: tileY }));
-
-    // this.board.forEachTileXY((tileXY: TileXY) => {
-    //   if (this.isTileInView(tileXY)) {
-    //     inView.push({ x: tileXY.x, y: tileXY.y });
-    //   }
-    // });
 
     return results;
   }

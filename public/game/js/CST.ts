@@ -45,10 +45,10 @@ export default {
     LINE_WIDTH: 1,
     LINE_COLOR: 0xffffff,
     LINE_ALPHA: 1,
-    BUFFER: {
-      // how much the grid buffer will be scaled in proportion to the real game size
-      SCALE: 15
-    }
+    // if the game is zoomed out too much, the grid will hide
+    ZOOM_DEACTIVATE: 0.2,
+    // the grid should be drawn on top of the tile layer
+    GRID_DEPTH: 2
   },
   TILEMAP: {
     OFFSCR_BUFF_KEY: "tileMapOffscreenCanvas",

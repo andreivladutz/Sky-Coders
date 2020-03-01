@@ -81,8 +81,7 @@ export default class Actor {
           key: `${animation.animationKey}.${DIRECTION}`,
           frames: frameNames,
           frameRate: ACTORS_CST.frameRate,
-          repeat: -1,
-          skipMissedFrames: true
+          repeat: -1
         });
       }
     }
