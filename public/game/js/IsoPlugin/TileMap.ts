@@ -32,10 +32,6 @@ export default class TileMap {
   // the underlying board provided by the Board Plugin
   isoBoard: IsoBoard;
 
-  // World position of the (0, 0) tile
-  mapX: number;
-  mapY: number;
-
   // Tilesize of the map
   mapWidth: number;
   mapHeight: number;
@@ -64,7 +60,7 @@ export default class TileMap {
     let projector = this.scene.iso.projector;
 
     // determine the position of the map corner
-    ({ x: this.mapX, y: this.mapY } = projector.project(new Point3(0, 0, 0)));
+    let { x: mapX, y: mapY } = projector.project(new Point3(0, 0, 0));
 
     this.tileWidth = config.tileWidth;
     this.tileHeight = config.tileHeight;
@@ -73,8 +69,8 @@ export default class TileMap {
 
     this.isoBoard = IsoBoard.getInstance({
       scene: this.scene,
-      x: this.mapX,
-      y: this.mapY,
+      x: mapX,
+      y: mapY,
       tileWidth: config.tileWidth,
       tileHeight: config.tileHeight,
       mapWidth: config.mapWidth,

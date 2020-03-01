@@ -1,0 +1,6 @@
+{
+  "restart": {
+    "exclude": [],
+    "include": ["\\.js$", "\\.ts", "\\.json"]
+  }
+}
