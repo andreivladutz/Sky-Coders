@@ -33,6 +33,7 @@ export default class IsoSprite extends Sprite {
   // if the depth is set manually via setDepth, then it shouldn't be automatically computed anymore
   private depthOverriden: boolean;
 
+  // TODO: update body to be the Physics' Body type
   body: { [key: string]: any };
 
   /**

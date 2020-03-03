@@ -8,7 +8,8 @@ export default {
   // scene keys
   SCENES: {
     LOAD: "LOAD",
-    GAME: "GAME"
+    GAME: "GAME",
+    UI: "UISCENE"
   },
   // terrain generation parameters
   MAP: {

@@ -8,6 +8,7 @@ import Actor from "../controllers/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
 import TileMap from "../IsoPlugin/TileMap";
 
+// TODO: remove global variables
 let cursors, speed, actor;
 
 export default class GameScene extends IsoScene {
@@ -19,6 +20,7 @@ export default class GameScene extends IsoScene {
     const config = {
       key: CST.SCENES.GAME
     };
+    // TODO: deactivate physics if not used anymore
     // also enable physics
     super(config, true);
 
@@ -40,6 +42,9 @@ export default class GameScene extends IsoScene {
       });
     }
     */
+
+    // start the UI scene and move it above
+    this.scene.launch(CST.SCENES.UI);
   }
 
   create() {

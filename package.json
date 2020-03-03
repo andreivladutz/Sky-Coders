@@ -18,7 +18,10 @@
     "phaser": "^3.22.0",
     "phaser3-rex-plugins": "^1.1.8",
     "simplex-noise": "^2.4.0",
-    "workbox-precaching": "^5.0.0"
+    "workbox-precaching": "^5.0.0",
+    "workbox-routing": "^5.0.0",
+    "workbox-strategies": "^5.0.0",
+    "workbox-window": "^5.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.8.6",

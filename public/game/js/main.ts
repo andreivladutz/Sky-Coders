@@ -5,14 +5,18 @@ import CONSTANTS from "./CST";
 // import the scenes
 import LoadingScene from "./scenes/LoadingScene";
 import GameScene from "./scenes/GameScene";
+import UIScene from "./scenes/UIScene";
 
-// enable await loader plugin from Rex
+// enable await loader and ui plugins from Rex
 import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js";
+import UIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 
-// service worker
-import SVHandler from "./sw-handler";
+// service worker and pwa logic
+import PwaHandler from "./controllers/PwaHandler";
+import CST from "./CST";
 
-SVHandler.register();
+// fire sw registering and such
+PwaHandler.init();
 
 // set the canvas to be fullscreen, centered and set the parent to the container div
 const scaleConfig: Phaser.Types.Core.ScaleConfig = {
@@ -35,7 +39,7 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   title: CONSTANTS.GAME.TITLE,
   version: CONSTANTS.GAME.VERSION,
   // the scenes array
-  scene: [LoadingScene, GameScene],
+  scene: [LoadingScene, GameScene, UIScene],
   // prevent right mouse click default behaviour
   disableContextMenu: true,
   scale: scaleConfig,
@@ -51,6 +55,14 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
         key: "rexAwaitLoader",
         plugin: AwaitLoaderPlugin,
         start: true
+      }
+    ],
+    scene: [
+      {
+        sceneKey: CST.SCENES.UI,
+        key: "rexUI",
+        plugin: UIPlugin,
+        mapping: "rexUI"
       }
     ]
   }
