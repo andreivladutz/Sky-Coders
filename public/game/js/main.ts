@@ -2,10 +2,17 @@ import Phaser from "phaser";
 
 import CONSTANTS from "./CST";
 
+// import the scenes
 import LoadingScene from "./scenes/LoadingScene";
 import GameScene from "./scenes/GameScene";
-// enable await loader
+
+// enable await loader plugin from Rex
 import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js";
+
+// service worker
+import SVHandler from "./sw-handler";
+
+SVHandler.register();
 
 // set the canvas to be fullscreen, centered and set the parent to the container div
 const scaleConfig: Phaser.Types.Core.ScaleConfig = {

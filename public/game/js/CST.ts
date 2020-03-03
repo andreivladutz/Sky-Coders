@@ -53,5 +53,9 @@ export default {
   TILEMAP: {
     OFFSCR_BUFF_KEY: "tileMapOffscreenCanvas",
     OFFSCR_BUFF_ID: "offscren-buffer"
+  },
+  // service-worker related csts
+  SW: {
+    BUILT_SW_PATH: "./sw-build.js"
   }
 };

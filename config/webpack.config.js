@@ -1,54 +1,36 @@
-/* eslint-disable no-undef */
-const path = require("path");
-const webpack = require("webpack");
-const { CleanWebpackPlugin } = require("clean-webpack-plugin");
+const webpack = require("webpack"),
+  Terser = require("terser-webpack-plugin"),
+  CST = require("./WP_CST");
 
-const PUBLIC_FOLDER = "public";
-const PUBLIC_PATH = path.resolve(__dirname, `../${PUBLIC_FOLDER}`);
+let webpackBaseCfg = require("./webpack-base.config");
 
-module.exports = {
-  entry: {
-    app: `./${PUBLIC_FOLDER}/game/js/main`
-  },
-  output: {
-    path: PUBLIC_PATH + "/build",
-    filename: "app.bundle.js"
-  },
-  resolve: {
-    extensions: [".js", ".ts", ".tsx"]
-  },
-  mode: "development",
-  module: {
-    rules: [
-      {
-        test: /\.js$/,
-        include: PUBLIC_PATH,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ["@babel/env"]
-          }
-        }
-      },
-      {
-        test: /\.tsx?$/,
-        use: "ts-loader",
-        exclude: /node_modules/
-      }
-    ]
-  },
-  optimization: {
-    splitChunks: {
-      chunks: "all"
+// this config is used for production
+webpackBaseCfg.mode = "production";
+// add babel
+webpackBaseCfg.module.rules.push({
+  test: /\.js$/,
+  include: CST.PUBLIC_PATH,
+  use: {
+    loader: "babel-loader",
+    options: {
+      presets: ["@babel/env"]
     }
-  },
-  plugins: [
-    new CleanWebpackPlugin({
-      root: path.resolve(__dirname, "../")
-    }),
-    new webpack.DefinePlugin({
-      "typeof CANVAS_RENDERER": JSON.stringify(true),
-      "typeof WEBGL_RENDERER": JSON.stringify(true)
-    })
-  ]
-};
+  }
+});
+// this is used to remove conditionals that are always false
+// Use terser instead of the default Uglify since service
+// worker code does not need to be transpiled to ES5.
+webpackBaseCfg.optimization.minimizer = [
+  new Terser({
+    // Ensure .mjs files get included.
+    test: /\.m?js$/
+  })
+];
+// remove dev-specific code from workbox
+webpackBaseCfg.plugins.push(
+  new webpack.DefinePlugin({
+    "process.env.NODE_ENV": JSON.stringify("production")
+  })
+);
+
+module.exports = webpackBaseCfg;

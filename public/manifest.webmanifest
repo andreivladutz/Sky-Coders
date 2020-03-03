@@ -1,0 +1,27 @@
+{
+  "short_name": "IsoGame",
+  "name": "IsoGame: Script the world of tomorrow.",
+  "description": "Building, survival game",
+  "categories": ["games", "education", "entertainment"],
+  "lang": "en-US",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "/image/icon/icon192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/image/icon/icon512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#716981",
+  "display": "fullscreen",
+  "scope": "/",
+  "theme_color": "#716981"
+}
