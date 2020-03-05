@@ -1,9 +1,8 @@
 import CONSTANTS from "../CST";
-import ActorsController from "../controllers/ActorsController";
+import ActorsManager from "../managers/ActorsManager";
 
 import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js";
-import MapController from "../controllers/MapController";
-import IsoScene from "../IsoPlugin/IsoScene";
+import MapManager from "../managers/MapManager";
 
 interface rexAwaitLoader extends Phaser.Loader.LoaderPlugin {
   rexAwait: AwaitLoaderPlugin;
@@ -31,16 +30,18 @@ export default class LoadingScene extends Phaser.Scene {
   preload() {
     this.load.setBaseURL("./game/assets/");
 
-    // load the resources for the actors
-    ActorsController.getInstance().loadResources(this.load);
-
     this.load.setPrefix("GROUND_TILES.");
     this.load.setPath("image/");
     this.load.image("floor", "tile.png");
 
-    this.load.rexAwait((succesCb: () => void) => {
+    this.load.rexAwait(async (succesCb: () => void) => {
+      this.load.setPrefix();
+
+      // load the resources for the actors
+      await ActorsManager.getInstance().preload(this.load);
+
       // fire the terrain generation
-      MapController.getInstance().preloadInit();
+      await MapManager.getInstance().preload();
 
       succesCb();
     });

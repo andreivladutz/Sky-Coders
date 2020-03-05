@@ -1,7 +1,9 @@
 import TerrainGenerator from "../terrain/terrainGenerator";
 import TileMap from "../IsoPlugin/TileMap";
-import CST from "../CST";
 import { IsoScene } from "../IsoPlugin/IsoPlugin";
+
+import Manager from "./Manager";
+import CST from "../CST";
 
 const TILE_WIDTH = 256,
   TILE_HEIGHT = 148;
@@ -10,9 +12,7 @@ const TILE_WIDTH = 256,
  * Singleton class that handles asset loading and terrain generation
  *
  */
-export default class MapController {
-  public static instance: MapController = null;
-
+export default class MapManager extends Manager {
   // the simplex noise based terrain generator
   terrainGen: TerrainGenerator;
   // tile map container class
@@ -20,8 +20,6 @@ export default class MapController {
   // the matrix of tiles where map data is held
   mapMatrix: number[][];
   gameScene: IsoScene;
-
-  private constructor() {}
 
   generateIsland() {
     this.terrainGen = TerrainGenerator.getInstance({
@@ -38,7 +36,7 @@ export default class MapController {
   }
 
   // terrain generation happens in the loading stage of the game
-  preloadInit() {
+  async preload() {
     this.generateIsland();
   }
 
@@ -58,11 +56,7 @@ export default class MapController {
     }));
   }
 
-  public static getInstance(): MapController {
-    if (MapController.instance === null) {
-      MapController.instance = new MapController();
-    }
-
-    return MapController.instance;
+  public static getInstance(): MapManager {
+    return super.getInstance() as MapManager;
   }
 }

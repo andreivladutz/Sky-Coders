@@ -1,15 +1,20 @@
 import Phaser from "phaser";
 import { Pan, Pinch } from "phaser3-rex-plugins/plugins/gestures";
+
+import Manager from "./Manager";
 import CST from "../CST";
 
 type Camera = Phaser.Cameras.Scene2D.Camera;
 
 interface CameraControlConfig {
+  camera: Camera;
+  scene: Phaser.Scene;
+
   enablePan: boolean;
   enableZoom: boolean;
 }
 
-export default class CameraController {
+export default class CameraManager extends Manager {
   camera: Camera;
   // the scene this camera belongs to
   scene: Phaser.Scene;
@@ -19,13 +24,11 @@ export default class CameraController {
   // utility for camera zooming
   pinch: Pinch;
 
-  constructor(
-    camera: Camera,
-    scene: Phaser.Scene,
-    config: CameraControlConfig
-  ) {
-    this.camera = camera;
-    this.scene = scene;
+  protected constructor(config: CameraControlConfig) {
+    super();
+
+    this.camera = config.camera;
+    this.scene = config.scene;
 
     if (config.enablePan) {
       this.enablePan();
@@ -63,14 +66,6 @@ export default class CameraController {
       },
       this
     );
-
-    // this.scene.input.on("pointermove", (pointer: Phaser.Input.Pointer) => {
-    //   if (!pointer.isDown) {
-    //     return;
-    //   }
-    //   window.x -= ((pointer.x - pointer.downX) / width) * 150;
-    //   window.y -= ((pointer.y - pointer.downY) / height) * 150;
-    // });
 
     this.camera.startFollow(
       window,
@@ -127,5 +122,9 @@ export default class CameraController {
       }
     });
     return this;
+  }
+
+  public static getInstance(config: CameraControlConfig): CameraManager {
+    return super.getInstance(config) as CameraManager;
   }
 }

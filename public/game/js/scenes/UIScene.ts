@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import CST from "../CST";
-import PwaHandler from "../controllers/PwaHandler";
+import PwaHandler from "../managers/PwaHandler";
 
 import UIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 

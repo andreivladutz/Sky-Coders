@@ -12,7 +12,7 @@ import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js
 import UIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 
 // service worker and pwa logic
-import PwaHandler from "./controllers/PwaHandler";
+import PwaHandler from "./managers/PwaHandler";
 import CST from "./CST";
 
 // fire sw registering and such

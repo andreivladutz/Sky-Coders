@@ -2,9 +2,9 @@ import CST from "../CST";
 import { IsoSprite, ISOMETRIC } from "../IsoPlugin/IsoPlugin";
 import IsoScene from "../IsoPlugin/IsoScene";
 
-import CameraController from "../controllers/CameraController";
-import MapController from "../controllers/MapController";
-import Actor from "../controllers/Actor";
+import CameraManager from "../managers/CameraManager";
+import MapManager from "../managers/MapManager";
+import Actor from "../managers/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
 import TileMap from "../IsoPlugin/TileMap";
 
@@ -13,8 +13,6 @@ let cursors, speed, actor;
 
 export default class GameScene extends IsoScene {
   tileMap: TileMap;
-  // class helpers
-  cameraControl: CameraController;
 
   constructor() {
     const config = {
@@ -52,9 +50,11 @@ export default class GameScene extends IsoScene {
     this.iso.projector.origin.setTo(0.5, 0.2);
 
     // fire the map init
-    this.tileMap = MapController.getInstance().initMap(this);
+    this.tileMap = MapManager.getInstance().initMap(this);
     // init the camera controller
-    this.cameraControl = new CameraController(this.cameras.main, this, {
+    CameraManager.getInstance({
+      camera: this.cameras.main,
+      scene: this,
       enablePan: true,
       enableZoom: true
     });
