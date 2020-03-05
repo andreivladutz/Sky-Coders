@@ -71,7 +71,7 @@ export default class GameScene extends IsoScene {
     cursors = this.input.keyboard.createCursorKeys();
     speed = 2000;
 
-    actor.walkAnim(ACTOR_DIRECTIONS.SOUTH);
+    actor.idleAnim(ACTOR_DIRECTIONS.SE);
 
     this.isoPhysics.world.enable(actor.isoSprite);
   }

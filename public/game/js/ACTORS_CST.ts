@@ -63,7 +63,7 @@ interface ActorsCST {
 // index by actors keys found in CST
 let ACTORS_CST: ActorsCST = {
   // where the atlases are found
-  basePath: "sprite/",
+  basePath: "sprite/characters/",
   // the prefix prepended to each actor resource's key
   resourcePrefix: "ACTORS.",
   // default frame rate of actors' animation
@@ -88,6 +88,20 @@ let ACTORS_CST: ActorsCST = {
           SW: "sw/mallack6",
           NE: "ne/mallack2",
           NW: "nw/mallack4"
+        }
+      },
+      [ACTOR_STATES.IDLE]: {
+        animationKey: `${ACTOR_NAMES.MALLACK}.${ACTOR_STATES.IDLE}`,
+        start: 40,
+        end: 120,
+        zeroPad: 4,
+        prefix: "Mallack_Idle/",
+        suffix: "",
+        DIRECTIONS: {
+          SE: "SE/mallack_idle0",
+          SW: "SW/mallack_idle3",
+          NE: "NE/mallack_idle1",
+          NW: "NW/mallack_idle2"
         }
       }
     }

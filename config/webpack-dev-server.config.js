@@ -1,7 +1,7 @@
 let webpackBaseCfg = require("./webpack-base.config");
 
 webpackBaseCfg.devServer = {
-  contentBase: "./public/",
+  contentBase: "../public/",
   writeToDisk: true,
   index: "",
   host: "localhost",

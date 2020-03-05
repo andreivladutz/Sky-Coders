@@ -51,6 +51,10 @@ export default class Actor {
     this.isoSprite.play(`${this.actorKey}.${ACTOR_STATES.WALK}.${direction}`);
   }
 
+  idleAnim(direction: ACTOR_DIRECTIONS) {
+    this.isoSprite.play(`${this.actorKey}.${ACTOR_STATES.IDLE}.${direction}`);
+  }
+
   // Create all animations for this actor as stored in ACTORS_CST
   private createAnims() {
     // animation object with all the possible animation states
@@ -67,6 +71,11 @@ export default class Actor {
 
       // generate an animation for each direction of this state
       for (let DIRECTION in ACTOR_DIRECTIONS) {
+        // check if this DIRECTION exists (Idle anims might not have all 8 directions. only 4)
+        if (typeof animation.DIRECTIONS[DIRECTION] === "undefined") {
+          continue;
+        }
+
         // generate the frames for this actor's scene
         // the actorKey is also the key name of the texture
         let frameNames = this.scene.anims.generateFrameNames(this.actorKey, {

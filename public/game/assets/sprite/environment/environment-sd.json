@@ -1,0 +1,272 @@
+{
+	"textures": [
+		{
+			"image": "environment-sd-0.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 253,
+				"h": 464
+			},
+			"scale": 0.125,
+			"frames": [
+				{
+					"filename": "Trees/Tree2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 163,
+						"h": 200
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 6,
+						"w": 145,
+						"h": 165
+					},
+					"frame": {
+						"x": 4,
+						"y": 4,
+						"w": 145,
+						"h": 165
+					}
+				},
+				{
+					"filename": "Trees/PineTree",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 200
+					},
+					"spriteSourceSize": {
+						"x": 6,
+						"y": 18,
+						"w": 105,
+						"h": 156
+					},
+					"frame": {
+						"x": 4,
+						"y": 175,
+						"w": 105,
+						"h": 156
+					}
+				},
+				{
+					"filename": "Trees/Tree1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 175,
+						"h": 200
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 45,
+						"w": 142,
+						"h": 123
+					},
+					"frame": {
+						"x": 4,
+						"y": 337,
+						"w": 142,
+						"h": 123
+					}
+				},
+				{
+					"filename": "Trees/Tree",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 200
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 56,
+						"w": 115,
+						"h": 113
+					},
+					"frame": {
+						"x": 115,
+						"y": 175,
+						"w": 115,
+						"h": 113
+					}
+				},
+				{
+					"filename": "Tiles/grass00",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 37
+					},
+					"frame": {
+						"x": 115,
+						"y": 294,
+						"w": 64,
+						"h": 37
+					}
+				},
+				{
+					"filename": "Tiles/grass01",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 37
+					},
+					"frame": {
+						"x": 155,
+						"y": 4,
+						"w": 64,
+						"h": 37
+					}
+				},
+				{
+					"filename": "Tiles/grass02",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 37
+					},
+					"frame": {
+						"x": 155,
+						"y": 47,
+						"w": 64,
+						"h": 37
+					}
+				},
+				{
+					"filename": "Tiles/grass03",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 37
+					},
+					"frame": {
+						"x": 155,
+						"y": 90,
+						"w": 64,
+						"h": 37
+					}
+				},
+				{
+					"filename": "Tiles/grass04",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 37
+					},
+					"frame": {
+						"x": 152,
+						"y": 337,
+						"w": 64,
+						"h": 37
+					}
+				},
+				{
+					"filename": "Tiles/grass05",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 37
+					},
+					"frame": {
+						"x": 185,
+						"y": 294,
+						"w": 64,
+						"h": 37
+					}
+				},
+				{
+					"filename": "Tiles/grass06",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 37
+					},
+					"frame": {
+						"x": 152,
+						"y": 380,
+						"w": 64,
+						"h": 37
+					}
+				},
+				{
+					"filename": "Tiles/grass07",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 37
+					},
+					"frame": {
+						"x": 152,
+						"y": 423,
+						"w": 64,
+						"h": 37
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:343b33260a1e2e666869354cef0c2bf5:2650e4401d05e661eb79d067e7b60adf:1efd645e775df4ac353f239e5fd118d6$"
+	}
+}
