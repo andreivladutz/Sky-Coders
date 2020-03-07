@@ -8,6 +8,8 @@ import ACTORS_CST, {
 import Phaser from "phaser";
 import { IsoSprite, IsoScene } from "../IsoPlugin/IsoPlugin";
 
+import ActorsManager from "./ActorsManager";
+
 // config received by the actor config
 export interface ActorConfig {
   actorKey: ACTOR_NAMES;
@@ -32,6 +34,9 @@ export default class Actor {
   scene: IsoScene;
   isoSprite: IsoSprite;
 
+  // is this actor selected?
+  selected: boolean = false;
+
   constructor(config: ActorConfig) {
     this.actorKey = config.actorKey;
     this.scene = config.scene;
@@ -45,6 +50,40 @@ export default class Actor {
       .setOrigin(0.5, 0.75);
 
     this.createAnims();
+    this.makeInteractive();
+
+    // subscribes itself to the Actors Manager
+    ActorsManager.getInstance().sceneActors.push(this);
+  }
+
+  /* Make the character:
+   *  - selectable
+   */
+
+  makeInteractive() {
+    this.isoSprite
+      .setInteractive()
+      .on("pointerover", () => {
+        // TODO: stop propagating move events to the underlying board
+        //event.stopPropagation();
+
+        this.isoSprite.setTint(CST.ACTOR.SELECTION_TINT);
+      })
+      .on("pointerout", () => {
+        if (!this.selected) {
+          this.isoSprite.clearTint();
+        }
+      })
+      .on("pointerdown", () => {
+        // TODO: deselect all actors if clicking away
+        this.selected = !this.selected;
+
+        if (!this.selected) {
+          this.isoSprite.clearTint();
+        } else {
+          this.isoSprite.setTint(CST.ACTOR.SELECTION_TINT);
+        }
+      });
   }
 
   walkAnim(direction: ACTOR_DIRECTIONS) {

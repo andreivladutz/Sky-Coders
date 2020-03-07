@@ -1,3 +1,6 @@
+//TODO: Change variant
+const VARIANT = "-hd";
+
 export default {
   GAME: {
     WIDTH: 1920,
@@ -18,7 +21,9 @@ export default {
     DEFAULT_CFG: {
       frequency: 0.025,
       exponent: 1
-    }
+    },
+    // maximum value when discretizing the noise map
+    HEIGHT_MAP_MAX: 0.85
   },
   PLUGINS: {
     ISO: {
@@ -58,5 +63,40 @@ export default {
   // service-worker related csts
   SW: {
     BUILT_SW_PATH: "./sw-build.js"
+  },
+  ENVIRONMENT: {
+    // the prefix added to Phaser's frames
+    TEXTURE_PREFIX: "ENV.",
+    // the key of the atlas resource
+    ATLAS_KEY: "ENVIRONMENT.ATLAS_KEY",
+    // path to multiatlas
+    MULTIATLAS_PATH: "sprite/environment/",
+    MULTIATLAS: `environment${VARIANT}.json`,
+    GRASS: {
+      PREFIX: "Tiles/grass",
+      BASE_PREFIX: "Tiles/base",
+      START: 0,
+      END: 5,
+      ZERO_PAD: 2,
+      // probability that a grass tile appears instead of a base one
+      PROBABILITIES: [1 / 100, 1 / 20, 0, 1 / 300, 1 / 300]
+    },
+    TREES: {
+      PREFIX: "Trees/",
+      TREE_NAMES: ["PineTree", "Tree", "Tree1", "Tree2"]
+    },
+    // the empty tile's index
+    EMPTY_TILE: 0,
+    EMPTY_TILE_RATIO: 0.3,
+    // how many of each
+    GRASS_TILES_COUNT: 5,
+    TREES_COUNT: 4,
+    // offsets of tiles in the tilemap
+    // e.g. map grass indices 1, 2,..,5 to 0,...,4
+    BASE_OFFSET: 1,
+    GRASS_OFFSET: 6
+  },
+  ACTOR: {
+    SELECTION_TINT: 0xd0f5e9
   }
 };

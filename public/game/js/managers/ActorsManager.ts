@@ -5,6 +5,9 @@ import Manager from "./Manager";
 
 // Singleton class handling the loading of the actor resources
 export default class ActorsManager extends Manager {
+  // all actors in this scene
+  sceneActors: Actor[] = [];
+
   // called in the preload() method of LoadingScene
   // loads all the resources needed for the actors
   async preload(load: Phaser.Loader.LoaderPlugin) {
@@ -39,3 +42,5 @@ export default class ActorsManager extends Manager {
     return super.getInstance() as ActorsManager;
   }
 }
+
+Manager.subscribeToLoadingPhase(ActorsManager);

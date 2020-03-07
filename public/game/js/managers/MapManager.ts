@@ -4,9 +4,7 @@ import { IsoScene } from "../IsoPlugin/IsoPlugin";
 
 import Manager from "./Manager";
 import CST from "../CST";
-
-const TILE_WIDTH = 256,
-  TILE_HEIGHT = 148;
+import EnvironmentManager from "./EnvironmentManager";
 
 /*
  * Singleton class that handles asset loading and terrain generation
@@ -21,6 +19,8 @@ export default class MapManager extends Manager {
   mapMatrix: number[][];
   gameScene: IsoScene;
 
+  envManager: EnvironmentManager = EnvironmentManager.getInstance();
+
   generateIsland() {
     this.terrainGen = TerrainGenerator.getInstance({
       seed: "nice",
@@ -32,7 +32,10 @@ export default class MapManager extends Manager {
       //scene: this
     }); //.addMoreNoiseMaps([{ f: 0.01, w: 0.3 }]);
 
-    this.mapMatrix = this.terrainGen.generateIslandTerrain([0, 1, 1]);
+    this.mapMatrix = this.terrainGen.generateIslandTerrain({
+      emptyTileRatio: CST.ENVIRONMENT.EMPTY_TILE_RATIO,
+      tileConfigs: this.envManager.getTilesIndicesConfigs()
+    });
   }
 
   // terrain generation happens in the loading stage of the game
@@ -46,10 +49,13 @@ export default class MapManager extends Manager {
   initMap(gameScene: IsoScene): TileMap {
     this.gameScene = gameScene;
 
+    // generate environment frames
+    this.envManager.generateFrames(gameScene);
+
     return (this.tileMap = new TileMap({
       scene: this.gameScene,
-      tileWidth: TILE_WIDTH,
-      tileHeight: TILE_HEIGHT,
+      tileWidth: this.envManager.TILE_WIDTH,
+      tileHeight: this.envManager.TILE_HEIGHT,
       mapWidth: CST.MAP.WIDTH,
       mapHeight: CST.MAP.HEIGHT,
       mapMatrix: this.mapMatrix
@@ -60,3 +66,5 @@ export default class MapManager extends Manager {
     return super.getInstance() as MapManager;
   }
 }
+
+Manager.subscribeToLoadingPhase(MapManager);

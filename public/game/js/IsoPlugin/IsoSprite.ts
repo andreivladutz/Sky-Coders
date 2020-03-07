@@ -24,6 +24,7 @@ export default class IsoSprite extends Sprite {
   private _position3DChanged: boolean;
   private _bounds3DChanged: boolean;
   private _bounds3D: Cube;
+
   // projected _bounds3D cube to check pointer hit against
   private hitPolygon: Phaser.Geom.Polygon;
 
@@ -163,6 +164,45 @@ export default class IsoSprite extends Sprite {
       this.body._reset = true;
     }
   }
+
+  // get screenX() {
+  //   return this.x;
+  // }
+
+  // get screenY() {
+  //   return this.y;
+  // }
+
+  // // let the user set the x and y already projected coords directly
+  // set screenX(value: number) {
+  //   this.x = value;
+  //   this.screenPosTo3D();
+  // }
+
+  // set screenY(value: number) {
+  //   this.y = value;
+  //   this.screenPosTo3D();
+  // }
+
+  // // set internal 3D position from screen position
+  // private screenPosTo3D() {
+  //   let projector = this.scene.iso.projector;
+
+  //   this._position3D = projector.unproject(
+  //     new Phaser.Geom.Point(this.x, this.y),
+  //     this._position3D,
+  //     this._position3D ? this._position3D.z : 0
+  //   );
+
+  //   // Phaser handles depth sorting automatically
+  //   if (!this.depthOverriden) {
+  //     this.depth =
+  //       this._position3D.x + this._position3D.y + this._position3D.z * 1.25;
+  //   }
+
+  //   this._position3DChanged = false;
+  //   this._bounds3DChanged = true;
+  // }
 
   /**
    * A Point3 object representing the axonometric position of the IsoSprite.

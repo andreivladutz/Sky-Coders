@@ -1,3 +1,4 @@
+// TODO:  change variant
 // just hardcoded for now
 const VARIANT = "-hd";
 

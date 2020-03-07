@@ -19,7 +19,6 @@ export default class GameScene extends IsoScene {
       key: CST.SCENES.GAME
     };
     // TODO: deactivate physics if not used anymore
-    // also enable physics
     super(config, true);
 
     // set the isometric projection to be true isometric
@@ -64,35 +63,24 @@ export default class GameScene extends IsoScene {
       x: 2000,
       y: 2000,
       z: 0,
-      scene: this,
-      frame: "Mallack/se/mallack00016"
+      scene: this
     });
 
+    MapManager.getInstance().tileMap.isoBoard.board.addChess(
+      actor.isoSprite,
+      20,
+      20
+    );
+
+    actor.isoSprite.isoX = 20 * 148;
+    actor.isoSprite.isoY = 20 * 148;
+
     cursors = this.input.keyboard.createCursorKeys();
-    speed = 2000;
 
     actor.idleAnim(ACTOR_DIRECTIONS.SE);
-
-    this.isoPhysics.world.enable(actor.isoSprite);
   }
 
   update() {
-    if (cursors.left.isDown) {
-      actor.isoSprite.body.velocity.x = -speed;
-    } else if (cursors.right.isDown) {
-      actor.isoSprite.body.velocity.x = speed;
-    } else {
-      actor.isoSprite.body.velocity.x = 0;
-    }
-
-    if (cursors.up.isDown) {
-      actor.isoSprite.body.velocity.y = -speed;
-    } else if (cursors.down.isDown) {
-      actor.isoSprite.body.velocity.y = speed;
-    } else {
-      actor.isoSprite.body.velocity.y = 0;
-    }
-
     this.tileMap.drawTilesDebug();
     this.tileMap.isoDebug.debugIsoSprites([actor.isoSprite], 0xeb4034, false);
   }

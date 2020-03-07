@@ -1,8 +1,14 @@
 import { Loader } from "phaser";
 
+type ManagerSubConstructor = typeof Manager;
+
 /**
  *   A manager is a Singleton class that acts as a "facade" for different subsystems of the game
  * abstacting away the complexity of the interconnected objects of those classes
+ *
+ *  All Managers that implement loading logic by overriding the preload async function and subcribe themselves
+ * by CALLING subscribeToLoadingPhase() will have
+ * their loading phase run in the loadingScene
  *
  * Manager serves as a base class for the other Managers with: a
  * @method getInstance() static method specific to the "singleton"
@@ -10,6 +16,9 @@ import { Loader } from "phaser";
  */
 export default class Manager {
   protected static _instance: Manager = null;
+
+  // array of Manager Classes whose preload() funcs will be called in the loadingScene
+  private static subscribedManagers: Array<ManagerSubConstructor> = [];
 
   // the args are provided just so typescript doesn't complain.
   // the parameters passing are meant for the subclasses
@@ -30,5 +39,14 @@ export default class Manager {
     }
 
     return this._instance;
+  }
+
+  // add a Manager class' preload() in the loading phase
+  public static subscribeToLoadingPhase(constrClass: ManagerSubConstructor) {
+    Manager.subscribedManagers.push(constrClass);
+  }
+
+  public static getSubscribedManagers(): Array<ManagerSubConstructor> {
+    return this.subscribedManagers;
   }
 }

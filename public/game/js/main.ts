@@ -69,3 +69,6 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
 };
 
 new Phaser.Game(gameConfig);
+
+// TODO: generate this seed on the serverside and keep it the same on next logins
+Phaser.Math.RND.init(["fooS33d"]);

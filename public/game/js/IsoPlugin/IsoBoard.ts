@@ -123,6 +123,7 @@ export default class IsoBoard {
   }
 
   private initListeners() {
+    // TODO: emit these events somewhere else, not on the camera
     this.camera
       .on(CST.CAMERA.MOVE_EVENT, () => {
         this.viewRectangleDirty = true;

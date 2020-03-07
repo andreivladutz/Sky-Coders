@@ -1,8 +1,13 @@
 import CONSTANTS from "../CST";
-import ActorsManager from "../managers/ActorsManager";
 
 import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js";
-import MapManager from "../managers/MapManager";
+
+// kick the load subscribing of these Managers
+// TODO: find a neater way
+import "../managers/ActorsManager";
+import "../managers/MapManager";
+import "../managers/EnvironmentManager";
+import Manager from "../managers/Manager";
 
 interface rexAwaitLoader extends Phaser.Loader.LoaderPlugin {
   rexAwait: AwaitLoaderPlugin;
@@ -30,18 +35,15 @@ export default class LoadingScene extends Phaser.Scene {
   preload() {
     this.load.setBaseURL("./game/assets/");
 
-    this.load.setPrefix("GROUND_TILES.");
-    this.load.setPath("image/");
-    this.load.image("floor", "tile.png");
-
     this.load.rexAwait(async (succesCb: () => void) => {
       this.load.setPrefix();
 
-      // load the resources for the actors
-      await ActorsManager.getInstance().preload(this.load);
+      // wait for all the subscribed Manager subclasses' preload
+      let preloadPromises = Manager.getSubscribedManagers().map(classConstr =>
+        classConstr.getInstance().preload(this.load)
+      );
 
-      // fire the terrain generation
-      await MapManager.getInstance().preload();
+      await Promise.all(preloadPromises);
 
       succesCb();
     });
@@ -64,19 +66,21 @@ export default class LoadingScene extends Phaser.Scene {
           color: 0xffffff
         }
       });
-      this.graphics.strokeRect(
+    }
+
+    this.graphics
+      .clear()
+      .strokeRect(
         MARGIN_OFFSET - LINE_WIDTH / 2,
         height / 2 - LINE_WIDTH / 2,
         width - MARGIN_OFFSET * 2 + LINE_WIDTH,
         BAR_HEIGHT + LINE_WIDTH
+      )
+      .fillRect(
+        MARGIN_OFFSET,
+        height / 2,
+        (width - MARGIN_OFFSET * 2) * progress,
+        BAR_HEIGHT
       );
-    }
-
-    this.graphics.fillRect(
-      MARGIN_OFFSET,
-      height / 2,
-      (width - MARGIN_OFFSET * 2) * progress,
-      BAR_HEIGHT
-    );
   }
 }
