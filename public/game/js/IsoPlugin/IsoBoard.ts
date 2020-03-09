@@ -25,8 +25,6 @@ interface IsoBoardConfig {
   mapMatrix: number[][];
 }
 
-// let DEBUG_GRAPHICS: Phaser.GameObjects.Graphics;
-
 /*
  * Singleton class that handles tile and grid logic
  */
@@ -111,13 +109,6 @@ export default class IsoBoard {
 
     this.initListeners();
 
-    // DEBUG_GRAPHICS = this.board.scene.add.graphics({
-    //   lineStyle: {
-    //     width: 10,
-    //     color: 0xff0000,
-    //     alpha: 1
-    //   }
-    // });
     this.updateViewRectangle();
     this.initKDBush(config.mapMatrix);
   }
@@ -212,12 +203,39 @@ export default class IsoBoard {
 
     this.graphics.clear();
 
-    // draw the board so it fills the whole grid buffer texture
-    this.getTilesInView().forEach((tileXY: TileXY) => {
+    this.drawTilesOnGrid(this.getTilesInView());
+  }
+
+  // public method to draw the outline and maybe fill of some tiles on the grid
+  public drawTilesOnGrid(
+    tiles: TileXY[],
+    strokeColor: number = CST.COLORS.WHITE,
+    lineWidth: number = 1,
+    fillAlpha: number = 0,
+    fillColor: number = CST.COLORS.WHITE,
+    // if userGraphicsObj is provided, the grid is drawn on
+    // that graphics object, otherwise the internal one is used
+    userGraphicsObj: Phaser.GameObjects.Graphics = null
+  ) {
+    let graphics = userGraphicsObj ? userGraphicsObj : this.graphics;
+
+    // the shape will be stroked only if fillAlpha is 0
+    graphics.lineStyle(lineWidth, strokeColor, 1);
+
+    if (fillAlpha !== 0) {
+      graphics.fillStyle(fillColor, fillAlpha);
+    }
+
+    tiles.forEach((tileXY: TileXY) => {
       // get the corners of this tile
       let tilePoints = this.board.getGridPoints(tileXY.x, tileXY.y, true);
 
-      this.graphics.strokePoints(tilePoints, true);
+      if (fillAlpha !== 0) {
+        graphics.fillPoints(tilePoints, true, true);
+      }
+
+      // also stroke around
+      graphics.strokePoints(tilePoints, true);
     });
   }
 

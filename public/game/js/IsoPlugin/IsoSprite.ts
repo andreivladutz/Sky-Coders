@@ -278,9 +278,9 @@ export default class IsoSprite extends Sprite {
    * Internal function that performs the axonometric projection from 3D to 2D space.
    * @method Phaser.Plugin.Isometric.IsoSprite#_project
    * @memberof Phaser.Plugin.Isometric.IsoSprite
-   * @private
+   * @protected
    */
-  private _project() {
+  protected _project() {
     if (!this._position3DChanged) {
       return;
     }
@@ -289,7 +289,10 @@ export default class IsoSprite extends Sprite {
     // const sceneProjector = this.scene[pluginKey].projector;
     const sceneProjector = this.scene.iso.projector;
 
-    ({ x: this.x, y: this.y } = sceneProjector.project(this._position3D));
+    let { x, y } = sceneProjector.project(this._position3D);
+
+    this.setX(x);
+    this.setY(y);
 
     // Phaser handles depth sorting automatically
     if (!this.depthOverriden) {

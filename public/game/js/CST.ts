@@ -54,7 +54,9 @@ export default {
     // if the game is zoomed out too much, the grid will hide
     ZOOM_DEACTIVATE: 0.2,
     // the grid should be drawn on top of the tile layer
-    GRID_DEPTH: 2
+    GRID_DEPTH: 2,
+    // fill alpha for game objects' grid
+    FILL_ALPHA: 0.3
   },
   TILEMAP: {
     OFFSCR_BUFF_KEY: "tileMapOffscreenCanvas",
@@ -98,5 +100,10 @@ export default {
   },
   ACTOR: {
     SELECTION_TINT: 0xd0f5e9
+  },
+  COLORS: {
+    WHITE: 0xffffff,
+    RED: 0xff0000,
+    GREEN: 0x00ff00
   }
 };

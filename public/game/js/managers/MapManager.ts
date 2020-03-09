@@ -5,6 +5,14 @@ import { IsoScene } from "../IsoPlugin/IsoPlugin";
 import Manager from "./Manager";
 import CST from "../CST";
 import EnvironmentManager from "./EnvironmentManager";
+import IsoGameObject from "./IsoGameObject";
+import { IsoDebugger } from "../utils/debug";
+import IsoBoard from "../IsoPlugin/IsoBoard";
+
+interface Point {
+  x: number;
+  y: number;
+}
 
 /*
  * Singleton class that handles asset loading and terrain generation
@@ -20,6 +28,54 @@ export default class MapManager extends Manager {
   gameScene: IsoScene;
 
   envManager: EnvironmentManager = EnvironmentManager.getInstance();
+
+  private debuggingActive: boolean = false;
+  // list of game objects to debug
+  private debuggingObjects: IsoGameObject[];
+  isoDebug: IsoDebugger;
+
+  // returns the {x, y} corresponding world coords
+  public tileToWorldCoords(tileX: number, tileY: number): Point {
+    return this.getIsoBoard().board.tileXYToWorldXY(tileX, tileY);
+  }
+
+  // returns the {x, y} corresponding tile coords
+  public worldToTileCoords(worldX: number, worldY: number): Point {
+    return this.getIsoBoard().board.worldXYToTileXY(worldX, worldY);
+  }
+
+  public getIsoBoard(): IsoBoard {
+    return this.tileMap.isoBoard;
+  }
+
+  // enable global debugging => bodies of isoGameObjects will be drawn
+  public enableDebugging(): this {
+    this.debuggingActive = true;
+
+    this.debuggingObjects = [];
+
+    this.isoDebug = new IsoDebugger(
+      this.gameScene,
+      this.gameScene.iso
+    ).enableDebugging();
+
+    this.gameScene.events.on("update", () => {
+      this.isoDebug.debugIsoSprites(this.debuggingObjects, 0xeb4034, false);
+    });
+
+    return this;
+  }
+
+  public addToDebuggingObjects(obj: IsoGameObject): this {
+    // debugging has not been activated
+    if (!this.debuggingActive) {
+      return this;
+    }
+
+    this.debuggingObjects.push(obj);
+
+    return this;
+  }
 
   generateIsland() {
     this.terrainGen = TerrainGenerator.getInstance({

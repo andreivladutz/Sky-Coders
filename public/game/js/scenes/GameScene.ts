@@ -7,6 +7,7 @@ import MapManager from "../managers/MapManager";
 import Actor from "../managers/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
 import TileMap from "../IsoPlugin/TileMap";
+import IsoGameObject from "../managers/IsoGameObject";
 
 // TODO: remove global variables
 let cursors, speed, actor;
@@ -75,13 +76,11 @@ export default class GameScene extends IsoScene {
     actor.isoSprite.isoX = 20 * 148;
     actor.isoSprite.isoY = 20 * 148;
 
-    cursors = this.input.keyboard.createCursorKeys();
-
     actor.idleAnim(ACTOR_DIRECTIONS.SE);
+
+    MapManager.getInstance().enableDebugging();
+    actor.isoSprite.enableDebugging();
   }
 
-  update() {
-    this.tileMap.drawTilesDebug();
-    this.tileMap.isoDebug.debugIsoSprites([actor.isoSprite], 0xeb4034, false);
-  }
+  update() {}
 }

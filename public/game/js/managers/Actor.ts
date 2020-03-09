@@ -6,7 +6,9 @@ import ACTORS_CST, {
   ActorAnimConfig
 } from "../ACTORS_CST";
 import Phaser from "phaser";
-import { IsoSprite, IsoScene } from "../IsoPlugin/IsoPlugin";
+import { IsoScene } from "../IsoPlugin/IsoPlugin";
+
+import IsoGameObject from "./IsoGameObject";
 
 import ActorsManager from "./ActorsManager";
 
@@ -32,8 +34,9 @@ export default class Actor {
   actorKey: ACTOR_NAMES;
   // the Phaser IsoScene the isoSprite belongs to
   scene: IsoScene;
-  isoSprite: IsoSprite;
+  isoSprite: IsoGameObject;
 
+  actorsManager: ActorsManager = ActorsManager.getInstance();
   // is this actor selected?
   selected: boolean = false;
 
@@ -45,15 +48,17 @@ export default class Actor {
       // the key of the texture this isoSprite is using is the same as the actorKey
       texture = this.actorKey;
 
-    this.isoSprite = this.scene.add
-      .isoSprite(x, y, z, texture, group, frame)
-      .setOrigin(0.5, 0.75);
+    this.isoSprite = new IsoGameObject(this.scene, x, y, z, texture, frame); //.setOrigin(0.5, 0.75);
+
+    if (config.group) {
+      config.group.add(this.isoSprite);
+    }
 
     this.createAnims();
     this.makeInteractive();
 
     // subscribes itself to the Actors Manager
-    ActorsManager.getInstance().sceneActors.push(this);
+    this.actorsManager.sceneActors.push(this);
   }
 
   /* Make the character:
@@ -75,15 +80,21 @@ export default class Actor {
         }
       })
       .on("pointerdown", () => {
-        // TODO: deselect all actors if clicking away
-        this.selected = !this.selected;
-
-        if (!this.selected) {
-          this.isoSprite.clearTint();
-        } else {
-          this.isoSprite.setTint(CST.ACTOR.SELECTION_TINT);
-        }
+        // TODO: deselection logic?!
+        this.toggleSelected();
       });
+  }
+
+  // select or deselect the actor
+  toggleSelected() {
+    this.selected = !this.selected;
+
+    if (!this.selected) {
+      this.isoSprite.clearTint();
+    } else {
+      this.actorsManager.onActorSelected(this);
+      this.isoSprite.setTint(CST.ACTOR.SELECTION_TINT);
+    }
   }
 
   walkAnim(direction: ACTOR_DIRECTIONS) {

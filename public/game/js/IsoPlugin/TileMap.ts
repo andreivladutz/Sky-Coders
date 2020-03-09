@@ -2,8 +2,6 @@ import { IsoSprite, IsoScene, Point3 } from "../IsoPlugin/IsoPlugin";
 import IsoBoard from "./IsoBoard";
 import IsoTile from "./IsoTile";
 
-import { IsoDebugger } from "../utils/debug";
-
 import List, { Node } from "../utils/List";
 import CST from "../CST";
 import EnvironmentManager from "../managers/EnvironmentManager";
@@ -24,8 +22,6 @@ interface TileMapConfig {
 }
 
 export default class TileMap {
-  // debugger class in case debugging is activated
-  isoDebug: IsoDebugger;
   // the game scene this
   scene: IsoScene;
   // the underlying board provided by the Board Plugin
@@ -78,11 +74,6 @@ export default class TileMap {
       mapHeight: config.mapHeight,
       mapMatrix: config.mapMatrix
     }).showGrid();
-
-    this.isoDebug = new IsoDebugger(
-      this.scene,
-      this.scene.iso
-    ).enableDebugging();
 
     // the map data with tile indices
     this.mapMatrix = config.mapMatrix;
@@ -274,15 +265,5 @@ export default class TileMap {
         this.tilesInPlace[i][j] = false;
       }
     }
-  }
-
-  drawTilesDebug(): this {
-    // this.isoDebug.debugIsoSprites(
-    //   this.tileLayerGroup.getChildren() as Array<IsoSprite>,
-    //   0xeb4034,
-    //   false
-    // );
-
-    return this;
   }
 }

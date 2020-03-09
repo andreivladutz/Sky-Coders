@@ -7,6 +7,18 @@ import Manager from "./Manager";
 export default class ActorsManager extends Manager {
   // all actors in this scene
   sceneActors: Actor[] = [];
+  // currently selected Actor
+  selectedActor: Actor = null;
+
+  // when an actor gets selected, the actorsManager should be informed
+  public onActorSelected(actor: Actor) {
+    // there is another actor selected, deselect him
+    if (this.selectedActor && this.selectedActor !== actor) {
+      this.selectedActor.toggleSelected();
+    }
+
+    this.selectedActor = actor;
+  }
 
   // called in the preload() method of LoadingScene
   // loads all the resources needed for the actors
