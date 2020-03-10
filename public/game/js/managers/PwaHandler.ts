@@ -1,6 +1,9 @@
 import CST from "../CST";
 import { Workbox } from "workbox-window";
 
+// @ts-ignore
+type Event = globalThis.Event;
+
 interface InstallEvent extends Event {
   prompt: () => void;
   userChoice: Promise<{ outcome: string }>;
@@ -60,11 +63,11 @@ export default class PwaHandler {
 
   // listen for the beforeinstallprompt event and save the event for later processing
   public static registerInstallEvent(): typeof PwaHandler {
-    window.addEventListener("appinstalled", () => {
+    globalThis.addEventListener("appinstalled", () => {
       this.alreadyInstalledOrCancelled = true;
     });
 
-    window.addEventListener("beforeinstallprompt", (e: InstallEvent) => {
+    globalThis.addEventListener("beforeinstallprompt", (e: InstallEvent) => {
       PwaHandler.deferredInstallPrompt = e;
 
       // we should know if the user accepted or declined the install prompt
@@ -88,7 +91,7 @@ export default class PwaHandler {
 
   // check if the service worker is available
   public static registerSW(): typeof PwaHandler {
-    if ("serviceWorker" in navigator) {
+    if ("serviceWorker" in globalThis.navigator) {
       this.workbox = new Workbox(CST.SW.BUILT_SW_PATH);
       this.listenForNewSW();
 
@@ -105,7 +108,6 @@ export default class PwaHandler {
     // Add an event listener to detect when the registered
     // service worker has installed but is waiting to activate.
     this.workbox.addEventListener("waiting", event => {
-      console.log("The SW is waiting");
       // `event.wasWaitingBeforeRegister` will be false if this is
       // the first time the updated service worker is waiting.
       // When `event.wasWaitingBeforeRegister` is true, a previously
@@ -114,7 +116,7 @@ export default class PwaHandler {
 
       // TODO: Replace confirm with a customized pop-up
       if (
-        confirm(
+        globalThis.confirm(
           "An updated service worker is waiting to be activated. Press ok to reload."
         )
       ) {
@@ -122,7 +124,7 @@ export default class PwaHandler {
         // that will reload the page as soon as the previously waiting
         // service worker has taken control.
         this.workbox.addEventListener("controlling", event => {
-          window.location.reload();
+          globalThis.location.reload();
         });
 
         // Send a message telling the service worker to skip waiting.

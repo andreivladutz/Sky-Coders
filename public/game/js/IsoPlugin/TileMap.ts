@@ -89,7 +89,7 @@ export default class TileMap {
 
     // check every update cycle if the viewport moved
     // if so, redraw all tiles
-    this.scene.events.on("preupdate", () => {
+    this.scene.events.on("update", () => {
       if (this.isoBoard.viewRectangleDirty) {
         this.redrawTiles();
       }

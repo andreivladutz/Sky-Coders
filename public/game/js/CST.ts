@@ -47,8 +47,8 @@ export default {
   },
   // options for the board grid
   GRID: {
-    // 1 px for the line width
-    LINE_WIDTH: 1,
+    // 2 px for the line width
+    LINE_WIDTH: 2,
     LINE_COLOR: 0xffffff,
     LINE_ALPHA: 1,
     // if the game is zoomed out too much, the grid will hide

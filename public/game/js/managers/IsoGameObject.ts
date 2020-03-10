@@ -2,7 +2,6 @@ import IsoSprite from "../IsoPlugin/IsoSprite";
 import EnvironmentManager from "./EnvironmentManager";
 import MapManager from "./MapManager";
 import CST from "../CST";
-import { Grid } from "matter";
 
 enum GridColor {
   DO_NOT_DRAW = -1,
@@ -66,9 +65,12 @@ export default class IsoGameObject extends IsoSprite {
     this.computeTileArea();
 
     // TODO: change this depth logic
-    this.gridGraphics = this.scene.add.graphics().setDepth(3);
+    this.gridGraphics = this.scene.add.graphics().setDepth(5);
 
-    this.scene.events.on("update", () => {
+    // the actors update on preupdate event, the tilemap updates on update event,
+    // as the drawing of the tilemap sets the isoBoard's viewRectangle "not dirty"
+    // and that means the grid of the actor will not draw anymore
+    this.scene.events.on("preupdate", () => {
       this.onSceneUpdate();
     });
   }
@@ -97,7 +99,6 @@ export default class IsoGameObject extends IsoSprite {
       }
     }
 
-    this.gridGraphics.clear();
     this.mapManager
       .getIsoBoard()
       .drawTilesOnGrid(
