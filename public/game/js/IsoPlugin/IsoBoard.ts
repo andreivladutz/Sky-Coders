@@ -211,10 +211,10 @@ export default class IsoBoard {
     this.camera
       .on(CST.CAMERA.MOVE_EVENT, () => {
         //this.viewRectangleDirty = true;
-        this.updateViewRectangle();
+        //this.updateViewRectangle();
       })
       .on(CST.CAMERA.ZOOM_EVENT, (actualZoomFactor: number) => {
-        this.updateViewRectangle();
+        //this.updateViewRectangle();
         //this.viewRectangleDirty = true;
 
         // if the game is zoomed out too much, the grid will hide
@@ -222,12 +222,6 @@ export default class IsoBoard {
           this.hideGrid();
         }
       });
-
-    // update the view rect every update cycle
-    this.board.scene.events.on("preupdate", () => {
-      this.updateViewRectangle();
-      this.drawGrid();
-    });
 
     // when the game screen resizes, the board has to be repositioned according to the projector
     this.board.scene.scale.on(
@@ -243,6 +237,13 @@ export default class IsoBoard {
       },
       this
     );
+  }
+
+  // update the view rect every update cycle
+  // called by the map manager
+  public onUpdate() {
+    this.updateViewRectangle();
+    this.drawGrid();
   }
 
   private updateViewRectangle() {
@@ -407,6 +408,7 @@ export default class IsoBoard {
       }
     }
 
+    this.graphics.clear();
     this.drawTilesOnGrid();
   }
 
@@ -423,13 +425,7 @@ export default class IsoBoard {
     // that graphics object, otherwise the internal one is used
     userGraphicsObj: Phaser.GameObjects.Graphics = null
   ) {
-    if (!this.viewRectangleDirty) {
-      return;
-    }
-
     let graphics = userGraphicsObj ? userGraphicsObj : this.graphics;
-
-    graphics.clear();
 
     // the shape will be stroked only if fillAlpha is 0
     graphics.lineStyle(lineWidth, strokeColor, 1);
@@ -619,6 +615,10 @@ export default class IsoBoard {
     return results;
   }
 
+  public worldXYToTileXYFloat(worldX: number, worldY: number): TileXY {
+    return GetTileXY.call(this.board.grid, worldX, worldY);
+  }
+
   public static getInstance(config?: IsoBoardConfig) {
     if (IsoBoard.instance === null) {
       if (!config) {
@@ -633,3 +633,20 @@ export default class IsoBoard {
     return IsoBoard.instance;
   }
 }
+
+// get tileXY not rounded
+// source code from rex's plugin
+let GetTileXY = function(worldX: number, worldY: number): TileXY {
+  let out: TileXY = { x: 0, y: 0 };
+
+  worldX -= this.x;
+  worldY -= this.y;
+
+  var tmpx = worldX / this.width;
+  var tmpy = worldY / this.height;
+
+  out.x = +tmpx + tmpy;
+  out.y = -tmpx + tmpy;
+
+  return out;
+};

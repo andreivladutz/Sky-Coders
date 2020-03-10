@@ -19,14 +19,14 @@ interface IsoInjectedScene extends Phaser.Scene {
  * The IsoSprites retain their 2D position property to prevent any problems and allow you to interact with them as you would a normal Sprite. The upside of this simplicity is that things should behave predictably for those already used to Phaser.
  */
 export default class IsoSprite extends Sprite {
-  _position3D: Point3;
+  protected _position3D: Point3;
+  protected _position3DChanged: boolean;
   snap: number;
-  private _position3DChanged: boolean;
-  private _bounds3DChanged: boolean;
-  private _bounds3D: Cube;
+  protected _bounds3DChanged: boolean;
+  protected _bounds3D: Cube;
 
   // projected _bounds3D cube to check pointer hit against
-  private hitPolygon: Phaser.Geom.Polygon;
+  protected hitPolygon: Phaser.Geom.Polygon;
 
   // let ts know this scene has an iso property
   scene: IsoInjectedScene;

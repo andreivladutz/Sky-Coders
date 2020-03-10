@@ -44,8 +44,26 @@ export default class MapManager extends Manager {
     return this.getIsoBoard().board.worldXYToTileXY(worldX, worldY);
   }
 
+  // returns the {x, y} corresponding floating tile coords
+  public worldToFloatTileCoords(worldX: number, worldY: number): Point {
+    return this.getIsoBoard().worldXYToTileXYFloat(worldX, worldY);
+  }
+
+  public addGameObjectToGrid(obj: IsoGameObject, tileX: number, tileY: number) {
+    this.tileMap.isoBoard.board.addChess(obj, tileX, tileY);
+  }
+
   public getIsoBoard(): IsoBoard {
     return this.tileMap.isoBoard;
+  }
+
+  public onUpdate() {
+    this.tileMap.isoBoard.onUpdate();
+    this.tileMap.onUpdate();
+
+    if (this.debuggingActive) {
+      this.isoDebug.debugIsoSprites(this.debuggingObjects, 0xeb4034, false);
+    }
   }
 
   // enable global debugging => bodies of isoGameObjects will be drawn
@@ -58,10 +76,6 @@ export default class MapManager extends Manager {
       this.gameScene,
       this.gameScene.iso
     ).enableDebugging();
-
-    this.gameScene.events.on("update", () => {
-      this.isoDebug.debugIsoSprites(this.debuggingObjects, 0xeb4034, false);
-    });
 
     return this;
   }
@@ -78,6 +92,7 @@ export default class MapManager extends Manager {
   }
 
   generateIsland() {
+    // TODO: change the seed with a server-generated seed
     this.terrainGen = TerrainGenerator.getInstance({
       seed: "nice",
       width: CST.MAP.WIDTH,
@@ -104,6 +119,12 @@ export default class MapManager extends Manager {
    */
   initMap(gameScene: IsoScene): TileMap {
     this.gameScene = gameScene;
+
+    // call onUpdate on the components every update cycle
+    // the order is important
+    this.gameScene.events.on("update", () => {
+      this.onUpdate();
+    });
 
     // generate environment frames
     this.envManager.generateFrames(gameScene);

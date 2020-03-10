@@ -61,25 +61,16 @@ export default class GameScene extends IsoScene {
 
     actor = new Actor({
       actorKey: ACTOR_NAMES.MALLACK,
-      x: 2000,
-      y: 2000,
+      tileX: 20,
+      tileY: 20,
       z: 0,
       scene: this
     });
 
-    MapManager.getInstance().tileMap.isoBoard.board.addChess(
-      actor.isoSprite,
-      20,
-      20
-    );
-
-    actor.isoSprite.isoX = 20 * 148;
-    actor.isoSprite.isoY = 20 * 148;
-
     actor.idleAnim(ACTOR_DIRECTIONS.SE);
 
     MapManager.getInstance().enableDebugging();
-    actor.isoSprite.enableDebugging();
+    actor.enableDebugging();
   }
 
   update() {}

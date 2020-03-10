@@ -12,17 +12,19 @@ import IsoGameObject from "./IsoGameObject";
 
 import ActorsManager from "./ActorsManager";
 
+import MoveTo from "../MoveToPlugin/MoveTo";
+
 // config received by the actor config
 export interface ActorConfig {
   actorKey: ACTOR_NAMES;
   // the iso scene this actor belongs to
   scene: IsoScene;
-  // x position of this actor
-  x: number;
-  // y position of this actor
-  y: number;
-  // z pos
-  z: number;
+  // tileX position of this actor
+  tileX: number;
+  // tileY position of this actor
+  tileY: number;
+  // z pos. if not provided, 0 will be the default
+  z?: number;
   // the group to add this actor to
   group?: Phaser.GameObjects.Group;
   // the current frame
@@ -32,9 +34,10 @@ export interface ActorConfig {
 export default class Actor {
   // this actor's key in the ACTORS_CST config object
   actorKey: ACTOR_NAMES;
-  // the Phaser IsoScene the isoSprite belongs to
+  // the Phaser IsoScene the gameObject belongs to
   scene: IsoScene;
-  isoSprite: IsoGameObject;
+  // underlying game object
+  gameObject: IsoGameObject;
 
   actorsManager: ActorsManager = ActorsManager.getInstance();
   // is this actor selected?
@@ -44,18 +47,27 @@ export default class Actor {
     this.actorKey = config.actorKey;
     this.scene = config.scene;
 
-    let { x, y, z, group, frame } = config,
+    let { tileX, tileY, z, group, frame } = config,
       // the key of the texture this isoSprite is using is the same as the actorKey
       texture = this.actorKey;
 
-    this.isoSprite = new IsoGameObject(this.scene, x, y, z, texture, frame); //.setOrigin(0.5, 0.75);
+    // default z to 0
+    z = z || 0;
 
-    if (config.group) {
-      config.group.add(this.isoSprite);
+    this.gameObject = new IsoGameObject(
+      this.scene,
+      tileX,
+      tileY,
+      z,
+      texture,
+      frame
+    ); //.setOrigin(0.5, 0.75);
+
+    if (group) {
+      group.add(this.gameObject);
     }
 
-    this.createAnims();
-    this.makeInteractive();
+    this.createAnims().makeInteractive();
 
     // subscribes itself to the Actors Manager
     this.actorsManager.sceneActors.push(this);
@@ -65,24 +77,26 @@ export default class Actor {
    *  - selectable
    */
 
-  makeInteractive() {
-    this.isoSprite
+  makeInteractive(): this {
+    this.gameObject
       .setInteractive()
       .on("pointerover", () => {
         // TODO: stop propagating move events to the underlying board
         //event.stopPropagation();
 
-        this.isoSprite.setTint(CST.ACTOR.SELECTION_TINT);
+        this.gameObject.setTint(CST.ACTOR.SELECTION_TINT);
       })
       .on("pointerout", () => {
         if (!this.selected) {
-          this.isoSprite.clearTint();
+          this.gameObject.clearTint();
         }
       })
       .on("pointerdown", () => {
         // TODO: deselection logic?!
         this.toggleSelected();
       });
+
+    return this;
   }
 
   // select or deselect the actor
@@ -90,23 +104,45 @@ export default class Actor {
     this.selected = !this.selected;
 
     if (!this.selected) {
-      this.isoSprite.clearTint();
+      this.gameObject.clearTint();
     } else {
       this.actorsManager.onActorSelected(this);
-      this.isoSprite.setTint(CST.ACTOR.SELECTION_TINT);
+      this.gameObject.setTint(CST.ACTOR.SELECTION_TINT);
+
+      let moveTo = new MoveTo(this.gameObject, {
+        speed: 400,
+        rotateToTarget: false,
+        occupiedTest: true,
+        blockerTest: true
+      });
+
+      moveTo.moveTo(50, 50);
+
+      moveTo.on("complete", () => {
+        console.log("EIOOO!!!");
+      });
     }
   }
 
-  walkAnim(direction: ACTOR_DIRECTIONS) {
-    this.isoSprite.play(`${this.actorKey}.${ACTOR_STATES.WALK}.${direction}`);
+  walkAnim(direction: ACTOR_DIRECTIONS): this {
+    this.gameObject.play(`${this.actorKey}.${ACTOR_STATES.WALK}.${direction}`);
+
+    return this;
   }
 
-  idleAnim(direction: ACTOR_DIRECTIONS) {
-    this.isoSprite.play(`${this.actorKey}.${ACTOR_STATES.IDLE}.${direction}`);
+  idleAnim(direction: ACTOR_DIRECTIONS): this {
+    this.gameObject.play(`${this.actorKey}.${ACTOR_STATES.IDLE}.${direction}`);
+
+    return this;
+  }
+
+  public enableDebugging(): this {
+    this.gameObject.enableDebugging();
+    return this;
   }
 
   // Create all animations for this actor as stored in ACTORS_CST
-  private createAnims() {
+  private createAnims(): this {
     // animation object with all the possible animation states
     let animsObject: { [key: string]: ActorAnimConfig } =
       ACTORS_CST[this.actorKey].anims;
@@ -144,5 +180,6 @@ export default class Actor {
         });
       }
     }
+    return this;
   }
 }

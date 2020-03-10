@@ -87,16 +87,16 @@ export default class TileMap {
     // no tile is in place at first
     this.initTilesInPlace();
 
-    // check every update cycle if the viewport moved
-    // if so, redraw all tiles
-    this.scene.events.on("update", () => {
-      if (this.isoBoard.viewRectangleDirty) {
-        this.redrawTiles();
-      }
-    });
-
     // add event listeners on the underlying board
     this.setBoardInteractive();
+  }
+
+  public onUpdate() {
+    // check every update cycle if the viewport moved
+    // if so, redraw all tiles
+    if (this.isoBoard.viewRectangleDirty) {
+      this.redrawTiles();
+    }
   }
 
   // this method checks if there is any unused tile in the pool of unused tile

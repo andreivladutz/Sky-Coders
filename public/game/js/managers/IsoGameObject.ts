@@ -9,6 +9,8 @@ enum GridColor {
   RED = CST.COLORS.RED
 }
 
+const envManager = EnvironmentManager.getInstance();
+
 export default class IsoGameObject extends IsoSprite {
   tileWidthX: number;
   tileWidthY: number;
@@ -24,22 +26,39 @@ export default class IsoGameObject extends IsoSprite {
   private drawingGridColor: GridColor = GridColor.RED;
 
   // tile coords of this object
+  // CAN BE FLOATING POINT NUMBERS!!!
   private tileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
+
+  // the last drew coordinates of the grid
+  lastDrewTileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
 
   mapManager: MapManager = MapManager.getInstance();
 
   // the size of this tile in 3D (unprojected it is a rectangle)
-  readonly TILE_SIZE3D = EnvironmentManager.getInstance().TILE_HEIGHT;
+  readonly TILE_SIZE3D = envManager.TILE_HEIGHT;
 
   constructor(
     scene: Phaser.Scene,
-    x: number,
-    y: number,
+    tileX: number,
+    tileY: number,
     z: number,
     texture: string,
     frame?: string | number
   ) {
-    super(scene, x, y, z, texture, frame);
+    super(
+      scene,
+      tileX * envManager.TILE_HEIGHT,
+      tileY * envManager.TILE_HEIGHT,
+      z,
+      texture,
+      frame
+    );
+
+    this.addToGridAt(tileX, tileY);
+
+    this.tileCoords.x = tileX;
+    this.tileCoords.y = tileY;
+
     // add myself to the scene
     // set the origin to default to the bottom right corner
     this.scene.add.existing(this.setOrigin(1, 1));
@@ -65,7 +84,7 @@ export default class IsoGameObject extends IsoSprite {
     this.computeTileArea();
 
     // TODO: change this depth logic
-    this.gridGraphics = this.scene.add.graphics().setDepth(5);
+    this.gridGraphics = this.scene.add.graphics().setDepth(3);
 
     // the actors update on preupdate event, the tilemap updates on update event,
     // as the drawing of the tilemap sets the isoBoard's viewRectangle "not dirty"
@@ -75,13 +94,23 @@ export default class IsoGameObject extends IsoSprite {
     });
   }
 
+  // Add this object to the grid at the provided tile coords
+  public addToGridAt(tileX: number, tileY: number): this {
+    this.mapManager.addGameObjectToGrid(this, tileX, tileY);
+    return this;
+  }
+
   // function called on each scene update event
   public onSceneUpdate() {
     this.drawGrid();
   }
 
   private drawGrid() {
-    if (this.drawingGridColor === GridColor.DO_NOT_DRAW) {
+    if (
+      this.drawingGridColor === GridColor.DO_NOT_DRAW ||
+      (this.lastDrewTileCoords.x === this.tileX &&
+        this.lastDrewTileCoords.y === this.tileY)
+    ) {
       return;
     }
 
@@ -107,8 +136,12 @@ export default class IsoGameObject extends IsoSprite {
         CST.GRID.LINE_WIDTH,
         CST.GRID.FILL_ALPHA,
         this.drawingGridColor,
-        this.gridGraphics
+        this.gridGraphics.clear()
       );
+
+    // remember the last drewn coords so we don't waste by drawing again and again and again
+    this.lastDrewTileCoords.x = this.tileX;
+    this.lastDrewTileCoords.y = this.tileY;
   }
 
   // enable grid drawing
@@ -137,25 +170,42 @@ export default class IsoGameObject extends IsoSprite {
   }
 
   // called internally to get tile coords
-  private computeTileCoords() {
-    this._project();
+  // private computeTileCoords() {
+  //   this._project();
 
-    ({
-      x: this.tileCoords.x,
-      y: this.tileCoords.y
-    } = this.mapManager.worldToTileCoords(this.x, this.y));
-  }
+  //   ({
+  //     x: this.tileCoords.x,
+  //     y: this.tileCoords.y
+  //   } = this.mapManager.worldToTileCoords(this.x, this.y));
+  // }
 
   get tileX() {
-    this.computeTileCoords();
+    // this.computeTileCoords();
 
-    return this.tileCoords.x;
+    return Math.round(this.tileCoords.x);
   }
 
   get tileY() {
-    this.computeTileCoords();
+    // this.computeTileCoords();
 
-    return this.tileCoords.y;
+    return Math.round(this.tileCoords.y);
+  }
+
+  public setTilePosition(tileX: number, tileY: number): this {
+    this.tileCoords.x = tileX;
+    this.tileCoords.y = tileY;
+
+    this.isoX = this.tileCoords.x * this.TILE_SIZE3D;
+    this.isoY = this.tileCoords.y * this.TILE_SIZE3D;
+
+    return this;
+  }
+
+  // move this game object to worldX worldY position
+  public moveToWorldXY(worldX: number, worldY: number): this {
+    let tileCoords = this.mapManager.worldToFloatTileCoords(worldX, worldY);
+
+    return this.setTilePosition(tileCoords.x, tileCoords.y);
   }
 
   // if body debugging is enabled, the body of this object will be drawn
