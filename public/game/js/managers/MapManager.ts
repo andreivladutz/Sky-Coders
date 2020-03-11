@@ -5,9 +5,10 @@ import { IsoScene } from "../IsoPlugin/IsoPlugin";
 import Manager from "./Manager";
 import CST from "../CST";
 import EnvironmentManager from "./EnvironmentManager";
-import IsoGameObject from "./IsoGameObject";
+import IsoSpriteObject from "./IsoSpriteObject";
 import { IsoDebugger } from "../utils/debug";
 import IsoBoard from "../IsoPlugin/IsoBoard";
+import CameraManager from "./CameraManager";
 
 interface Point {
   x: number;
@@ -31,7 +32,7 @@ export default class MapManager extends Manager {
 
   private debuggingActive: boolean = false;
   // list of game objects to debug
-  private debuggingObjects: IsoGameObject[];
+  private debuggingObjects: IsoSpriteObject[];
   isoDebug: IsoDebugger;
 
   // returns the {x, y} corresponding world coords
@@ -49,7 +50,23 @@ export default class MapManager extends Manager {
     return this.getIsoBoard().worldXYToTileXYFloat(worldX, worldY);
   }
 
-  public addGameObjectToGrid(obj: IsoGameObject, tileX: number, tileY: number) {
+  // Set the scrolling of the camera such that it's centered over these tile coords
+  public setScrollOverTiles(tileX: number, tileY: number): this {
+    let tilesWorldCoords = this.tileToWorldCoords(tileX, tileY);
+
+    CameraManager.getInstance().centerOn(
+      tilesWorldCoords.x,
+      tilesWorldCoords.y
+    );
+
+    return this;
+  }
+
+  public addSpriteObjectToGrid(
+    obj: IsoSpriteObject,
+    tileX: number,
+    tileY: number
+  ) {
     this.tileMap.isoBoard.board.addChess(obj, tileX, tileY);
   }
 
@@ -66,7 +83,7 @@ export default class MapManager extends Manager {
     }
   }
 
-  // enable global debugging => bodies of isoGameObjects will be drawn
+  // enable global debugging => bodies of isoSpriteObjects will be drawn
   public enableDebugging(): this {
     this.debuggingActive = true;
 
@@ -80,7 +97,7 @@ export default class MapManager extends Manager {
     return this;
   }
 
-  public addToDebuggingObjects(obj: IsoGameObject): this {
+  public addToDebuggingObjects(obj: IsoSpriteObject): this {
     // debugging has not been activated
     if (!this.debuggingActive) {
       return this;

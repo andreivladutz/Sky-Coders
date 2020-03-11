@@ -2,6 +2,7 @@ import IsoSprite from "../IsoPlugin/IsoSprite";
 import EnvironmentManager from "./EnvironmentManager";
 import MapManager from "./MapManager";
 import CST from "../CST";
+import { TileXY } from "../IsoPlugin/IsoBoard";
 
 enum GridColor {
   DO_NOT_DRAW = -1,
@@ -11,7 +12,7 @@ enum GridColor {
 
 const envManager = EnvironmentManager.getInstance();
 
-export default class IsoGameObject extends IsoSprite {
+export default class IsoSpriteObject extends IsoSprite {
   tileWidthX: number;
   tileWidthY: number;
 
@@ -20,17 +21,17 @@ export default class IsoGameObject extends IsoSprite {
   localTileY: number;
 
   // the graphics used to draw this object's grid
-  private gridGraphics: Phaser.GameObjects.Graphics;
+  protected gridGraphics: Phaser.GameObjects.Graphics;
   // should we draw the grid? if so this property is a valid number
   // TODO: should default to DO_NOT_DRAW
-  private drawingGridColor: GridColor = GridColor.RED;
+  protected drawingGridColor: GridColor = GridColor.RED;
 
   // tile coords of this object
   // CAN BE FLOATING POINT NUMBERS!!!
-  private tileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
+  protected tileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
 
   // the last drew coordinates of the grid
-  lastDrewTileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
+  protected lastDrewTileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
 
   mapManager: MapManager = MapManager.getInstance();
 
@@ -96,8 +97,31 @@ export default class IsoGameObject extends IsoSprite {
 
   // Add this object to the grid at the provided tile coords
   public addToGridAt(tileX: number, tileY: number): this {
-    this.mapManager.addGameObjectToGrid(this, tileX, tileY);
+    this.mapManager.addSpriteObjectToGrid(this, tileX, tileY);
     return this;
+  }
+
+  // Get the list of tiles composing this object's grid
+  // we can specify a certain tile's coords to get the grid around that tile
+  public getGridTiles(
+    currTileX: number = this.tileX,
+    currTileY: number = this.tileY
+  ): TileXY[] {
+    // the tiles occupied by this game object
+    // they are relative to the (tileX, tileY) coords of the origin
+    let gridTiles = [];
+
+    // how are these tiles positioned relative to the localTileX, localTileY?
+    for (let x = 0; x < this.tileWidthX; x++) {
+      for (let y = 0; y < this.tileWidthY; y++) {
+        let dX = x - this.localTileX,
+          dy = y - this.localTileY;
+
+        gridTiles.push({ x: currTileX + dX, y: currTileY + dy });
+      }
+    }
+
+    return gridTiles;
   }
 
   // function called on each scene update event
@@ -114,19 +138,7 @@ export default class IsoGameObject extends IsoSprite {
       return;
     }
 
-    // the tiles occupied by this game object
-    // they are relative to the (tileX, tileY) coords of the origin
-    let gridTiles = [];
-
-    // how are these tiles positioned relative to the localTileX, localTileY?
-    for (let x = 0; x < this.tileWidthX; x++) {
-      for (let y = 0; y < this.tileWidthY; y++) {
-        let dX = x - this.localTileX,
-          dy = y - this.localTileY;
-
-        gridTiles.push({ x: this.tileX + dX, y: this.tileY + dy });
-      }
-    }
+    let gridTiles = this.getGridTiles();
 
     this.mapManager
       .getIsoBoard()
@@ -189,6 +201,15 @@ export default class IsoGameObject extends IsoSprite {
     // this.computeTileCoords();
 
     return Math.round(this.tileCoords.y);
+  }
+
+  // Get tile coords of this Game Object without rounding
+  get floatingTileX() {
+    return this.tileCoords.x;
+  }
+
+  get floatingTileY() {
+    return this.tileCoords.y;
   }
 
   public setTilePosition(tileX: number, tileY: number): this {

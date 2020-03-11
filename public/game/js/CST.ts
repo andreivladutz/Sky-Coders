@@ -1,3 +1,5 @@
+import Point3 from "./IsoPlugin/Point3";
+
 //TODO: Change variant
 const VARIANT = "-hd";
 
@@ -100,6 +102,9 @@ export default {
   },
   ACTOR: {
     SELECTION_TINT: 0xd0f5e9
+  },
+  NAV_OBJECT: {
+    SPEED: 400
   },
   COLORS: {
     WHITE: 0xffffff,

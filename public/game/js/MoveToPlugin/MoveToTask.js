@@ -165,6 +165,8 @@ class MoveTo extends TickTask {
       newY = targetY;
     }
 
+    // debugger;
+
     // modified for isoGameObjects
     gameObject.moveToWorldXY(newX, newY);
 
@@ -175,7 +177,7 @@ class MoveTo extends TickTask {
   }
 }
 
-const EPSILON = 0.0001;
+const EPSILON = 5;
 
 let reallyCloseTo = function(a, b) {
   if (Math.abs(a - b) <= EPSILON) {

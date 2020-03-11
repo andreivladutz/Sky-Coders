@@ -1,5 +1,7 @@
-import { Board, QuadGrid } from "phaser3-rex-plugins/plugins/board-components";
+// TODO: NEEDS REFACTORING!!!
+import { Board } from "phaser3-rex-plugins/plugins/board-components";
 import { IsoScene, Point3 } from "./IsoPlugin";
+import BlockerFactory from "./Blocker";
 
 import CST from "../CST";
 import KDBush from "kdbush";
@@ -117,6 +119,9 @@ interface IsoBoardConfig {
 export default class IsoBoard {
   public static instance: IsoBoard = null;
 
+  // blockerFactory used to mark unwalkable tiles and such
+  blockerFactory: BlockerFactory;
+
   // the graphics object used to draw the board grid
   private graphics: Phaser.GameObjects.Graphics;
   private visibleGrid: boolean = false;
@@ -172,6 +177,13 @@ export default class IsoBoard {
 
     // the used board texture
     this.board = new Board(config.scene, boardConfig);
+
+    // adding this to fix a typo in Rex's Plugin AStar PathFinding
+    this.board.tileXYToWroldX = this.board.tileXYToWorldX;
+    this.board.tileXYToWroldY = this.board.tileXYToWorldY;
+
+    // init the blocker factory
+    this.blockerFactory = BlockerFactory.getInstance(this.board);
 
     // the real gameSize
     this.gameSize = config.scene.game.scale.gameSize;
@@ -568,7 +580,9 @@ export default class IsoBoard {
     // take the mid point of each tile
     this.board.forEachTileXY((tileXY: TileXY) => {
       // if there's no tile here no point in drawing grid stroke
-      if (!mapMatrix[tileXY.y] || !mapMatrix[tileXY.y][tileXY.x]) {
+      if (!mapMatrix[tileXY.y][tileXY.x]) {
+        this.blockerFactory.addBlockerTile(tileXY.x, tileXY.y);
+
         return;
       }
 

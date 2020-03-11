@@ -8,11 +8,9 @@ import ACTORS_CST, {
 import Phaser from "phaser";
 import { IsoScene } from "../IsoPlugin/IsoPlugin";
 
-import IsoGameObject from "./IsoGameObject";
+import NavSpriteObject from "./NavSpriteObject";
 
 import ActorsManager from "./ActorsManager";
-
-import MoveTo from "../MoveToPlugin/MoveTo";
 
 // config received by the actor config
 export interface ActorConfig {
@@ -31,40 +29,28 @@ export interface ActorConfig {
   frame?: string | number;
 }
 
-export default class Actor {
+export default class Actor extends NavSpriteObject {
   // this actor's key in the ACTORS_CST config object
   actorKey: ACTOR_NAMES;
-  // the Phaser IsoScene the gameObject belongs to
-  scene: IsoScene;
-  // underlying game object
-  gameObject: IsoGameObject;
 
   actorsManager: ActorsManager = ActorsManager.getInstance();
   // is this actor selected?
   selected: boolean = false;
 
   constructor(config: ActorConfig) {
+    super(
+      config.scene,
+      config.tileX,
+      config.tileY,
+      config.z,
+      config.actorKey,
+      config.frame
+    );
+
     this.actorKey = config.actorKey;
-    this.scene = config.scene;
 
-    let { tileX, tileY, z, group, frame } = config,
-      // the key of the texture this isoSprite is using is the same as the actorKey
-      texture = this.actorKey;
-
-    // default z to 0
-    z = z || 0;
-
-    this.gameObject = new IsoGameObject(
-      this.scene,
-      tileX,
-      tileY,
-      z,
-      texture,
-      frame
-    ); //.setOrigin(0.5, 0.75);
-
-    if (group) {
-      group.add(this.gameObject);
+    if (config.group) {
+      config.group.add(this);
     }
 
     this.createAnims().makeInteractive();
@@ -78,17 +64,16 @@ export default class Actor {
    */
 
   makeInteractive(): this {
-    this.gameObject
-      .setInteractive()
+    this.setInteractive()
       .on("pointerover", () => {
         // TODO: stop propagating move events to the underlying board
         //event.stopPropagation();
 
-        this.gameObject.setTint(CST.ACTOR.SELECTION_TINT);
+        this.setTint(CST.ACTOR.SELECTION_TINT);
       })
       .on("pointerout", () => {
         if (!this.selected) {
-          this.gameObject.clearTint();
+          this.clearTint();
         }
       })
       .on("pointerdown", () => {
@@ -104,40 +89,24 @@ export default class Actor {
     this.selected = !this.selected;
 
     if (!this.selected) {
-      this.gameObject.clearTint();
+      this.clearTint();
     } else {
+      this.navigateTo(50, 50);
+
       this.actorsManager.onActorSelected(this);
-      this.gameObject.setTint(CST.ACTOR.SELECTION_TINT);
-
-      let moveTo = new MoveTo(this.gameObject, {
-        speed: 400,
-        rotateToTarget: false,
-        occupiedTest: true,
-        blockerTest: true
-      });
-
-      moveTo.moveTo(50, 50);
-
-      moveTo.on("complete", () => {
-        console.log("EIOOO!!!");
-      });
+      this.setTint(CST.ACTOR.SELECTION_TINT);
     }
   }
 
   walkAnim(direction: ACTOR_DIRECTIONS): this {
-    this.gameObject.play(`${this.actorKey}.${ACTOR_STATES.WALK}.${direction}`);
+    this.play(`${this.actorKey}.${ACTOR_STATES.WALK}.${direction}`);
 
     return this;
   }
 
   idleAnim(direction: ACTOR_DIRECTIONS): this {
-    this.gameObject.play(`${this.actorKey}.${ACTOR_STATES.IDLE}.${direction}`);
+    this.play(`${this.actorKey}.${ACTOR_STATES.IDLE}.${direction}`);
 
-    return this;
-  }
-
-  public enableDebugging(): this {
-    this.gameObject.enableDebugging();
     return this;
   }
 

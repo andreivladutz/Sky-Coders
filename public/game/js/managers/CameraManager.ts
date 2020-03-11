@@ -24,6 +24,8 @@ export default class CameraManager extends Manager {
   // utility for camera zooming
   pinch: Pinch;
 
+  private window: Phaser.GameObjects.Zone;
+
   protected constructor(config: CameraControlConfig) {
     super();
 
@@ -38,12 +40,30 @@ export default class CameraManager extends Manager {
     }
   }
 
+  getViewRect(): Phaser.Geom.Rectangle {
+    return this.camera.worldView;
+  }
+
+  // center the camera view on these coords
+  centerOn(scrollX: number, scrollY: number): this {
+    if (this.window) {
+      this.window.x = scrollX;
+      this.window.y = scrollY;
+    } else {
+      let { width, height } = this.camera.worldView;
+
+      this.camera.setScroll(scrollX - width / 2, scrollY - height / 2);
+    }
+
+    return this;
+  }
+
   enablePan(): this {
     let { width, height } = this.scene.game.scale.gameSize;
 
     // add a hidden object the size of the window which will be moved
     // while panning. the camera will follow to object to simulate camera pan
-    let window = this.scene.add
+    this.window = this.scene.add
       .zone(width / 2, height / 2, width, height)
       .setVisible(false)
       .setOrigin(0.5);
@@ -59,8 +79,8 @@ export default class CameraManager extends Manager {
       (pan: Pan) => {
         // using the inverse of the zoom so when the camera is zoomed out
         // the player can pan the camera faster
-        window.x -= (pan.dx * 1) / this.camera.zoom;
-        window.y -= (pan.dy * 1) / this.camera.zoom;
+        this.window.x -= (pan.dx * 1) / this.camera.zoom;
+        this.window.y -= (pan.dy * 1) / this.camera.zoom;
 
         this.camera.emit(CST.CAMERA.MOVE_EVENT);
       },
@@ -68,7 +88,7 @@ export default class CameraManager extends Manager {
     );
 
     this.camera.startFollow(
-      window,
+      this.window,
       false,
       CST.CAMERA.PAN_LERP,
       CST.CAMERA.PAN_LERP
@@ -124,7 +144,13 @@ export default class CameraManager extends Manager {
     return this;
   }
 
-  public static getInstance(config: CameraControlConfig): CameraManager {
+  public static getInstance(config?: CameraControlConfig): CameraManager {
+    if (!this._instance && !config) {
+      throw new Error(
+        "A configuration object should be provided to initialise the CameraManager."
+      );
+    }
+
     return super.getInstance(config) as CameraManager;
   }
 }
