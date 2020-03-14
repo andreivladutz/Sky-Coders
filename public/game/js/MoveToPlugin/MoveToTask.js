@@ -24,11 +24,14 @@
 
 import TickTask from "phaser3-rex-plugins/plugins/utils/ticktask/TickTask.js";
 import GetSceneObject from "phaser3-rex-plugins/plugins/utils/system/GetSceneObject.js";
+import MapManager from "../managers/MapManager";
 
 const GetValue = Phaser.Utils.Objects.GetValue;
 const DistanceBetween = Phaser.Math.Distance.Between;
 const Lerp = Phaser.Math.Linear;
 const AngleBetween = Phaser.Math.Angle.Between;
+
+const mapManager = MapManager.getInstance();
 
 class MoveTo extends TickTask {
   constructor(gameObject, config) {
@@ -128,22 +131,35 @@ class MoveTo extends TickTask {
 
     this.targetX = x;
     this.targetY = y;
+
+    ({
+      x: this.worldTargetX,
+      y: this.worldTargetY
+    } = mapManager.tileToWorldCoords(x, y));
+
     super.start();
     return this;
   }
 
+  // Converted the update method to use tile coordinates instead of
+  // world coordinates, as the isoGame object handles tile coords to world coords internally
   update(time, delta) {
     if (!this.isRunning || !this.enable) {
       return this;
     }
 
     var gameObject = this.gameObject;
-    var curX = gameObject.x,
-      curY = gameObject.y;
+    // the position in TILES the game object has now
+    var curX = gameObject.floatingTileX,
+      curY = gameObject.floatingTileY;
+    // the end position of this moveTo task
     var targetX = this.targetX,
       targetY = this.targetY;
 
     if (reallyCloseTo(curX, targetX) && reallyCloseTo(curY, targetY)) {
+      // round the coords, otherwise the error will keep increasing each time
+      // gameObject.setToWorldXY(targetX, targetY, true);
+
       this.complete();
       return this;
     }
@@ -154,10 +170,23 @@ class MoveTo extends TickTask {
 
     var dt = (delta * this.timeScale) / 1000;
     var movingDist = this.speed * dt;
-    var distToTarget = DistanceBetween(curX, curY, targetX, targetY);
+
+    let curWorldX = gameObject.x,
+      curWorldY = gameObject.y;
+
+    // only the distance should be computed between real world coordinates
+    var distToTarget = DistanceBetween(
+      curWorldX,
+      curWorldY,
+      this.worldTargetX,
+      this.worldTargetY
+    );
+
     var newX, newY;
+
     if (movingDist < distToTarget) {
       var t = movingDist / distToTarget;
+
       newX = Lerp(curX, targetX, t);
       newY = Lerp(curY, targetY, t);
     } else {
@@ -168,7 +197,8 @@ class MoveTo extends TickTask {
     // debugger;
 
     // modified for isoGameObjects
-    gameObject.moveToWorldXY(newX, newY);
+    // using tile coordinates
+    gameObject.setTilePosition(newX, newY);
 
     if (this.rotateToTarget) {
       gameObject.rotation = AngleBetween(curX, curY, newX, newY);
@@ -177,7 +207,7 @@ class MoveTo extends TickTask {
   }
 }
 
-const EPSILON = 5;
+const EPSILON = 0.001;
 
 let reallyCloseTo = function(a, b) {
   if (Math.abs(a - b) <= EPSILON) {

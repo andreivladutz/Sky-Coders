@@ -1,5 +1,5 @@
 import { IsoSprite, IsoScene, Point3 } from "../IsoPlugin/IsoPlugin";
-import IsoBoard from "./IsoBoard";
+import IsoBoard, { TileXY } from "./IsoBoard";
 import IsoTile from "./IsoTile";
 
 import List, { Node } from "../utils/List";
@@ -87,8 +87,8 @@ export default class TileMap {
     // no tile is in place at first
     this.initTilesInPlace();
 
-    // add event listeners on the underlying board
-    this.setBoardInteractive();
+    // add event listeners
+    this.registerToEvents();
   }
 
   public onUpdate() {
@@ -96,6 +96,40 @@ export default class TileMap {
     // if so, redraw all tiles
     if (this.isoBoard.viewRectangleDirty) {
       this.redrawTiles();
+    }
+  }
+
+  public onTileOver(tileXY: TileXY) {
+    let x = tileXY.x,
+      y = tileXY.y;
+
+    // don't forget to clear the last tile on tile exit
+    if (
+      this.lastTintedTile &&
+      (this.lastTintedTile.tileX !== x || this.lastTintedTile.tileY !== y)
+    ) {
+      this.lastTintedTile.destroy();
+      this.lastTintedTile = null;
+    }
+
+    // we are over a valid tile, different than the last tinted one
+    if (
+      this.mapMatrix[y][x] &&
+      (!this.lastTintedTile ||
+        this.lastTintedTile.tileX !== x ||
+        this.lastTintedTile.tileY !== y)
+    ) {
+      this.lastTintedTile = new IsoTile(
+        this.scene,
+        x * this.tileHeight,
+        y * this.tileHeight,
+        x,
+        y,
+        this.envManager.getTextureKey(),
+        this.envManager.getGrassFrame(this.mapMatrix[y][x])
+      )
+        .setOrigin(0.5, 0.5)
+        .setTint(0x86bfda);
     }
   }
 
@@ -133,52 +167,7 @@ export default class TileMap {
     return tile;
   }
 
-  setBoardInteractive() {
-    this.isoBoard.board
-      .setInteractive()
-      .on("tilemove", (pointer, tileXY: { x: number; y: number }) => {
-        let x = tileXY.x,
-          y = tileXY.y;
-
-        // don't forget to clear the last tile on tile exit
-        if (
-          this.lastTintedTile &&
-          (this.lastTintedTile.tileX !== x || this.lastTintedTile.tileY !== y)
-        ) {
-          this.lastTintedTile.destroy();
-          this.lastTintedTile = null;
-        }
-
-        // we are over a valid tile, different than the last tinted one
-        if (
-          this.mapMatrix[y][x] &&
-          (!this.lastTintedTile ||
-            this.lastTintedTile.tileX !== x ||
-            this.lastTintedTile.tileY !== y)
-        ) {
-          this.lastTintedTile = new IsoTile(
-            this.scene,
-            x * this.tileHeight,
-            y * this.tileHeight,
-            x,
-            y,
-            this.envManager.getTextureKey(),
-            this.envManager.getGrassFrame(this.mapMatrix[y][x])
-          )
-            .setOrigin(0.5, 0.5)
-            .setTint(0x86bfda);
-        }
-      });
-
-    // board plugin specific events
-    this.isoBoard.board.on("tiletap", () => {
-      console.log("TILETAP!");
-    });
-
-    this.isoBoard.board.on("tilepressstart", () => {
-      console.log("TILEPRESS!");
-    });
-
+  registerToEvents() {
     // when the game resizes, we should reposition all the tiles
     this.scene.scale.on(
       "resize",

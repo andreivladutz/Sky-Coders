@@ -26,6 +26,11 @@ export default class IsoSpriteObject extends IsoSprite {
   // TODO: should default to DO_NOT_DRAW
   protected drawingGridColor: GridColor = GridColor.RED;
 
+  // the tint color of this object when a pointer is over it or it is selected
+  protected selectedTintColor: number = CST.ACTOR.SELECTION_TINT;
+  // is this object selected?
+  selected: boolean = false;
+
   // tile coords of this object
   // CAN BE FLOATING POINT NUMBERS!!!
   protected tileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
@@ -93,6 +98,60 @@ export default class IsoSpriteObject extends IsoSprite {
     this.scene.events.on("preupdate", () => {
       this.onSceneUpdate();
     });
+
+    // determine the grid to redraw on screen resize
+    this.scene.scale.on("resize", () => {
+      this.lastDrewTileCoords.x = -1;
+    });
+  }
+
+  // make this iso object selectable or unselectable
+  // pass false to the enable parameter to deactivate the selectable property
+  public makeSelectable(enable: boolean = true): this {
+    if (enable === false) {
+      this.disableInteractive();
+      return this;
+    }
+
+    this.setInteractive()
+      .on("pointerover", () => {
+        // TODO: stop propagating move events to the underlying board
+        //event.stopPropagation();
+
+        this.setTint(this.selectedTintColor);
+      })
+      .on("pointerout", () => {
+        if (!this.selected) {
+          this.clearTint();
+        }
+      })
+      .on("pointerdown", () => {
+        this.toggleSelected();
+      });
+
+    return this;
+  }
+
+  // select or deselect the actor
+  toggleSelected() {
+    this.selected = !this.selected;
+
+    // this object was just deselected, emit the event
+    if (!this.selected) {
+      this.clearTint();
+
+      // TODO: deselection logic?!
+      this.emit(CST.EVENTS.OBJECT.DESELECT);
+    } else {
+      // this object was just selected, emit the event
+      this.emit(CST.EVENTS.OBJECT.SELECT);
+
+      this.setTint(this.selectedTintColor);
+    }
+  }
+
+  public setSelectedTintColor(color: number) {
+    this.selectedTintColor = color;
   }
 
   // Add this object to the grid at the provided tile coords
@@ -223,8 +282,18 @@ export default class IsoSpriteObject extends IsoSprite {
   }
 
   // move this game object to worldX worldY position
-  public moveToWorldXY(worldX: number, worldY: number): this {
-    let tileCoords = this.mapManager.worldToFloatTileCoords(worldX, worldY);
+  // we have the choice to round the tile coords, placing the object at integer coords
+  public setToWorldXY(
+    worldX: number,
+    worldY: number,
+    roundTileCoords: boolean = false
+  ): this {
+    const toTileCoords = (roundTileCoords
+      ? this.mapManager.worldToTileCoords
+      : this.mapManager.worldToFloatTileCoords
+    ).bind(this.mapManager);
+
+    let tileCoords = toTileCoords(worldX, worldY);
 
     return this.setTilePosition(tileCoords.x, tileCoords.y);
   }

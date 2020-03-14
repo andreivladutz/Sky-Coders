@@ -246,6 +246,9 @@ export default class IsoBoard {
 
         this.board.grid.x = mapX;
         this.board.grid.y = mapY;
+
+        // redraw everything
+        this.viewRectangleDirty = true;
       },
       this
     );

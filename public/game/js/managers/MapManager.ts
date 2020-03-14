@@ -7,12 +7,20 @@ import CST from "../CST";
 import EnvironmentManager from "./EnvironmentManager";
 import IsoSpriteObject from "./IsoSpriteObject";
 import { IsoDebugger } from "../utils/debug";
-import IsoBoard from "../IsoPlugin/IsoBoard";
+import IsoBoard, { TileXY } from "../IsoPlugin/IsoBoard";
 import CameraManager from "./CameraManager";
+
+type EventEmitter = Phaser.Events.EventEmitter;
+const EventEmitter = Phaser.Events.EventEmitter;
 
 interface Point {
   x: number;
   y: number;
+}
+
+interface MapTileSize {
+  w: number;
+  h: number;
 }
 
 /*
@@ -20,8 +28,6 @@ interface Point {
  *
  */
 export default class MapManager extends Manager {
-  // the simplex noise based terrain generator
-  terrainGen: TerrainGenerator;
   // tile map container class
   tileMap: TileMap;
   // the matrix of tiles where map data is held
@@ -33,7 +39,33 @@ export default class MapManager extends Manager {
   private debuggingActive: boolean = false;
   // list of game objects to debug
   private debuggingObjects: IsoSpriteObject[];
-  isoDebug: IsoDebugger;
+  private isoDebug: IsoDebugger;
+
+  events: EventEmitter = new EventEmitter();
+
+  // register to events and emit them further
+  private initEvents() {
+    // board plugin specific events
+    this.getIsoBoard()
+      .board.setInteractive()
+      .on(CST.EVENTS.MAP.MOVE, (pointer, tile: TileXY) => {
+        this.tileMap.onTileOver(tile);
+        this.events.emit(CST.EVENTS.MAP.MOVE, tile);
+      })
+      .on(CST.EVENTS.MAP.TAP, (pointer, tile: TileXY) => {
+        this.events.emit(CST.EVENTS.MAP.TAP, tile);
+      })
+      .on(CST.EVENTS.MAP.PRESS, (pointer, tile: TileXY) => {
+        this.events.emit(CST.EVENTS.MAP.PRESS, tile);
+      });
+  }
+
+  public getMapTilesize(): MapTileSize {
+    return {
+      w: this.tileMap.mapWidth,
+      h: this.tileMap.mapHeight
+    };
+  }
 
   // returns the {x, y} corresponding world coords
   public tileToWorldCoords(tileX: number, tileY: number): Point {
@@ -108,29 +140,6 @@ export default class MapManager extends Manager {
     return this;
   }
 
-  generateIsland() {
-    // TODO: change the seed with a server-generated seed
-    this.terrainGen = TerrainGenerator.getInstance({
-      seed: "nice",
-      width: CST.MAP.WIDTH,
-      height: CST.MAP.HEIGHT,
-      frequency: CST.MAP.DEFAULT_CFG.frequency
-      // pass along for debugging the noise map
-      //debug: true,
-      //scene: this
-    }); //.addMoreNoiseMaps([{ f: 0.01, w: 0.3 }]);
-
-    this.mapMatrix = this.terrainGen.generateIslandTerrain({
-      emptyTileRatio: CST.ENVIRONMENT.EMPTY_TILE_RATIO,
-      tileConfigs: this.envManager.getTilesIndicesConfigs()
-    });
-  }
-
-  // terrain generation happens in the loading stage of the game
-  async preload() {
-    this.generateIsland();
-  }
-
   /**
    * @param {IsoScene} gameScene The game scene that renders the tile map
    */
@@ -146,14 +155,45 @@ export default class MapManager extends Manager {
     // generate environment frames
     this.envManager.generateFrames(gameScene);
 
-    return (this.tileMap = new TileMap({
+    // init the tilemap
+    this.tileMap = new TileMap({
       scene: this.gameScene,
       tileWidth: this.envManager.TILE_WIDTH,
       tileHeight: this.envManager.TILE_HEIGHT,
       mapWidth: CST.MAP.WIDTH,
       mapHeight: CST.MAP.HEIGHT,
       mapMatrix: this.mapMatrix
-    }));
+    });
+
+    // now that the tilemap and the isoboard are inited
+    // we can also init the events logic
+    this.initEvents();
+
+    return this.tileMap;
+  }
+
+  // the simplex noise based terrain generator
+  private generateIsland() {
+    // TODO: change the seed with a server-generated seed
+    let terrainGen = TerrainGenerator.getInstance({
+      seed: "nice",
+      width: CST.MAP.WIDTH,
+      height: CST.MAP.HEIGHT,
+      frequency: CST.MAP.DEFAULT_CFG.frequency
+      // pass along for debugging the noise map
+      //debug: true,
+      //scene: this
+    }); //.addMoreNoiseMaps([{ f: 0.01, w: 0.3 }]);
+
+    this.mapMatrix = terrainGen.generateIslandTerrain({
+      emptyTileRatio: CST.ENVIRONMENT.EMPTY_TILE_RATIO,
+      tileConfigs: this.envManager.getTilesIndicesConfigs()
+    });
+  }
+
+  // terrain generation happens in the loading stage of the game
+  async preload() {
+    this.generateIsland();
   }
 
   public static getInstance(): MapManager {

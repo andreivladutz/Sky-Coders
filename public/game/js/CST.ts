@@ -104,11 +104,22 @@ export default {
     SELECTION_TINT: 0xd0f5e9
   },
   NAV_OBJECT: {
-    SPEED: 400
+    SPEED: 4000
   },
   COLORS: {
     WHITE: 0xffffff,
     RED: 0xff0000,
     GREEN: 0x00ff00
+  },
+  EVENTS: {
+    MAP: {
+      TAP: "tiletap",
+      MOVE: "tilemove",
+      PRESS: "tilepressstart"
+    },
+    OBJECT: {
+      SELECT: "object.select",
+      DESELECT: "object.deselect"
+    }
   }
 };

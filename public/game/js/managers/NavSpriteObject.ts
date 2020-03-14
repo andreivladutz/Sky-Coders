@@ -1,26 +1,24 @@
 import IsoSpriteObject from "./IsoSpriteObject";
+import MapManager from "./MapManager";
 import CST from "../CST";
 
 import MoveTo from "../MoveToPlugin/MoveTo";
-import { PathFinder } from "phaser3-rex-plugins/plugins/board-components.js";
+import EasyStar from "../utils/astar/easystar";
 
 interface TileXY {
   x: number;
   y: number;
 }
 
-// A tile returned by the path finder plugin
-interface PathTile extends TileXY {
-  cost: number;
-}
-
 // A navigating subclass of the sprite object
 export default class NavSpriteObject extends IsoSpriteObject {
-  pathFollowing: PathTile[];
+  pathFollowing: TileXY[];
   // MoveTo plugin instance used for moving this sprite
   moveTo: MoveTo;
-  // PathFinder plugin used to find path
-  pathFinder: PathFinder;
+
+  // the size of the map in tiles
+  mapWidth: number = 0;
+  mapHeight: number = 0;
 
   constructor(
     scene: Phaser.Scene,
@@ -32,7 +30,7 @@ export default class NavSpriteObject extends IsoSpriteObject {
   ) {
     super(scene, tileX, tileY, z, texture, frame);
 
-    // RexPlugins behaviours:
+    // RexPlugins behaviour:
     this.moveTo = new MoveTo(this, {
       speed: CST.NAV_OBJECT.SPEED,
       rotateToTarget: false,
@@ -40,50 +38,115 @@ export default class NavSpriteObject extends IsoSpriteObject {
       blockerTest: false
     });
 
-    this.pathFinder = new PathFinder(this, {
-      occupiedTest: true,
-      blockerTest: true,
-      costCallback: this.costCallback,
-      costCallbackScope: this,
-      // useful when using a cost function
-      cacheCost: false,
-      // use A* algorithm
-      pathMode: "A*-line",
-      // Weight parameter for A* searching mode
-      weight: 10
-    });
+    let mapMgrInstance = MapManager.getInstance();
+
+    // the size of the map in tiles, useful for walkable checking
+    ({ w: this.mapWidth, h: this.mapHeight } = mapMgrInstance.getMapTilesize());
   }
 
-  // this function will be called to compute cost when deciding path
-  // "currTileXY, preTileXY : TileXY position {x, y}. Cost of moving from preTileXY to currTileXY"
-  private costCallback(
-    currTile: TileXY,
-    preTile: TileXY,
-    pathFinder: PathFinder
-  ) {
-    // return this when we cannot move to currTile
-    const BLOCKER = pathFinder.BLOCKER,
-      CONSTANT_COST = 1;
+  // this function will be called to compute whether a tile should be walked on or not
+  private walkableCallback(currTile: TileXY): boolean {
+    console.log("CAlled cost function");
 
     // tiles ocuppied by this object
     let gridTiles = this.getGridTiles(currTile.x, currTile.y);
 
     // check if any of the tiles of this object's grid overlaps a blocker. if so it's a no-no!
     for (let tile of gridTiles) {
+      // also check if any of the object's grid tile ended up being out of world bounds
+      if (
+        tile.x < 0 ||
+        tile.x >= this.mapWidth ||
+        tile.y < 0 ||
+        tile.y >= this.mapHeight
+      ) {
+        return false;
+      }
+
       if (this.mapManager.getIsoBoard().board.hasBlocker(tile.x, tile.y)) {
-        return BLOCKER;
+        return false;
       }
     }
 
-    return CONSTANT_COST;
+    // this tile is safe to walk on
+    return true;
+  }
+
+  // smoothen the path walked by this game object
+  // do not want to walk in zig zags if succesive tiles are on a diagonal
+  private smoothPath(): TileXY[] {
+    let i = 0,
+      n = this.pathFollowing.length,
+      path = this.pathFollowing,
+      smoothedPath = [];
+    const abs = Math.abs;
+
+    const getDx = (a: TileXY, b: TileXY) => a.x - b.x,
+      getDy = (a: TileXY, b: TileXY) => a.y - b.y;
+
+    while (i < n) {
+      smoothedPath.push(path[i]);
+
+      // if there is a next tile in the path check if it's diagonal to this tile
+      if (path[i + 1]) {
+        let dx = getDx(path[i + 1], path[i]),
+          dy = getDy(path[i + 1], path[i]);
+
+        // diagonal found
+        if (abs(dx) === 1 && abs(dy) === 1) {
+          // we can skip the tile in-between i.e. tile at i + 1
+          do {
+            i = i + 1;
+          } while (
+            path[i + 1] &&
+            getDx(path[i + 1], path[i]) === dx &&
+            getDy(path[i + 1], path[i]) === dy
+          );
+
+          smoothedPath.push(path[i]);
+        }
+      }
+
+      i = i + 1;
+    }
+
+    return smoothedPath;
   }
 
   // find path to tileX and tileY and start moving towards there
   navigateTo(tileX: number, tileY: number) {
-    this.pathFollowing = this.pathFinder.findPath({ x: tileX, y: tileY });
+    let easystar = new EasyStar.js();
 
-    // start moving along path
-    this.moveAlongPath();
+    easystar
+      .setGrid(this.mapManager.mapMatrix)
+      .setUnacceptableTiles([0])
+      .enableDiagonals()
+      .setIterationsPerCalculation(100)
+      .setCanWalkOnCb(this.walkableCallback, this);
+
+    easystar.findPath(
+      this.tileX,
+      this.tileY,
+      tileX,
+      tileY,
+      (path: TileXY[]) => {
+        this.pathFollowing = path;
+
+        console.log(this.pathFollowing);
+
+        // no path has been found
+        if (path === null) {
+          return;
+        }
+
+        this.pathFollowing = this.smoothPath();
+
+        // start moving along path
+        this.moveAlongPath();
+      }
+    );
+
+    easystar.calculate();
   }
 
   // Method that recursively calls itself while this actor is moving, until the movement is over

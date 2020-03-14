@@ -11,6 +11,7 @@ import { IsoScene } from "../IsoPlugin/IsoPlugin";
 import NavSpriteObject from "./NavSpriteObject";
 
 import ActorsManager from "./ActorsManager";
+import { TileXY } from "../IsoPlugin/IsoBoard";
 
 // config received by the actor config
 export interface ActorConfig {
@@ -34,8 +35,6 @@ export default class Actor extends NavSpriteObject {
   actorKey: ACTOR_NAMES;
 
   actorsManager: ActorsManager = ActorsManager.getInstance();
-  // is this actor selected?
-  selected: boolean = false;
 
   constructor(config: ActorConfig) {
     super(
@@ -64,38 +63,26 @@ export default class Actor extends NavSpriteObject {
    */
 
   makeInteractive(): this {
-    this.setInteractive()
-      .on("pointerover", () => {
-        // TODO: stop propagating move events to the underlying board
-        //event.stopPropagation();
+    this.makeSelectable().setSelectedTintColor(CST.ACTOR.SELECTION_TINT);
 
-        this.setTint(CST.ACTOR.SELECTION_TINT);
-      })
-      .on("pointerout", () => {
-        if (!this.selected) {
-          this.clearTint();
-        }
-      })
-      .on("pointerdown", () => {
-        // TODO: deselection logic?!
-        this.toggleSelected();
+    // when this actor gets SELECTED
+    this.on(CST.EVENTS.OBJECT.SELECT, () => {
+      this.mapManager.events.on(CST.EVENTS.MAP.TAP, (tile: TileXY) => {
+        this.navigateTo(tile.x, tile.y);
       });
 
-    return this;
-  }
+      this.actorsManager.onActorSelected(this);
+    });
 
-  // select or deselect the actor
-  toggleSelected() {
-    this.selected = !this.selected;
-
-    if (!this.selected) {
-      this.clearTint();
-    } else {
-      this.navigateTo(50, 50);
+    // when this actor gets DESELECTED
+    this.on(CST.EVENTS.OBJECT.DESELECT, () => {
+      // stop listening to tap events
+      this.mapManager.events.off(CST.EVENTS.MAP.TAP);
 
       this.actorsManager.onActorSelected(this);
-      this.setTint(CST.ACTOR.SELECTION_TINT);
-    }
+    });
+
+    return this;
   }
 
   walkAnim(direction: ACTOR_DIRECTIONS): this {

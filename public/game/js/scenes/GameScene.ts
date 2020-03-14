@@ -61,7 +61,7 @@ export default class GameScene extends IsoScene {
 
     actor = new Actor({
       actorKey: ACTOR_NAMES.MALLACK,
-      tileX: 20,
+      tileX: 33,
       tileY: 20,
       z: 0,
       scene: this

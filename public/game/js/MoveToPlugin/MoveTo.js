@@ -23,7 +23,7 @@
 */
 
 import TickTask from "phaser3-rex-plugins/plugins/utils/ticktask/TickTask.js";
-import Methods from "phaser3-rex-plugins/plugins/board/moveto/Methods.js";
+import Methods from "./Methods.js";
 import MoveToTask from "./MoveToTask.js";
 import GetChessData from "phaser3-rex-plugins/plugins/board/chess/GetChessData.js";
 import GetValue from "phaser3-rex-plugins/plugins/utils/object/GetValue.js";
