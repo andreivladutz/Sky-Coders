@@ -4,6 +4,7 @@ import { Island, IslandHandler } from "./island";
 import { NoiseMapDebugger } from "../utils/debug";
 
 import Phaser from "phaser";
+import { GrassTileConfig } from "../managers/EnvironmentManager";
 
 function linspace(
   startValue: number,
@@ -17,6 +18,14 @@ function linspace(
   }
 
   return arr;
+}
+
+interface TileIndicesConfig {
+  // number between 0 and 1
+  // the closer it is to 0 the less empty tiles the generated terrain will have
+  emptyTileRatio: number;
+  // tile indices to pick from
+  tileConfigs: GrassTileConfig[];
 }
 
 // config used to add more subdivisions to the primary hills
@@ -187,18 +196,44 @@ export default class TerrainGenerator extends NoiseGenerator {
     this.scene = config.scene || this.scene;
   }
 
-  // get a map and an array of tiles and return a matrix of tiles
-  public discretizeMap(map: number[][], tiles: number[]): number[][] {
-    let discreteInterval = linspace(0, 1, tiles.length + 1),
-      tileMap = [];
+  // get a map and a tile config (having an array of tile indices) and return a matrix of tiles
+  public discretizeMap(
+    map: number[][],
+    tileConfig: TileIndicesConfig
+  ): number[][] {
+    let tiles: GrassTileConfig[] = tileConfig.tileConfigs;
+
+    // discretize the interval from emptyTile ratio to 1
+    let discreteInterval = linspace(
+        tileConfig.emptyTileRatio,
+        CST.MAP.HEIGHT_MAP_MAX,
+        // one slot is for the empty tile (0)
+        tiles.length + 1
+      ),
+      tileMap: number[][] = [];
 
     for (let y = 0; y < this.height; y++) {
       tileMap[y] = [];
 
       for (let x = 0; x < this.width; x++) {
+        // should this tile be the empty tile?
+        if (map[y][x] <= discreteInterval[0]) {
+          tileMap[y][x] = CST.ENVIRONMENT.EMPTY_TILE;
+          continue;
+        }
+
         for (let i = 1; i < discreteInterval.length; i++) {
           if (map[y][x] <= discreteInterval[i]) {
-            tileMap[y][x] = tiles[i - 1];
+            let tileCfg = tiles[i - 1];
+
+            // pick a random number to decide the choice of tile
+            if (
+              Phaser.Math.RND.realInRange(0, 1) <= tileCfg.decorationProbability
+            ) {
+              tileMap[y][x] = tileCfg.grassTile;
+            } else {
+              tileMap[y][x] = tileCfg.baseTile;
+            }
             break;
           }
         }
@@ -245,9 +280,9 @@ export default class TerrainGenerator extends NoiseGenerator {
   }
 
   // get the tiles used for the generation of this island
-  public generateIslandTerrain(tiles: number[]): number[][] {
+  public generateIslandTerrain(tileConfig: TileIndicesConfig): number[][] {
     let terrain = this.generateNoiseMap(),
-      tiledMap = this.discretizeMap(terrain, tiles);
+      tiledMap = this.discretizeMap(terrain, tileConfig);
 
     // if debugging is enabled, show the noise map at coords (0, 0)
     if (this.debug && this.scene) {

@@ -24,6 +24,8 @@ export default class IsoTile extends Phaser.GameObjects.Image {
 
     this.projector = scene.iso.projector;
     this.set3DPosition(this.x, this.y, 0);
+
+    this.scene.add.existing(this);
   }
 
   set3DPosition(x: number, y: number, z: number): this {

@@ -19,13 +19,14 @@ interface IsoInjectedScene extends Phaser.Scene {
  * The IsoSprites retain their 2D position property to prevent any problems and allow you to interact with them as you would a normal Sprite. The upside of this simplicity is that things should behave predictably for those already used to Phaser.
  */
 export default class IsoSprite extends Sprite {
-  _position3D: Point3;
+  protected _position3D: Point3;
+  protected _position3DChanged: boolean;
   snap: number;
-  private _position3DChanged: boolean;
-  private _bounds3DChanged: boolean;
-  private _bounds3D: Cube;
+  protected _bounds3DChanged: boolean;
+  protected _bounds3D: Cube;
+
   // projected _bounds3D cube to check pointer hit against
-  private hitPolygon: Phaser.Geom.Polygon;
+  protected hitPolygon: Phaser.Geom.Polygon;
 
   // let ts know this scene has an iso property
   scene: IsoInjectedScene;
@@ -33,6 +34,7 @@ export default class IsoSprite extends Sprite {
   // if the depth is set manually via setDepth, then it shouldn't be automatically computed anymore
   private depthOverriden: boolean;
 
+  // TODO: update body to be the Physics' Body type
   body: { [key: string]: any };
 
   /**
@@ -163,6 +165,45 @@ export default class IsoSprite extends Sprite {
     }
   }
 
+  // get screenX() {
+  //   return this.x;
+  // }
+
+  // get screenY() {
+  //   return this.y;
+  // }
+
+  // // let the user set the x and y already projected coords directly
+  // set screenX(value: number) {
+  //   this.x = value;
+  //   this.screenPosTo3D();
+  // }
+
+  // set screenY(value: number) {
+  //   this.y = value;
+  //   this.screenPosTo3D();
+  // }
+
+  // // set internal 3D position from screen position
+  // private screenPosTo3D() {
+  //   let projector = this.scene.iso.projector;
+
+  //   this._position3D = projector.unproject(
+  //     new Phaser.Geom.Point(this.x, this.y),
+  //     this._position3D,
+  //     this._position3D ? this._position3D.z : 0
+  //   );
+
+  //   // Phaser handles depth sorting automatically
+  //   if (!this.depthOverriden) {
+  //     this.depth =
+  //       this._position3D.x + this._position3D.y + this._position3D.z * 1.25;
+  //   }
+
+  //   this._position3DChanged = false;
+  //   this._bounds3DChanged = true;
+  // }
+
   /**
    * A Point3 object representing the axonometric position of the IsoSprite.
    *
@@ -237,9 +278,9 @@ export default class IsoSprite extends Sprite {
    * Internal function that performs the axonometric projection from 3D to 2D space.
    * @method Phaser.Plugin.Isometric.IsoSprite#_project
    * @memberof Phaser.Plugin.Isometric.IsoSprite
-   * @private
+   * @protected
    */
-  private _project() {
+  protected _project() {
     if (!this._position3DChanged) {
       return;
     }
@@ -248,7 +289,10 @@ export default class IsoSprite extends Sprite {
     // const sceneProjector = this.scene[pluginKey].projector;
     const sceneProjector = this.scene.iso.projector;
 
-    ({ x: this.x, y: this.y } = sceneProjector.project(this._position3D));
+    let { x, y } = sceneProjector.project(this._position3D);
+
+    this.setX(x);
+    this.setY(y);
 
     // Phaser handles depth sorting automatically
     if (!this.depthOverriden) {

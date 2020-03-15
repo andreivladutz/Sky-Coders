@@ -1,25 +1,26 @@
 import CST from "../CST";
-import { IsoSprite, ISOMETRIC } from "../IsoPlugin/IsoPlugin";
+import { IsoSprite, ISOMETRIC, Point3 } from "../IsoPlugin/IsoPlugin";
 import IsoScene from "../IsoPlugin/IsoScene";
 
-import CameraController from "../controllers/CameraController";
-import MapController from "../controllers/MapController";
-import Actor from "../controllers/Actor";
+import CameraManager from "../managers/CameraManager";
+import MapManager from "../managers/MapManager";
+import Actor from "../managers/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
 import TileMap from "../IsoPlugin/TileMap";
+import IsoGameObject from "../managers/IsoSpriteObject";
+import AstarWorkerManager from "../managers/AstarWorkerManager";
 
-let cursors, speed, actor;
+// TODO: remove global variables
+let actor: Actor;
 
 export default class GameScene extends IsoScene {
   tileMap: TileMap;
-  // class helpers
-  cameraControl: CameraController;
 
   constructor() {
     const config = {
       key: CST.SCENES.GAME
     };
-    // also enable physics
+    // TODO: deactivate physics if not used anymore
     super(config, true);
 
     // set the isometric projection to be true isometric
@@ -40,6 +41,9 @@ export default class GameScene extends IsoScene {
       });
     }
     */
+
+    // start the UI scene and move it above
+    this.scene.launch(CST.SCENES.UI);
   }
 
   create() {
@@ -47,48 +51,36 @@ export default class GameScene extends IsoScene {
     this.iso.projector.origin.setTo(0.5, 0.2);
 
     // fire the map init
-    this.tileMap = MapController.getInstance().initMap(this);
+    this.tileMap = MapManager.getInstance().initMap(this);
     // init the camera controller
-    this.cameraControl = new CameraController(this.cameras.main, this, {
+    CameraManager.getInstance({
+      camera: this.cameras.main,
+      scene: this,
       enablePan: true,
       enableZoom: true
     });
 
     actor = new Actor({
       actorKey: ACTOR_NAMES.MALLACK,
-      x: 2000,
-      y: 2000,
+      tileX: 33,
+      tileY: 20,
       z: 0,
-      scene: this,
-      frame: "Mallack/se/mallack00016"
+      scene: this
     });
 
-    cursors = this.input.keyboard.createCursorKeys();
-    speed = 2000;
+    actor.idleAnim(ACTOR_DIRECTIONS.SE);
 
-    actor.walkAnim(ACTOR_DIRECTIONS.SOUTH);
-
-    this.isoPhysics.world.enable(actor.isoSprite);
+    MapManager.getInstance()
+      .enableDebugging()
+      .setScrollOverTiles(actor.tileX, actor.tileY);
+    actor.enableDebugging();
   }
 
   update() {
-    if (cursors.left.isDown) {
-      actor.isoSprite.body.velocity.x = -speed;
-    } else if (cursors.right.isDown) {
-      actor.isoSprite.body.velocity.x = speed;
-    } else {
-      actor.isoSprite.body.velocity.x = 0;
-    }
-
-    if (cursors.up.isDown) {
-      actor.isoSprite.body.velocity.y = -speed;
-    } else if (cursors.down.isDown) {
-      actor.isoSprite.body.velocity.y = speed;
-    } else {
-      actor.isoSprite.body.velocity.y = 0;
-    }
-
-    this.tileMap.drawTilesDebug();
-    this.tileMap.isoDebug.debugIsoSprites([actor.isoSprite], 0xeb4034, false);
+    // code to follow an actor
+    // MapManager.getInstance().setScrollOverTiles(
+    //   actor.gameObject.floatingTileX,
+    //   actor.gameObject.floatingTileY
+    // );
   }
 }

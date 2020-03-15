@@ -1,0 +1,335 @@
+{
+	"textures": [
+		{
+			"image": "environment-hd-0.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 982,
+				"h": 1827
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Trees/Tree2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 650,
+						"h": 800
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 30,
+						"w": 572,
+						"h": 650
+					},
+					"frame": {
+						"x": 10,
+						"y": 10,
+						"w": 572,
+						"h": 650
+					}
+				},
+				{
+					"filename": "Trees/PineTree",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 800
+					},
+					"spriteSourceSize": {
+						"x": 26,
+						"y": 75,
+						"w": 414,
+						"h": 637
+					},
+					"frame": {
+						"x": 10,
+						"y": 678,
+						"w": 414,
+						"h": 637
+					}
+				},
+				{
+					"filename": "Trees/Tree1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 700,
+						"h": 800
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 185,
+						"w": 565,
+						"h": 484
+					},
+					"frame": {
+						"x": 10,
+						"y": 1333,
+						"w": 565,
+						"h": 484
+					}
+				},
+				{
+					"filename": "Trees/Tree",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 512,
+						"h": 800
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 228,
+						"w": 456,
+						"h": 443
+					},
+					"frame": {
+						"x": 442,
+						"y": 678,
+						"w": 456,
+						"h": 443
+					}
+				},
+				{
+					"filename": "Tiles/base00",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 442,
+						"y": 1139,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/base01",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 442,
+						"y": 1139,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/base03",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 442,
+						"y": 1139,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/base02",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 600,
+						"y": 10,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/base02bef",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 600,
+						"y": 176,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/base04",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 600,
+						"y": 342,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/grass00",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 600,
+						"y": 508,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/grass01",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 593,
+						"y": 1305,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/grass02",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 716,
+						"y": 1139,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/grass03",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 593,
+						"y": 1471,
+						"w": 256,
+						"h": 148
+					}
+				},
+				{
+					"filename": "Tiles/grass04",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 148
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 148
+					},
+					"frame": {
+						"x": 593,
+						"y": 1637,
+						"w": 256,
+						"h": 148
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:54400bbadb3243616da480d8c4cf9784:a10ee68fde0e1f02e78326d304ff15d0:1efd645e775df4ac353f239e5fd118d6$"
+	}
+}

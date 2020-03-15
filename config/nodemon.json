@@ -1,4 +1,5 @@
 {
   "ext": "ts,js,json,mjs",
-  "ignore": ["public/", "node_modules/"]
+  "ignore": ["public/", "node_modules/"],
+  "watch": ["server/*"]
 }

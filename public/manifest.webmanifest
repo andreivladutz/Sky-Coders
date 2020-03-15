@@ -1,0 +1,27 @@
+{
+  "short_name": "Sky Dwellers",
+  "name": "Sky Dwellers: Build a new world.",
+  "description": "Building, survival game, scripting",
+  "categories": ["games", "education", "entertainment"],
+  "lang": "en-US",
+  "orientation": "landscape",
+  "icons": [
+    {
+      "src": "/image/icon/icon192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/image/icon/icon512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#716981",
+  "display": "fullscreen",
+  "scope": "/",
+  "theme_color": "#716981"
+}

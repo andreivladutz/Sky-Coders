@@ -1,3 +1,8 @@
+import WORKER_CST from "./utils/astar/WORKER_CST";
+
+//TODO: Change variant
+const VARIANT = "-hd";
+
 export default {
   GAME: {
     WIDTH: 1920,
@@ -8,7 +13,8 @@ export default {
   // scene keys
   SCENES: {
     LOAD: "LOAD",
-    GAME: "GAME"
+    GAME: "GAME",
+    UI: "UISCENE"
   },
   // terrain generation parameters
   MAP: {
@@ -17,7 +23,9 @@ export default {
     DEFAULT_CFG: {
       frequency: 0.025,
       exponent: 1
-    }
+    },
+    // maximum value when discretizing the noise map
+    HEIGHT_MAP_MAX: 0.85
   },
   PLUGINS: {
     ISO: {
@@ -41,17 +49,79 @@ export default {
   },
   // options for the board grid
   GRID: {
-    // 1 px for the line width
-    LINE_WIDTH: 1,
+    // 2 px for the line width
+    LINE_WIDTH: 2,
     LINE_COLOR: 0xffffff,
     LINE_ALPHA: 1,
-    BUFFER: {
-      // how much the grid buffer will be scaled in proportion to the real game size
-      SCALE: 15
-    }
+    // if the game is zoomed out too much, the grid will hide
+    ZOOM_DEACTIVATE: 0.2,
+    // the grid should be drawn on top of the tile layer
+    GRID_DEPTH: 2,
+    // fill alpha for game objects' grid
+    FILL_ALPHA: 0.3
   },
   TILEMAP: {
     OFFSCR_BUFF_KEY: "tileMapOffscreenCanvas",
     OFFSCR_BUFF_ID: "offscren-buffer"
-  }
+  },
+  // service-worker related csts
+  SW: {
+    BUILT_SW_PATH: "./sw-build.js"
+  },
+  ENVIRONMENT: {
+    // the prefix added to Phaser's frames
+    TEXTURE_PREFIX: "ENV.",
+    // the key of the atlas resource
+    ATLAS_KEY: "ENVIRONMENT.ATLAS_KEY",
+    // path to multiatlas
+    MULTIATLAS_PATH: "sprite/environment/",
+    MULTIATLAS: `environment${VARIANT}.json`,
+    GRASS: {
+      PREFIX: "Tiles/grass",
+      BASE_PREFIX: "Tiles/base",
+      START: 0,
+      END: 5,
+      ZERO_PAD: 2,
+      // probability that a grass tile appears instead of a base one
+      PROBABILITIES: [1 / 100, 1 / 20, 0, 1 / 300, 1 / 300]
+    },
+    TREES: {
+      PREFIX: "Trees/",
+      TREE_NAMES: ["PineTree", "Tree", "Tree1", "Tree2"]
+    },
+    // the empty tile's index
+    EMPTY_TILE: 0,
+    EMPTY_TILE_RATIO: 0.3,
+    // how many of each
+    GRASS_TILES_COUNT: 5,
+    TREES_COUNT: 4,
+    // offsets of tiles in the tilemap
+    // e.g. map grass indices 1, 2,..,5 to 0,...,4
+    BASE_OFFSET: 1,
+    GRASS_OFFSET: 6
+  },
+  ACTOR: {
+    SELECTION_TINT: 0xd0f5e9
+  },
+  NAV_OBJECT: {
+    SPEED: 4000
+  },
+  COLORS: {
+    WHITE: 0xffffff,
+    RED: 0xff0000,
+    GREEN: 0x00ff00
+  },
+  EVENTS: {
+    MAP: {
+      TAP: "tiletap",
+      MOVE: "tilemove",
+      PRESS: "tilepressstart"
+    },
+    OBJECT: {
+      SELECT: "object.select",
+      DESELECT: "object.deselect"
+    }
+  },
+  // constants imported from the worker cst
+  WORKER: WORKER_CST
 };

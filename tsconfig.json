@@ -1,8 +1,9 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "module": "ESNext",
-        "moduleResolution": "Node",
-        "allowSyntheticDefaultImports": true
-    },
+  "compilerOptions": {
+    "target": "es6",
+    "module": "ESNext",
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true,
+    "lib": ["ES2019", "ES2015.Promise"]
+  }
 }
