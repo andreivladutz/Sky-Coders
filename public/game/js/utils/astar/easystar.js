@@ -6,15 +6,35 @@
  *   Implementation By Bryce Neal (@prettymuchbryce)
  **/
 
+const FIND_AREA = 0,
+  FIND_PATH = 1;
+
 var EasyStar = {};
-var Instance = require("./instance");
-var Node = require("./node");
-var Heap = require("./heap");
+
+/**
+ * Represents a single instance of EasyStar.
+ * A path that is in the queue to eventually be found.
+ */
+var Instance = function() {
+  this.pointsToAvoid = {};
+  this.startX;
+  this.callback;
+  this.startY;
+  this.endX;
+  this.endY;
+  this.nodeHash = {};
+  this.openList;
+
+  // the mode this instance is running in
+  // can be FIND_AREA = searching all reacheable tiles from a tile
+  // or FIND_PATH = searching a path from a starting tile to a particular ending tile
+  this.MODE;
+  // the area size in case of FIND_AREA mode
+  this.maxTiles;
+};
 
 const CLOSED_LIST = 0;
 const OPEN_LIST = 1;
-
-module.exports = EasyStar;
 
 var nextInstanceId = 1;
 
@@ -35,6 +55,9 @@ EasyStar.js = function() {
   var acceptableTiles;
   var unacceptableTiles;
   var diagonalsEnabled = false;
+
+  // if the mode is sync, should we stop after an iterationsPerCalculation number of iterations?
+  var shouldIterateInfinitely = false;
 
   // Added custom canWalkOn callback which can be set
   var canWalkOnCb;
@@ -115,9 +138,14 @@ EasyStar.js = function() {
   /**
    * Enables sync mode for this EasyStar instance..
    * if you're into that sort of thing.
+   *
+   * @param {boolean} infiniteIterations pass true to force astar
+   * to iterate until a path is found. Defaults to @default false, so after the set number
+   * of iterations, the calculate() method interrupts and has to be called again
    **/
-  this.enableSync = function() {
+  this.enableSync = function(infiniteIterations = false) {
     syncEnabled = true;
+    shouldIterateInfinitely = infiniteIterations;
 
     return this;
   };
@@ -320,6 +348,45 @@ EasyStar.js = function() {
   };
 
   /**
+   * Find the walkable area of maximum maxTiles around a start tile.
+   *
+   * @param {Number} startX The X position of the starting point.
+   * @param {Number} startY The Y position of the starting point.
+   * @param {Number} maxTiles The maximum number of tiles this area around the start tile should be .
+   * @param {Function} callback A function that is called when your path
+   * is found, or no path is found.
+   * @return {Number} A numeric, non-zero value which identifies the created instance. This value can be passed to cancelPath to cancel the path calculation.
+   *
+   **/
+  this.findArea = function(startX, startY, maxTiles, callback) {
+    // the setup with callback wrapping and checking if all
+    // necessary conditions are met to run this algorithm
+    var callbackWrapper = preparePathFinding.call(this, callback);
+
+    // Start or endpoint outside of scope.
+    if (
+      startX < 0 ||
+      startY < 0 ||
+      startX > collisionGrid[0].length - 1 ||
+      startY > collisionGrid.length - 1
+    ) {
+      throw new Error("Your start point is outside the scope of your grid.");
+    }
+
+    // creates a new instance computing this area
+    // there can be many instances that compute different areas
+    return createNewPathFindingInstance(
+      startX,
+      startY,
+      NaN,
+      NaN,
+      callbackWrapper,
+      FIND_AREA,
+      maxTiles
+    );
+  };
+
+  /**
    * Find a path.
    *
    * @param {Number} startX The X position of the starting point.
@@ -332,34 +399,9 @@ EasyStar.js = function() {
    *
    **/
   this.findPath = function(startX, startY, endX, endY, callback) {
-    // Wraps the callback for sync vs async logic
-    var callbackWrapper = function(result) {
-      if (syncEnabled) {
-        callback(result);
-      } else {
-        setTimeout(function() {
-          callback(result);
-        });
-      }
-    };
-
-    // No grid was set
-    if (collisionGrid === undefined) {
-      throw new Error(
-        "You can't set a path without first calling setGrid() on EasyStar."
-      );
-    }
-
-    // No acceptable tiles were set
-    if (acceptableTiles === undefined) {
-      if (unacceptableTiles !== undefined) {
-        this.computeAcceptableTiles();
-      } else {
-        throw new Error(
-          "You can't set a path without first calling setAcceptableTiles() on EasyStar."
-        );
-      }
-    }
+    // the setup with callback wrapping and checking if all
+    // necessary conditions are met to run this algorithm
+    var callbackWrapper = preparePathFinding.call(this, callback);
 
     // Start or endpoint outside of scope.
     if (
@@ -376,6 +418,8 @@ EasyStar.js = function() {
         "Your start or end point is outside the scope of your grid."
       );
     }
+
+    // Performing helpful checks on the end tile:
 
     // Start and end are the same tile.
     if (startX === endX && startY === endY) {
@@ -404,33 +448,16 @@ EasyStar.js = function() {
       return;
     }
 
-    // Create the instance
-    var instance = new Instance();
-    instance.openList = new Heap(function(nodeA, nodeB) {
-      return nodeA.bestGuessDistance() - nodeB.bestGuessDistance();
-    });
-    instance.isDoneCalculating = false;
-    instance.nodeHash = {};
-    instance.startX = startX;
-    instance.startY = startY;
-    instance.endX = endX;
-    instance.endY = endY;
-    instance.callback = callbackWrapper;
-
-    instance.openList.push(
-      coordinateToNode(
-        instance,
-        instance.startX,
-        instance.startY,
-        null,
-        STRAIGHT_COST
-      )
+    // creates a new instance computing this path
+    // there can be many instances that compute different paths
+    return createNewPathFindingInstance(
+      startX,
+      startY,
+      endX,
+      endY,
+      callbackWrapper,
+      FIND_PATH
     );
-
-    var instanceId = nextInstanceId++;
-    instances[instanceId] = instance;
-    instanceQueue.push(instanceId);
-    return instanceId;
   };
 
   /**
@@ -472,7 +499,7 @@ EasyStar.js = function() {
         return;
       }
 
-      if (syncEnabled) {
+      if (syncEnabled && shouldIterateInfinitely) {
         // If this is a sync instance, we want to make sure that it calculates synchronously.
         iterationsSoFar = 0;
       }
@@ -485,9 +512,17 @@ EasyStar.js = function() {
         continue;
       }
 
-      // Couldn't find a path.
+      // Couldn't find a path if FIND_PATH mode.
+      // Otherwise if FIND_AREA mode, the algorithm is over
       if (instance.openList.size() === 0) {
-        instance.callback(null);
+        if (instance.MODE === FIND_PATH) {
+          instance.callback(null);
+        } else if (instance.MODE === FIND_AREA) {
+          getWalkableArea(instance);
+        }
+
+        // free the memory of this instance
+        // once all the needed data has been retrieved
         delete instances[instanceId];
         instanceQueue.shift();
         continue;
@@ -697,6 +732,16 @@ EasyStar.js = function() {
         cost
       );
 
+      // if in FIND_AREA mode and the distance to this node becomes greater
+      // than the maximum number of tiles allowed, than do not push it in the openList anymore
+      if (
+        instance.MODE === FIND_AREA &&
+        getDistance(instance.startX, instance.startY, node.x, node.y) >
+          instance.maxTiles
+      ) {
+        return;
+      }
+
       if (node.list === undefined) {
         node.list = OPEN_LIST;
         instance.openList.push(node);
@@ -786,12 +831,17 @@ EasyStar.js = function() {
     } else {
       instance.nodeHash[y] = {};
     }
-    var simpleDistanceToTarget = getDistance(
-      x,
-      y,
-      instance.endX,
-      instance.endY
-    );
+
+    let simpleDistanceToTarget;
+
+    // if MODE is FIND_AREA don't add the H heuristic
+    // this way the algorithm becomes a simple Dijkstra algorithm
+    if (instance.MODE === FIND_AREA) {
+      simpleDistanceToTarget = 0;
+    } else if (instance.MODE === FIND_PATH) {
+      simpleDistanceToTarget = getDistance(x, y, instance.endX, instance.endY);
+    }
+
     if (parent !== null) {
       var costSoFar = parent.costSoFar + cost;
     } else {
@@ -800,6 +850,31 @@ EasyStar.js = function() {
     var node = new Node(parent, x, y, costSoFar, simpleDistanceToTarget);
     instance.nodeHash[y][x] = node;
     return node;
+  };
+
+  // return the area resulted from an instance with FIND_AREA mode
+  var getWalkableArea = function(instance) {
+    let path = [];
+
+    for (var y = 0; y < collisionGrid.length; y++) {
+      for (var x = 0; x < collisionGrid[0].length; x++) {
+        if (instance.nodeHash[y] && instance.nodeHash[y][x]) {
+          path.push({
+            x: instance.nodeHash[y][x].x,
+            y: instance.nodeHash[y][x].y,
+            parent: instance.nodeHash[y][x].parent
+              ? {
+                  x: instance.nodeHash[y][x].parent.x,
+                  y: instance.nodeHash[y][x].parent.y
+                }
+              : null,
+            cost: instance.nodeHash[y][x].costSoFar
+          });
+        }
+      }
+    }
+
+    instance.callback(path);
   };
 
   var getDistance = function(x1, y1, x2, y2) {
@@ -818,6 +893,85 @@ EasyStar.js = function() {
       var dy = Math.abs(y1 - y2);
       return dx + dy;
     }
+  };
+
+  // returns the callback wrapper
+  var preparePathFinding = function(callback) {
+    // Wraps the callback for sync vs async logic
+    var callbackWrapper = function(result) {
+      if (syncEnabled) {
+        callback(result);
+      } else {
+        setTimeout(function() {
+          callback(result);
+        });
+      }
+    };
+
+    // No grid was set
+    if (collisionGrid === undefined) {
+      throw new Error(
+        "You can't set a path without first calling setGrid() on EasyStar."
+      );
+    }
+
+    // No acceptable tiles were set
+    if (acceptableTiles === undefined) {
+      if (unacceptableTiles !== undefined) {
+        this.computeAcceptableTiles();
+      } else {
+        throw new Error(
+          "You can't set a path without first calling setAcceptableTiles() on EasyStar."
+        );
+      }
+    }
+
+    return callbackWrapper;
+  };
+
+  // returns the new instanceId of the created instance
+  var createNewPathFindingInstance = function(
+    startX,
+    startY,
+    endX,
+    endY,
+    callbackWrapper,
+    MODE = FIND_PATH,
+    // in case MODE is FIND_AREA
+    maxTiles = 0
+  ) {
+    // Create the instance
+    var instance = new Instance();
+
+    instance.openList = new Heap(function(nodeA, nodeB) {
+      return nodeA.bestGuessDistance() - nodeB.bestGuessDistance();
+    });
+
+    instance.isDoneCalculating = false;
+    instance.nodeHash = {};
+    instance.startX = startX;
+    instance.startY = startY;
+    instance.endX = endX;
+    instance.endY = endY;
+    instance.callback = callbackWrapper;
+    // The mode the path finding algorithm is running in
+    instance.MODE = MODE;
+    instance.maxTiles = maxTiles;
+
+    instance.openList.push(
+      coordinateToNode(
+        instance,
+        instance.startX,
+        instance.startY,
+        null,
+        STRAIGHT_COST
+      )
+    );
+
+    var instanceId = nextInstanceId++;
+    instances[instanceId] = instance;
+    instanceQueue.push(instanceId);
+    return instanceId;
   };
 };
 

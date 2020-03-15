@@ -8,6 +8,7 @@ import Actor from "../managers/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
 import TileMap from "../IsoPlugin/TileMap";
 import IsoGameObject from "../managers/IsoSpriteObject";
+import AstarWorkerManager from "../managers/AstarWorkerManager";
 
 // TODO: remove global variables
 let actor: Actor;

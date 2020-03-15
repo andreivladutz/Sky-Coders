@@ -7,9 +7,9 @@ import MoveCloser from "phaser3-rex-plugins/plugins/board/moveto/MoveCloser.js";
 
 export default {
   canMoveTo: CanMoveToTile,
-  moveTo: MoveToTile,
-  moveToward: MoveToward,
-  moveToRandomNeighbor: MoveToRandomNeighbor,
-  moveAway: MoveAway,
-  moveCloser: MoveCloser
+  moveTo: MoveToTile
+  // moveToward: MoveToward,
+  // moveToRandomNeighbor: MoveToRandomNeighbor,
+  // moveAway: MoveAway,
+  // moveCloser: MoveCloser
 };

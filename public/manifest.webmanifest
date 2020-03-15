@@ -1,7 +1,7 @@
 {
-  "short_name": "IsoGame",
-  "name": "IsoGame: Script the world of tomorrow.",
-  "description": "Building, survival game",
+  "short_name": "Sky Dwellers",
+  "name": "Sky Dwellers: Build a new world.",
+  "description": "Building, survival game, scripting",
   "categories": ["games", "education", "entertainment"],
   "lang": "en-US",
   "orientation": "landscape",

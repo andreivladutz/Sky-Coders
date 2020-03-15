@@ -53,6 +53,8 @@ export default class MapManager extends Manager {
         this.events.emit(CST.EVENTS.MAP.MOVE, tile);
       })
       .on(CST.EVENTS.MAP.TAP, (pointer, tile: TileXY) => {
+        // TODO: IF ON MOBILE (DETECT) then on tile over should be called
+        //this.tileMap.onTileOver(tile);
         this.events.emit(CST.EVENTS.MAP.TAP, tile);
       })
       .on(CST.EVENTS.MAP.PRESS, (pointer, tile: TileXY) => {

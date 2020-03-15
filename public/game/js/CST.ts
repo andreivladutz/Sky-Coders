@@ -1,4 +1,4 @@
-import Point3 from "./IsoPlugin/Point3";
+import WORKER_CST from "./utils/astar/WORKER_CST";
 
 //TODO: Change variant
 const VARIANT = "-hd";
@@ -121,5 +121,7 @@ export default {
       SELECT: "object.select",
       DESELECT: "object.deselect"
     }
-  }
+  },
+  // constants imported from the worker cst
+  WORKER: WORKER_CST
 };

@@ -374,15 +374,17 @@
     return Heap;
   })();
 
-  (function(root, factory) {
-    if (typeof define === "function" && define.amd) {
-      return define([], factory);
-    } else if (typeof exports === "object") {
-      return (module.exports = factory());
-    } else {
-      return (root.Heap = factory());
-    }
-  })(this, function() {
-    return Heap;
-  });
-}.call(this));
+  // (function(root, factory) {
+  //   if (typeof define === "function" && define.amd) {
+  //     return define([], factory);
+  //   } else if (typeof exports === "object") {
+  //     return (module.exports = factory());
+  //   } else {
+  //     return (root.Heap = factory());
+  //   }
+  // })(this, function() {
+  //   return Heap;
+  // });
+
+  return (this.Heap = Heap);
+}.call(globalThis));

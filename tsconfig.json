@@ -4,6 +4,6 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
-    "lib": ["ES2019"]
+    "lib": ["ES2019", "ES2015.Promise"]
   }
 }

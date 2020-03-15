@@ -31,13 +31,11 @@ export interface ActorConfig {
 }
 
 export default class Actor extends NavSpriteObject {
-  // this actor's key in the ACTORS_CST config object
-  actorKey: ACTOR_NAMES;
-
   actorsManager: ActorsManager = ActorsManager.getInstance();
 
   constructor(config: ActorConfig) {
     super(
+      config.actorKey,
       config.scene,
       config.tileX,
       config.tileY,
@@ -45,8 +43,6 @@ export default class Actor extends NavSpriteObject {
       config.actorKey,
       config.frame
     );
-
-    this.actorKey = config.actorKey;
 
     if (config.group) {
       config.group.add(this);
