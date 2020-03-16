@@ -104,7 +104,20 @@ export default {
     SELECTION_TINT: 0xd0f5e9
   },
   NAV_OBJECT: {
-    SPEED: 4000
+    SPEED: 400,
+    EVENTS: {
+      WALKING: {
+        S: "walking.S",
+        SE: "walking.SE",
+        SW: "walking.SW",
+        N: "walking.N",
+        NE: "walking.NE",
+        NW: "walking.NW",
+        E: "walking.E",
+        W: "walking.W"
+      },
+      IDLE: "idle"
+    }
   },
   COLORS: {
     WHITE: 0xffffff,

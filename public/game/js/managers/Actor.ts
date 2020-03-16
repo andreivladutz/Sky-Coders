@@ -13,6 +13,31 @@ import NavSpriteObject from "./NavSpriteObject";
 import ActorsManager from "./ActorsManager";
 import { TileXY } from "../IsoPlugin/IsoBoard";
 
+// mapping event to directions
+const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
+  DIR = ACTOR_DIRECTIONS,
+  EVENT_TO_DIRECTION = {
+    [WALK_EV.E]: DIR.EAST,
+    [WALK_EV.W]: DIR.WEST,
+    [WALK_EV.N]: DIR.NORTH,
+    [WALK_EV.S]: DIR.SOUTH,
+    [WALK_EV.SE]: DIR.SE,
+    [WALK_EV.NE]: DIR.NE,
+    [WALK_EV.NW]: DIR.NW,
+    [WALK_EV.SW]: DIR.SW
+  },
+  // mapping 8 directions to 4
+  DIRECTION8_TO_DIRECTION4 = {
+    [DIR.SW]: DIR.SW,
+    [DIR.NE]: DIR.NE,
+    [DIR.SE]: DIR.SE,
+    [DIR.SOUTH]: DIR.SE,
+    [DIR.EAST]: DIR.SE,
+    [DIR.NW]: DIR.NW,
+    [DIR.NORTH]: DIR.NE,
+    [DIR.WEST]: DIR.SW
+  };
+
 // config received by the actor config
 export interface ActorConfig {
   actorKey: ACTOR_NAMES;
@@ -32,6 +57,9 @@ export interface ActorConfig {
 
 export default class Actor extends NavSpriteObject {
   actorsManager: ActorsManager = ActorsManager.getInstance();
+
+  walking: boolean = false;
+  direction: ACTOR_DIRECTIONS = ACTOR_DIRECTIONS.SE;
 
   constructor(config: ActorConfig) {
     super(
@@ -54,18 +82,22 @@ export default class Actor extends NavSpriteObject {
     this.actorsManager.sceneActors.push(this);
   }
 
+  // Keep it as a separate function so we can then remove the listener
+  navigationHandler = (tile: TileXY) => {
+    if (!this.tileCoordsOnThisGrid(tile.x, tile.y)) {
+      this.navigateTo(tile.x, tile.y);
+    }
+  };
+
   /* Make the character:
    *  - selectable
    */
-
   makeInteractive(): this {
     this.makeSelectable().setSelectedTintColor(CST.ACTOR.SELECTION_TINT);
 
     // when this actor gets SELECTED
     this.on(CST.EVENTS.OBJECT.SELECT, () => {
-      this.mapManager.events.on(CST.EVENTS.MAP.TAP, (tile: TileXY) => {
-        this.navigateTo(tile.x, tile.y);
-      });
+      this.mapManager.events.on(CST.EVENTS.MAP.TAP, this.navigationHandler);
 
       this.actorsManager.onActorSelected(this);
     });
@@ -73,22 +105,73 @@ export default class Actor extends NavSpriteObject {
     // when this actor gets DESELECTED
     this.on(CST.EVENTS.OBJECT.DESELECT, () => {
       // stop listening to tap events
-      this.mapManager.events.off(CST.EVENTS.MAP.TAP);
+      this.mapManager.events.off(CST.EVENTS.MAP.TAP, this.navigationHandler);
 
-      this.actorsManager.onActorSelected(this);
+      this.actorsManager.onActorDeselected(this);
     });
 
+    // play walk animation on walk event:
+    Object.entries(EVENT_TO_DIRECTION).forEach(([event, direction]) => {
+      this.on(event, () => {
+        this.walkAnim(direction);
+      });
+    });
+
+    // play idle anims when the actor stop walking
+    this.on(CST.NAV_OBJECT.EVENTS.IDLE, this.idleAnim, this);
+
     return this;
   }
 
+  // override the deselect function
+  deselect(pointer?: Phaser.Input.Pointer) {
+    // if no pointer is provided just deselect
+    if (!pointer) {
+      super.deselect();
+    }
+
+    // check if the pointer is above the object's grid only to deselect
+    let { x, y } = this.mapManager.worldToTileCoords(
+      pointer.worldX,
+      pointer.worldY
+    );
+
+    if (this.tileCoordsOnThisGrid(x, y)) {
+      super.deselect();
+    }
+  }
+
+  // Play the walking animation in the provided direction
   walkAnim(direction: ACTOR_DIRECTIONS): this {
+    // if the actor is already walking we want to keep the progress of the animation
+    // not "begining to walk" again
+    let progress = 0;
+    if (this.walking) {
+      progress = this.anims.getProgress();
+    }
+
     this.play(`${this.actorKey}.${ACTOR_STATES.WALK}.${direction}`);
 
+    this.anims.setProgress(progress);
+
+    this.walking = true;
+    this.direction = direction;
+
     return this;
   }
 
-  idleAnim(direction: ACTOR_DIRECTIONS): this {
+  // Play the idle animation in the provided direction
+  idleAnim(direction?: ACTOR_DIRECTIONS): this {
+    this.walking = false;
+
+    if (!direction) {
+      // get the current direction mapped to the only 4 directions of the idle anims
+      direction = DIRECTION8_TO_DIRECTION4[this.direction];
+    }
+
     this.play(`${this.actorKey}.${ACTOR_STATES.IDLE}.${direction}`);
+
+    this.direction = direction;
 
     return this;
   }
@@ -128,7 +211,8 @@ export default class Actor extends NavSpriteObject {
           key: `${animation.animationKey}.${DIRECTION}`,
           frames: frameNames,
           frameRate: ACTORS_CST.frameRate,
-          repeat: -1
+          repeat: -1,
+          skipMissedFrames: false
         });
       }
     }

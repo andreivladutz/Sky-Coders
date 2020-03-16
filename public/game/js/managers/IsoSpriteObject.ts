@@ -105,6 +105,17 @@ export default class IsoSpriteObject extends IsoSprite {
     });
   }
 
+  // Check if the tile coords are contained in this object's grid
+  public tileCoordsOnThisGrid(x: number, y: number) {
+    for (let { x: tileX, y: tileY } of this.getGridTiles()) {
+      if (x === tileX && y === tileY) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   // make this iso object selectable or unselectable
   // pass false to the enable parameter to deactivate the selectable property
   public makeSelectable(enable: boolean = true): this {
@@ -125,29 +136,32 @@ export default class IsoSpriteObject extends IsoSprite {
           this.clearTint();
         }
       })
-      .on("pointerdown", () => {
-        this.toggleSelected();
+      .on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+        this.toggleSelected(pointer);
       });
 
     return this;
   }
 
   // select or deselect the actor
-  toggleSelected() {
-    this.selected = !this.selected;
-
+  toggleSelected(pointer?: Phaser.Input.Pointer) {
     // this object was just deselected, emit the event
-    if (!this.selected) {
-      this.clearTint();
-
-      // TODO: deselection logic?!
-      this.emit(CST.EVENTS.OBJECT.DESELECT);
+    if (this.selected) {
+      this.deselect(pointer);
     } else {
       // this object was just selected, emit the event
       this.emit(CST.EVENTS.OBJECT.SELECT);
 
+      this.selected = true;
       this.setTint(this.selectedTintColor);
     }
+  }
+
+  // Provide it as a different function so deselection logic can be overriden in the subclasses
+  deselect(pointer?: Phaser.Input.Pointer) {
+    this.clearTint();
+    this.emit(CST.EVENTS.OBJECT.DESELECT);
+    this.selected = false;
   }
 
   public setSelectedTintColor(color: number) {

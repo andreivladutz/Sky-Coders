@@ -20,6 +20,12 @@ export default class ActorsManager extends Manager {
     this.selectedActor = actor;
   }
 
+  public onActorDeselected(actor: Actor) {
+    if (this.selectedActor === actor) {
+      this.selectedActor = null;
+    }
+  }
+
   // called in the preload() method of LoadingScene
   // loads all the resources needed for the actors
   async preload(load: Phaser.Loader.LoaderPlugin) {

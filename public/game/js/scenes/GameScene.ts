@@ -20,8 +20,8 @@ export default class GameScene extends IsoScene {
     const config = {
       key: CST.SCENES.GAME
     };
-    // TODO: deactivate physics if not used anymore
-    super(config, true);
+
+    super(config);
 
     // set the isometric projection to be true isometric
     this.isometricType = ISOMETRIC;
@@ -68,7 +68,7 @@ export default class GameScene extends IsoScene {
       scene: this
     });
 
-    actor.idleAnim(ACTOR_DIRECTIONS.SE);
+    actor.idleAnim();
 
     MapManager.getInstance()
       .enableDebugging()
