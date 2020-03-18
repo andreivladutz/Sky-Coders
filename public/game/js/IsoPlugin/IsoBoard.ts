@@ -361,6 +361,8 @@ export default class IsoBoard {
   }
 
   private getVerticalGridLines(): Array<TileLine> {
+    const mapWith = this.mapSize.w / this.mapSize.tileW - 1;
+
     let verticalLines: Array<TileLine> = [];
 
     let leftmostTile = this.board.worldXYToTileXY(
@@ -373,7 +375,7 @@ export default class IsoBoard {
       );
 
     let leftmostX = Math.max(leftmostTile.x, 0),
-      rightmostX = Math.min(rightmostTile.x, this.mapSize.tileW);
+      rightmostX = Math.min(rightmostTile.x, mapWith);
 
     for (let x = leftmostX; x <= rightmostX; x++) {
       verticalLines.push(...this.verticalGridLines[x]);
@@ -383,6 +385,8 @@ export default class IsoBoard {
   }
 
   private getHorizontalGridLines(): Array<TileLine> {
+    const mapHeight = this.mapSize.h / this.mapSize.tileH - 1;
+
     let horizontalLines = [];
 
     let topmostTile = this.board.worldXYToTileXY(
@@ -395,7 +399,7 @@ export default class IsoBoard {
       );
 
     let topmostY = Math.max(topmostTile.y, 0),
-      lowermostY = Math.min(lowermostTile.y, this.mapSize.tileH);
+      lowermostY = Math.min(lowermostTile.y, mapHeight);
 
     for (let y = topmostY; y <= lowermostY; y++) {
       horizontalLines.push(...this.horizontalGridLines[y]);

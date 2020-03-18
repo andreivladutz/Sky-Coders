@@ -100,6 +100,18 @@ export default {
     BASE_OFFSET: 1,
     GRASS_OFFSET: 6
   },
+  // CSTs for the PlacementManager
+  REGIONS: {
+    // the number of randomly picked regions in which we place game resources
+    N_REG: 8,
+    // how wide a region should be in tiles
+    MAXSIZE: 30,
+    // how many trees should be inside a region
+    MAXTREES: 30,
+    MINTREES: 4,
+    // how many tiles should be around the trees
+    TREE_RADIUS: 1
+  },
   ACTOR: {
     SELECTION_TINT: 0xd0f5e9
   },

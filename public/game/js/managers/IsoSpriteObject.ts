@@ -10,7 +10,18 @@ enum GridColor {
   RED = CST.COLORS.RED
 }
 
-const envManager = EnvironmentManager.getInstance();
+// check if a tile is out of bounds
+let outOfBounds = function(
+  tile: { x: number; y: number },
+  mapGrid: number[][]
+) {
+  return (
+    tile.y < 0 ||
+    tile.y >= mapGrid.length ||
+    tile.x < 0 ||
+    tile.x >= mapGrid[0].length
+  );
+};
 
 export default class IsoSpriteObject extends IsoSprite {
   tileWidthX: number;
@@ -41,7 +52,7 @@ export default class IsoSpriteObject extends IsoSprite {
   mapManager: MapManager = MapManager.getInstance();
 
   // the size of this tile in 3D (unprojected it is a rectangle)
-  readonly TILE_SIZE3D = envManager.TILE_HEIGHT;
+  readonly TILE_SIZE3D = EnvironmentManager.getInstance().TILE_HEIGHT;
 
   constructor(
     scene: Phaser.Scene,
@@ -53,8 +64,8 @@ export default class IsoSpriteObject extends IsoSprite {
   ) {
     super(
       scene,
-      tileX * envManager.TILE_HEIGHT,
-      tileY * envManager.TILE_HEIGHT,
+      tileX * EnvironmentManager.getInstance().TILE_HEIGHT,
+      tileY * EnvironmentManager.getInstance().TILE_HEIGHT,
       z,
       texture,
       frame
@@ -69,22 +80,36 @@ export default class IsoSpriteObject extends IsoSprite {
     // set the origin to default to the bottom right corner
     this.scene.add.existing(this.setOrigin(1, 1));
 
-    for (let frameKey in this.texture.frames) {
-      // take the first frame key that's different than base
-      // so we can set the origin of this game object correctly
-      if (
-        frameKey !== "__BASE" &&
-        this.texture.frames.hasOwnProperty(frameKey) &&
-        this.texture.frames[frameKey].pivotX &&
-        this.texture.frames[frameKey].pivotY
-      ) {
-        this.setOrigin(
-          this.texture.frames[frameKey].pivotX,
+    if (!frame) {
+      // If no frame has been provided
+      for (let frameKey in this.texture.frames) {
+        // take the first frame key that's different than base
+        // so we can set the origin of this game object correctly
+        if (
+          frameKey !== "__BASE" &&
+          this.texture.frames.hasOwnProperty(frameKey) &&
+          this.texture.frames[frameKey].pivotX &&
           this.texture.frames[frameKey].pivotY
-        );
+        ) {
+          this.setOrigin(
+            this.texture.frames[frameKey].pivotX,
+            this.texture.frames[frameKey].pivotY
+          );
 
-        break;
+          break;
+        }
       }
+    }
+    // Otherwise, use the provided frame's pivot
+    else if (
+      this.texture.frames.hasOwnProperty(frame) &&
+      this.texture.frames[frame].pivotX &&
+      this.texture.frames[frame].pivotY
+    ) {
+      this.setOrigin(
+        this.texture.frames[frame].pivotX,
+        this.texture.frames[frame].pivotY
+      );
     }
 
     this.computeTileArea();
@@ -211,7 +236,14 @@ export default class IsoSpriteObject extends IsoSprite {
       return;
     }
 
-    let gridTiles = this.getGridTiles();
+    let gridTiles = [];
+
+    // Some of the grid padding tiles might end up out of the bounds of the map grid
+    for (let tile of this.getGridTiles()) {
+      if (!outOfBounds(tile, this.mapManager.mapMatrix)) {
+        gridTiles.push(tile);
+      }
+    }
 
     this.mapManager
       .getIsoBoard()

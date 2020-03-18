@@ -3,6 +3,9 @@ import Phaser from "phaser";
 import Manager from "./Manager";
 import CST from "../CST";
 
+import PlacementManager from "./PlacementManager";
+import IsoScene from "../IsoPlugin/IsoScene";
+
 type Frame = Phaser.Types.Animations.AnimationFrame;
 type FrameGen = Phaser.Types.Animations.GenerateFrameNames;
 
@@ -30,6 +33,13 @@ export default class EnvironmentManager extends Manager {
   public TILE_WIDTH: number;
   public TILE_HEIGHT: number;
 
+  placementManager: PlacementManager;
+
+  protected constructor() {
+    super();
+    this.placementManager = PlacementManager.getInstance();
+  }
+
   getTextureKey() {
     return CST.ENVIRONMENT.ATLAS_KEY;
   }
@@ -54,6 +64,16 @@ export default class EnvironmentManager extends Manager {
     } else if (idx < this.GRASS_OFFSET && idx >= this.BASE_OFFSET) {
       return this.baseFrames[idx - this.BASE_OFFSET];
     }
+  }
+
+  // Just call the method on the placement manager
+  public placeRandomResources(
+    scene: IsoScene,
+    mapGrid: number[][],
+    mapW: number,
+    mapH: number
+  ) {
+    this.placementManager.placeRandomResources(scene, mapGrid, mapW, mapH);
   }
 
   async preload(load: Phaser.Loader.LoaderPlugin) {

@@ -4,30 +4,59 @@
 			"image": "environment-sd-0.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 581,
-				"h": 253
+				"w": 811,
+				"h": 254
 			},
 			"scale": 0.125,
 			"frames": [
 				{
-					"filename": "Trees/Tree2",
+					"filename": "Trees/Tree",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
-						"w": 163,
-						"h": 200
+						"w": 214,
+						"h": 221
 					},
 					"spriteSourceSize": {
-						"x": 0,
-						"y": 6,
-						"w": 145,
-						"h": 165
+						"x": 20,
+						"y": 2,
+						"w": 193,
+						"h": 184
 					},
 					"frame": {
 						"x": 10,
 						"y": 10,
-						"w": 145,
-						"h": 165
+						"w": 193,
+						"h": 184
+					},
+					"anchor": {
+						"x": 0.60210035,
+						"y": 0.8007923
+					}
+				},
+				{
+					"filename": "Trees/Tree1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 221,
+						"h": 217
+					},
+					"spriteSourceSize": {
+						"x": 6,
+						"y": 0,
+						"w": 215,
+						"h": 179
+					},
+					"frame": {
+						"x": 221,
+						"y": 10,
+						"w": 215,
+						"h": 179
+					},
+					"anchor": {
+						"x": 0.63554046,
+						"y": 0.772203
 					}
 				},
 				{
@@ -45,10 +74,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 10,
-						"y": 193,
+						"x": 221,
+						"y": 207,
 						"w": 64,
 						"h": 37
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				},
 				{
@@ -66,10 +99,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 10,
-						"y": 193,
+						"x": 221,
+						"y": 207,
 						"w": 64,
 						"h": 37
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				},
 				{
@@ -87,10 +124,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 10,
-						"y": 193,
+						"x": 221,
+						"y": 207,
 						"w": 64,
 						"h": 37
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				},
 				{
@@ -108,31 +149,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 92,
-						"y": 193,
+						"x": 303,
+						"y": 207,
 						"w": 64,
 						"h": 37
-					}
-				},
-				{
-					"filename": "Trees/PineTree",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 128,
-						"h": 200
 					},
-					"spriteSourceSize": {
-						"x": 6,
-						"y": 18,
-						"w": 105,
-						"h": 156
-					},
-					"frame": {
-						"x": 173,
-						"y": 10,
-						"w": 105,
-						"h": 156
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				},
 				{
@@ -150,10 +174,39 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 174,
-						"y": 184,
+						"x": 385,
+						"y": 207,
 						"w": 64,
 						"h": 37
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
+					"filename": "Trees/Tree2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 163,
+						"h": 200
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 7,
+						"w": 143,
+						"h": 164
+					},
+					"frame": {
+						"x": 454,
+						"y": 10,
+						"w": 143,
+						"h": 164
+					},
+					"anchor": {
+						"x": 0.50230769,
+						"y": 0.8225
 					}
 				},
 				{
@@ -171,31 +224,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 256,
-						"y": 184,
+						"x": 467,
+						"y": 192,
 						"w": 64,
 						"h": 37
-					}
-				},
-				{
-					"filename": "Trees/Tree1",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 175,
-						"h": 200
 					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 45,
-						"w": 142,
-						"h": 123
-					},
-					"frame": {
-						"x": 296,
-						"y": 10,
-						"w": 142,
-						"h": 123
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				},
 				{
@@ -213,10 +249,39 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 338,
-						"y": 151,
+						"x": 549,
+						"y": 192,
 						"w": 64,
 						"h": 37
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
+					"filename": "Trees/PineTree",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 153,
+						"h": 213
+					},
+					"spriteSourceSize": {
+						"x": 19,
+						"y": 19,
+						"w": 104,
+						"h": 152
+					},
+					"frame": {
+						"x": 615,
+						"y": 10,
+						"w": 104,
+						"h": 152
+					},
+					"anchor": {
+						"x": 0.49264706,
+						"y": 0.76470588
 					}
 				},
 				{
@@ -234,10 +299,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 338,
-						"y": 206,
+						"x": 631,
+						"y": 180,
 						"w": 64,
 						"h": 37
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				},
 				{
@@ -255,10 +324,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 420,
-						"y": 151,
+						"x": 713,
+						"y": 180,
 						"w": 64,
 						"h": 37
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				},
 				{
@@ -276,31 +349,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 420,
-						"y": 206,
+						"x": 737,
+						"y": 10,
 						"w": 64,
 						"h": 37
-					}
-				},
-				{
-					"filename": "Trees/Tree",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 128,
-						"h": 200
 					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 56,
-						"w": 115,
-						"h": 113
-					},
-					"frame": {
-						"x": 456,
-						"y": 10,
-						"w": 115,
-						"h": 113
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				},
 				{
@@ -318,10 +374,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 502,
-						"y": 141,
+						"x": 737,
+						"y": 65,
 						"w": 64,
 						"h": 37
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				}
 			]
@@ -330,6 +390,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:54400bbadb3243616da480d8c4cf9784:a10ee68fde0e1f02e78326d304ff15d0:1efd645e775df4ac353f239e5fd118d6$"
+		"smartupdate": "$TexturePacker:SmartUpdate:b974fd07a53211741ba20ca268c371ba:edc77e0824a4902461305da37f22758a:1efd645e775df4ac353f239e5fd118d6$"
 	}
 }

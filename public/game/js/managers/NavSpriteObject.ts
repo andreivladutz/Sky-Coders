@@ -2,7 +2,7 @@ import IsoSpriteObject from "./IsoSpriteObject";
 import MapManager from "./MapManager";
 import CST from "../CST";
 
-import MoveTo from "../MoveToPlugin/MoveTo";
+import MoveTo from "../plugins/MoveToPlugin/MoveTo";
 import AstarWorkerManager from "./AstarWorkerManager";
 
 interface TileXY {

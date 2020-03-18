@@ -167,6 +167,28 @@ export default class MapManager extends Manager {
       mapMatrix: this.mapMatrix
     });
 
+    // Place the random resources on the map
+    let mapSize = this.getMapTilesize();
+    this.envManager.placeRandomResources(
+      gameScene,
+      this.mapMatrix,
+      mapSize.w,
+      mapSize.h
+    );
+
+    // for (let region of this.envManager.placementManager.regions) {
+    //   let gridGraphics = this.gameScene.add.graphics().setDepth(3);
+
+    //   this.getIsoBoard().drawTilesOnGrid(
+    //     region.regionTiles,
+    //     CST.COLORS.GREEN,
+    //     CST.GRID.LINE_WIDTH,
+    //     CST.GRID.FILL_ALPHA,
+    //     CST.COLORS.GREEN,
+    //     gridGraphics.clear()
+    //   );
+    // }
+
     // now that the tilemap and the isoboard are inited
     // we can also init the events logic
     this.initEvents();
