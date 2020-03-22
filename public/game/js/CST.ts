@@ -89,6 +89,10 @@ export default {
       PREFIX: "Trees/",
       TREE_NAMES: ["PineTree", "Tree", "Tree1", "Tree2"]
     },
+    CLIFFS: {
+      PREFIX: "Cliffs/",
+      CLIFF_NAMES: ["cliff1", "cliff2", "cliff3"]
+    },
     // the empty tile's index
     EMPTY_TILE: 0,
     EMPTY_TILE_RATIO: 0.3,
@@ -108,7 +112,7 @@ export default {
     MAXSIZE: 30,
     // how many trees should be inside a region
     MAXTREES: 30,
-    MINTREES: 4,
+    MINTREES: 8,
     // how many tiles should be around the trees
     TREE_RADIUS: 1
   },

@@ -36,7 +36,8 @@ globalThis.NavObjectHelpers = class {
       smoothedPath = [];
 
     const getDx = (a, b) => a.x - b.x,
-      getDy = (a, b) => a.y - b.y;
+      getDy = (a, b) => a.y - b.y,
+      abs = Math.abs;
 
     while (i < n) {
       smoothedPath.push(path[i]);
@@ -46,19 +47,19 @@ globalThis.NavObjectHelpers = class {
         let dx = getDx(path[i + 1], path[i]),
           dy = getDy(path[i + 1], path[i]);
 
-        // diagonal found
-        //if (abs(dx) === 1 && abs(dy) === 1) {
-        // we can skip the tile in-between i.e. tile at i + 1
-        do {
-          i = i + 1;
-        } while (
-          path[i + 1] &&
-          getDx(path[i + 1], path[i]) === dx &&
-          getDy(path[i + 1], path[i]) === dy
-        );
+        // no diagonals allowed
+        if (abs(dx) !== abs(dy)) {
+          // we can skip the tile in-between i.e. tile at i + 1
+          do {
+            i = i + 1;
+          } while (
+            path[i + 1] &&
+            getDx(path[i + 1], path[i]) === dx &&
+            getDy(path[i + 1], path[i]) === dy
+          );
 
-        smoothedPath.push(path[i]);
-        //}
+          smoothedPath.push(path[i]);
+        }
       }
 
       i = i + 1;

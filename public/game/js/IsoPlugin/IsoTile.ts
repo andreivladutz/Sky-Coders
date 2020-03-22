@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { Projector, IsoScene, Point3 } from "./IsoPlugin";
 import IsoBoard from "./IsoBoard";
+import EnvironmentManager from "../managers/EnvironmentManager";
 
 export default class IsoTile extends Phaser.GameObjects.Image {
   projector: Projector;
@@ -28,7 +29,14 @@ export default class IsoTile extends Phaser.GameObjects.Image {
     this.scene.add.existing(this);
   }
 
-  set3DPosition(x: number, y: number, z: number): this {
+  // reset the 3D position based on the tile coords
+  reset3DPosition() {
+    let tileSize = EnvironmentManager.getInstance().TILE_HEIGHT;
+
+    this.set3DPosition(tileSize * this.tileX, tileSize * this.tileY);
+  }
+
+  set3DPosition(x: number, y: number, z: number = 0): this {
     let projectedPos = this.projector.project(new Point3(x, y, z));
 
     this.x = projectedPos.x;

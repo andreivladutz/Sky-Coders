@@ -4,36 +4,11 @@
 			"image": "environment-sd-0.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 811,
-				"h": 254
+				"w": 449,
+				"h": 491
 			},
 			"scale": 0.125,
 			"frames": [
-				{
-					"filename": "Trees/Tree",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 214,
-						"h": 221
-					},
-					"spriteSourceSize": {
-						"x": 20,
-						"y": 2,
-						"w": 193,
-						"h": 184
-					},
-					"frame": {
-						"x": 10,
-						"y": 10,
-						"w": 193,
-						"h": 184
-					},
-					"anchor": {
-						"x": 0.60210035,
-						"y": 0.8007923
-					}
-				},
 				{
 					"filename": "Trees/Tree1",
 					"rotated": false,
@@ -49,14 +24,64 @@
 						"h": 179
 					},
 					"frame": {
-						"x": 221,
+						"x": 10,
 						"y": 10,
 						"w": 215,
 						"h": 179
 					},
 					"anchor": {
-						"x": 0.63554046,
+						"x": 0.63554,
 						"y": 0.772203
+					}
+				},
+				{
+					"filename": "Trees/Tree",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 214,
+						"h": 221
+					},
+					"spriteSourceSize": {
+						"x": 20,
+						"y": 2,
+						"w": 193,
+						"h": 184
+					},
+					"frame": {
+						"x": 243,
+						"y": 10,
+						"w": 193,
+						"h": 184
+					},
+					"anchor": {
+						"x": 0.6021,
+						"y": 0.800792
+					}
+				},
+				{
+					"filename": "Trees/Tree2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 163,
+						"h": 200
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 7,
+						"w": 143,
+						"h": 164
+					},
+					"frame": {
+						"x": 10,
+						"y": 207,
+						"w": 143,
+						"h": 164
+					},
+					"anchor": {
+						"x": 0.502308,
+						"y": 0.8225
 					}
 				},
 				{
@@ -74,8 +99,8 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 221,
-						"y": 207,
+						"x": 10,
+						"y": 389,
 						"w": 64,
 						"h": 37
 					},
@@ -99,8 +124,8 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 221,
-						"y": 207,
+						"x": 10,
+						"y": 389,
 						"w": 64,
 						"h": 37
 					},
@@ -124,8 +149,8 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 221,
-						"y": 207,
+						"x": 10,
+						"y": 389,
 						"w": 64,
 						"h": 37
 					},
@@ -149,8 +174,8 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 303,
-						"y": 207,
+						"x": 10,
+						"y": 444,
 						"w": 64,
 						"h": 37
 					},
@@ -174,39 +199,14 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 385,
-						"y": 207,
+						"x": 92,
+						"y": 389,
 						"w": 64,
 						"h": 37
 					},
 					"anchor": {
 						"x": 0.5,
 						"y": 0.5
-					}
-				},
-				{
-					"filename": "Trees/Tree2",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 163,
-						"h": 200
-					},
-					"spriteSourceSize": {
-						"x": 2,
-						"y": 7,
-						"w": 143,
-						"h": 164
-					},
-					"frame": {
-						"x": 454,
-						"y": 10,
-						"w": 143,
-						"h": 164
-					},
-					"anchor": {
-						"x": 0.50230769,
-						"y": 0.8225
 					}
 				},
 				{
@@ -224,33 +224,8 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 467,
-						"y": 192,
-						"w": 64,
-						"h": 37
-					},
-					"anchor": {
-						"x": 0.5,
-						"y": 0.5
-					}
-				},
-				{
-					"filename": "Tiles/grass00",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 64,
-						"h": 37
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 64,
-						"h": 37
-					},
-					"frame": {
-						"x": 549,
-						"y": 192,
+						"x": 92,
+						"y": 444,
 						"w": 64,
 						"h": 37
 					},
@@ -274,14 +249,114 @@
 						"h": 152
 					},
 					"frame": {
-						"x": 615,
-						"y": 10,
+						"x": 171,
+						"y": 212,
 						"w": 104,
 						"h": 152
 					},
 					"anchor": {
-						"x": 0.49264706,
-						"y": 0.76470588
+						"x": 0.492647,
+						"y": 0.764706
+					}
+				},
+				{
+					"filename": "Cliffs/cliff2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 64,
+						"h": 106
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 7,
+						"w": 64,
+						"h": 99
+					},
+					"frame": {
+						"x": 174,
+						"y": 382,
+						"w": 64,
+						"h": 99
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.17411764705882352
+					}
+				},
+				{
+					"filename": "Cliffs/cliff1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 64,
+						"h": 100
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 1,
+						"w": 64,
+						"h": 96
+					},
+					"frame": {
+						"x": 256,
+						"y": 382,
+						"w": 64,
+						"h": 96
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.185
+					}
+				},
+				{
+					"filename": "Cliffs/cliff3",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 64,
+						"h": 106
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 3,
+						"w": 64,
+						"h": 103
+					},
+					"frame": {
+						"x": 293,
+						"y": 212,
+						"w": 64,
+						"h": 103
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.17411764705882352
+					}
+				},
+				{
+					"filename": "Tiles/grass00",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 64,
+						"h": 37
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 64,
+						"h": 37
+					},
+					"frame": {
+						"x": 338,
+						"y": 333,
+						"w": 64,
+						"h": 37
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
 					}
 				},
 				{
@@ -299,8 +374,8 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 631,
-						"y": 180,
+						"x": 375,
+						"y": 212,
 						"w": 64,
 						"h": 37
 					},
@@ -324,8 +399,8 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 713,
-						"y": 180,
+						"x": 375,
+						"y": 267,
 						"w": 64,
 						"h": 37
 					},
@@ -349,8 +424,8 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 737,
-						"y": 10,
+						"x": 338,
+						"y": 388,
 						"w": 64,
 						"h": 37
 					},
@@ -374,8 +449,8 @@
 						"h": 37
 					},
 					"frame": {
-						"x": 737,
-						"y": 65,
+						"x": 338,
+						"y": 443,
 						"w": 64,
 						"h": 37
 					},
@@ -390,6 +465,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:b974fd07a53211741ba20ca268c371ba:edc77e0824a4902461305da37f22758a:1efd645e775df4ac353f239e5fd118d6$"
+		"smartupdate": "$TexturePacker:SmartUpdate:b2766b253b2be064e3087568f04e8b5d:b41c9cf9662d3ea967fc13489b03e4b8:1efd645e775df4ac353f239e5fd118d6$"
 	}
 }

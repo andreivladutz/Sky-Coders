@@ -4,11 +4,36 @@
 			"image": "environment-md-0.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 1376,
-				"h": 478
+				"w": 449,
+				"h": 1720
 			},
 			"scale": 0.25,
 			"frames": [
+				{
+					"filename": "Trees/Tree1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 442,
+						"h": 434
+					},
+					"spriteSourceSize": {
+						"x": 13,
+						"y": 0,
+						"w": 429,
+						"h": 356
+					},
+					"frame": {
+						"x": 10,
+						"y": 10,
+						"w": 429,
+						"h": 356
+					},
+					"anchor": {
+						"x": 0.63554,
+						"y": 0.772203
+					}
+				},
 				{
 					"filename": "Trees/Tree",
 					"rotated": false,
@@ -25,13 +50,138 @@
 					},
 					"frame": {
 						"x": 10,
-						"y": 10,
+						"y": 384,
 						"w": 385,
 						"h": 366
 					},
 					"anchor": {
-						"x": 0.60210035,
-						"y": 0.8007923
+						"x": 0.6021,
+						"y": 0.800792
+					}
+				},
+				{
+					"filename": "Trees/Tree2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 325,
+						"h": 400
+					},
+					"spriteSourceSize": {
+						"x": 5,
+						"y": 14,
+						"w": 282,
+						"h": 326
+					},
+					"frame": {
+						"x": 10,
+						"y": 768,
+						"w": 282,
+						"h": 326
+					},
+					"anchor": {
+						"x": 0.502308,
+						"y": 0.8225
+					}
+				},
+				{
+					"filename": "Trees/PineTree",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 306,
+						"h": 425
+					},
+					"spriteSourceSize": {
+						"x": 40,
+						"y": 39,
+						"w": 206,
+						"h": 300
+					},
+					"frame": {
+						"x": 10,
+						"y": 1112,
+						"w": 206,
+						"h": 300
+					},
+					"anchor": {
+						"x": 0.492647,
+						"y": 0.764706
+					}
+				},
+				{
+					"filename": "Cliffs/cliff3",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 213
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 8,
+						"w": 127,
+						"h": 205
+					},
+					"frame": {
+						"x": 10,
+						"y": 1430,
+						"w": 127,
+						"h": 205
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.17411764705882352
+					}
+				},
+				{
+					"filename": "Cliffs/cliff2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 213
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 15,
+						"w": 127,
+						"h": 198
+					},
+					"frame": {
+						"x": 310,
+						"y": 768,
+						"w": 127,
+						"h": 198
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.17411764705882352
+					}
+				},
+				{
+					"filename": "Cliffs/cliff1",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 200
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 4,
+						"w": 128,
+						"h": 188
+					},
+					"frame": {
+						"x": 155,
+						"y": 1430,
+						"w": 128,
+						"h": 188
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.185
 					}
 				},
 				{
@@ -49,8 +199,8 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 10,
-						"y": 394,
+						"x": 310,
+						"y": 984,
 						"w": 128,
 						"h": 74
 					},
@@ -74,8 +224,8 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 10,
-						"y": 394,
+						"x": 310,
+						"y": 984,
 						"w": 128,
 						"h": 74
 					},
@@ -99,8 +249,8 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 10,
-						"y": 394,
+						"x": 310,
+						"y": 984,
 						"w": 128,
 						"h": 74
 					},
@@ -124,8 +274,8 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 156,
-						"y": 394,
+						"x": 310,
+						"y": 1076,
 						"w": 128,
 						"h": 74
 					},
@@ -149,39 +299,14 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 302,
-						"y": 394,
+						"x": 155,
+						"y": 1636,
 						"w": 128,
 						"h": 74
 					},
 					"anchor": {
 						"x": 0.5,
 						"y": 0.5
-					}
-				},
-				{
-					"filename": "Trees/Tree1",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 442,
-						"h": 434
-					},
-					"spriteSourceSize": {
-						"x": 13,
-						"y": 0,
-						"w": 429,
-						"h": 356
-					},
-					"frame": {
-						"x": 413,
-						"y": 10,
-						"w": 429,
-						"h": 356
-					},
-					"anchor": {
-						"x": 0.63554046,
-						"y": 0.772203
 					}
 				},
 				{
@@ -199,8 +324,8 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 448,
-						"y": 384,
+						"x": 234,
+						"y": 1168,
 						"w": 128,
 						"h": 74
 					},
@@ -224,8 +349,8 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 594,
-						"y": 384,
+						"x": 234,
+						"y": 1260,
 						"w": 128,
 						"h": 74
 					},
@@ -249,39 +374,14 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 740,
-						"y": 384,
+						"x": 301,
+						"y": 1352,
 						"w": 128,
 						"h": 74
 					},
 					"anchor": {
 						"x": 0.5,
 						"y": 0.5
-					}
-				},
-				{
-					"filename": "Trees/Tree2",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 325,
-						"h": 400
-					},
-					"spriteSourceSize": {
-						"x": 5,
-						"y": 14,
-						"w": 282,
-						"h": 326
-					},
-					"frame": {
-						"x": 860,
-						"y": 10,
-						"w": 282,
-						"h": 326
-					},
-					"anchor": {
-						"x": 0.50230769,
-						"y": 0.8225
 					}
 				},
 				{
@@ -299,8 +399,8 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 886,
-						"y": 354,
+						"x": 301,
+						"y": 1444,
 						"w": 128,
 						"h": 74
 					},
@@ -324,39 +424,14 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 1032,
-						"y": 354,
+						"x": 301,
+						"y": 1536,
 						"w": 128,
 						"h": 74
 					},
 					"anchor": {
 						"x": 0.5,
 						"y": 0.5
-					}
-				},
-				{
-					"filename": "Trees/PineTree",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 306,
-						"h": 425
-					},
-					"spriteSourceSize": {
-						"x": 40,
-						"y": 39,
-						"w": 206,
-						"h": 300
-					},
-					"frame": {
-						"x": 1160,
-						"y": 10,
-						"w": 206,
-						"h": 300
-					},
-					"anchor": {
-						"x": 0.49264706,
-						"y": 0.76470588
 					}
 				},
 				{
@@ -374,8 +449,8 @@
 						"h": 74
 					},
 					"frame": {
-						"x": 1178,
-						"y": 328,
+						"x": 301,
+						"y": 1628,
 						"w": 128,
 						"h": 74
 					},
@@ -390,6 +465,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:b974fd07a53211741ba20ca268c371ba:edc77e0824a4902461305da37f22758a:1efd645e775df4ac353f239e5fd118d6$"
+		"smartupdate": "$TexturePacker:SmartUpdate:b2766b253b2be064e3087568f04e8b5d:b41c9cf9662d3ea967fc13489b03e4b8:1efd645e775df4ac353f239e5fd118d6$"
 	}
 }

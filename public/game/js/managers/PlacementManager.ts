@@ -7,19 +7,12 @@ import RandomPlace from "../plugins/RandomPlace/RandomPlace";
 import IsoSpriteObject from "./IsoSpriteObject";
 import IsoScene from "../IsoPlugin/IsoScene";
 
+import IsoTile from "../IsoPlugin/IsoTile";
+
 interface Tile {
   x: number;
   y: number;
 }
-
-let outOfBounds = function(tile: Tile, mapGrid: number[][]) {
-  return (
-    tile.y < 0 ||
-    tile.y >= mapGrid.length ||
-    tile.x < 0 ||
-    tile.x >= mapGrid[0].length
-  );
-};
 
 // how much to extend a region in the four directions
 interface RegionExtension {
@@ -147,10 +140,13 @@ export default class PlacementManager extends Manager {
   regions: Region[];
   treesObjects: IsoSpriteObject[] = [];
 
+  // the key of the texture holding all environment assets
+  envTexture: string;
+
+  private RND: Phaser.Math.RandomDataGenerator;
+
   // generate the regions of the placement
   private generateRegions() {
-    const RND = Phaser.Math.RND;
-
     // just some points used to represent regions' tile mid points
     this.regions = [];
 
@@ -167,8 +163,8 @@ export default class PlacementManager extends Manager {
       getPositionCallback: (out: Region) => {
         // Generate random tile positions until we find a non empty tile
         do {
-          out.x = RND.integerInRange(0, this.mapW - 1);
-          out.y = RND.integerInRange(0, this.mapH - 1);
+          out.x = this.RND.integerInRange(0, this.mapW - 1);
+          out.y = this.RND.integerInRange(0, this.mapH - 1);
         } while (this.mapGrid[out.y][out.x] === CST.ENVIRONMENT.EMPTY_TILE);
       }
     });
@@ -181,10 +177,8 @@ export default class PlacementManager extends Manager {
 
   private _placeResources(scene: IsoScene) {
     const envManager = EnvironmentManager.getInstance(),
-      REG = CST.REGIONS,
-      RND = Phaser.Math.RND;
-    let envTexture = envManager.getTextureKey(),
-      treesFrames = envManager.treesFrames;
+      REG = CST.REGIONS;
+    let treesFrames = envManager.treesFrames;
 
     // take each region and place trees randomly in it
     for (let region of this.regions) {
@@ -192,8 +186,15 @@ export default class PlacementManager extends Manager {
         // configuration of the trees with the radius of the empty space around them
         treesCfg = [];
 
+      // Pick a random tree frame for this region, this way, same trees are clustered in regions
+      let treeFrame = this.RND.pick(treesFrames);
+
       // place some trees randomly
-      for (let i = 0; i < RND.integerInRange(REG.MINTREES, REG.MAXTREES); i++) {
+      for (
+        let i = 0;
+        i < this.RND.integerInRange(REG.MINTREES, REG.MAXTREES);
+        i++
+      ) {
         treesCfg.push({
           gameObject: new RandomPlacedPoint(-1, -1),
           radius: REG.TREE_RADIUS,
@@ -205,7 +206,7 @@ export default class PlacementManager extends Manager {
       RandomPlace(treesCfg, {
         getPositionCallback: (out: RandomPlacedPoint) => {
           // pick a random tile to place the game resource on
-          let tile = RND.pick(regTiles);
+          let tile = this.RND.pick(regTiles);
 
           out.x = tile.x;
           out.y = tile.y;
@@ -222,16 +223,14 @@ export default class PlacementManager extends Manager {
         if (cfgObj.tree) {
           let pos: RandomPlacedPoint = cfgObj.gameObject;
 
-          console.log(pos);
-
           this.treesObjects.push(
             new IsoSpriteObject(
               scene,
               pos.x,
               pos.y,
               0,
-              envTexture,
-              RND.pick(treesFrames)
+              this.envTexture,
+              treeFrame
             )
           );
         }
@@ -249,16 +248,31 @@ export default class PlacementManager extends Manager {
     mapGrid: number[][],
     mapW: number,
     mapH: number
-  ) {
+  ): this {
     this.mapGrid = mapGrid;
     this.mapW = mapW;
     this.mapH = mapH;
 
+    this.envTexture = EnvironmentManager.getInstance().getTextureKey();
+    this.RND = Phaser.Math.RND;
+
     this.generateRegions();
     this._placeResources(scene);
+
+    return this;
   }
 
   public static getInstance() {
     return super.getInstance() as PlacementManager;
   }
+}
+
+// module private functions
+function outOfBounds(tile: Tile, mapGrid: number[][]) {
+  return (
+    tile.y < 0 ||
+    tile.y >= mapGrid.length ||
+    tile.x < 0 ||
+    tile.x >= mapGrid[0].length
+  );
 }

@@ -22,6 +22,8 @@ export default class EnvironmentManager extends Manager {
   public treesFrames: string[];
   public grassFrames: string[];
   public baseFrames: string[];
+  // The frames of the cliff margins
+  public cliffFrames: string[];
 
   // CONSTANTS:
   public readonly GRASS_TILES_COUNT = CST.ENVIRONMENT.GRASS_TILES_COUNT;
@@ -121,6 +123,10 @@ export default class EnvironmentManager extends Manager {
     // the frame names for the trees are different
     this.treesFrames = ENV.TREES.TREE_NAMES.map((name: string): string =>
       ENV.TREES.PREFIX.concat(name)
+    );
+
+    this.cliffFrames = ENV.CLIFFS.CLIFF_NAMES.map((name: string): string =>
+      ENV.CLIFFS.PREFIX.concat(name)
     );
 
     // get the width and height of a tile
