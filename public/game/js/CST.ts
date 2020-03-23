@@ -93,6 +93,10 @@ export default {
       PREFIX: "Cliffs/",
       CLIFF_NAMES: ["cliff1", "cliff2", "cliff3"]
     },
+    ORES: {
+      PREFIX: "Ores/",
+      ORES_NAMES: ["black_ore", "crystal"]
+    },
     // the empty tile's index
     EMPTY_TILE: 0,
     EMPTY_TILE_RATIO: 0.3,
@@ -114,7 +118,8 @@ export default {
     MAXTREES: 30,
     MINTREES: 8,
     // how many tiles should be around the trees
-    TREE_RADIUS: 1
+    TREE_RADIUS: 1,
+    ORE_RADIUS: 5
   },
   ACTOR: {
     SELECTION_TINT: 0xd0f5e9

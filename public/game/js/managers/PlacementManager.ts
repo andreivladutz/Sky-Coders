@@ -138,7 +138,10 @@ export default class PlacementManager extends Manager {
   mapH: number;
 
   regions: Region[];
+  // trees objects placed on the map
   treesObjects: IsoSpriteObject[] = [];
+  // ore objects placed on the map
+  oreObjects: IsoSpriteObject[] = [];
 
   // the key of the texture holding all environment assets
   envTexture: string;
@@ -178,7 +181,20 @@ export default class PlacementManager extends Manager {
   private _placeResources(scene: IsoScene) {
     const envManager = EnvironmentManager.getInstance(),
       REG = CST.REGIONS;
-    let treesFrames = envManager.treesFrames;
+
+    let treesFrames = envManager.treesFrames,
+      oreFrames = envManager.oreFrames,
+      // each ore sits in one region
+      oreRegionsPicked = [];
+
+    let regionIdx = 0;
+    // pick a region for each oreFrame to place
+    for (let oreFrame of oreFrames) {
+      oreRegionsPicked.push({
+        region: this.regions[regionIdx++],
+        frame: oreFrame
+      });
+    }
 
     // take each region and place trees randomly in it
     for (let region of this.regions) {
@@ -189,7 +205,20 @@ export default class PlacementManager extends Manager {
       // Pick a random tree frame for this region, this way, same trees are clustered in regions
       let treeFrame = this.RND.pick(treesFrames);
 
-      // place some trees randomly
+      // go through the regions picked for the placing of the ores
+      // if this region is one of those, than place the appropiate ore here
+      for (let oreRegion of oreRegionsPicked) {
+        if (region == oreRegion.region) {
+          treesCfg.push({
+            gameObject: new RandomPlacedPoint(-1, -1),
+            radius: REG.ORE_RADIUS,
+            // this is how we will know the object is an ore object
+            ore: oreRegion.frame
+          });
+        }
+      }
+
+      // place some trees randomly -> pushing the config objects used by the RandomPlace plugin
       for (
         let i = 0;
         i < this.RND.integerInRange(REG.MINTREES, REG.MAXTREES);
@@ -220,9 +249,9 @@ export default class PlacementManager extends Manager {
           continue;
         }
 
-        if (cfgObj.tree) {
-          let pos: RandomPlacedPoint = cfgObj.gameObject;
+        let pos: RandomPlacedPoint = cfgObj.gameObject;
 
+        if (cfgObj.tree) {
           this.treesObjects.push(
             new IsoSpriteObject(
               scene,
@@ -231,6 +260,19 @@ export default class PlacementManager extends Manager {
               0,
               this.envTexture,
               treeFrame
+            )
+          );
+        }
+
+        if (cfgObj.ore) {
+          this.oreObjects.push(
+            new IsoSpriteObject(
+              scene,
+              pos.x,
+              pos.y,
+              0,
+              this.envTexture,
+              cfgObj.ore
             )
           );
         }

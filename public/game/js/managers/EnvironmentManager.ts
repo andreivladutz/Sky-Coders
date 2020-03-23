@@ -24,6 +24,8 @@ export default class EnvironmentManager extends Manager {
   public baseFrames: string[];
   // The frames of the cliff margins
   public cliffFrames: string[];
+  // The frames of the various ores found in the game
+  public oreFrames: string[];
 
   // CONSTANTS:
   public readonly GRASS_TILES_COUNT = CST.ENVIRONMENT.GRASS_TILES_COUNT;
@@ -127,6 +129,10 @@ export default class EnvironmentManager extends Manager {
 
     this.cliffFrames = ENV.CLIFFS.CLIFF_NAMES.map((name: string): string =>
       ENV.CLIFFS.PREFIX.concat(name)
+    );
+
+    this.oreFrames = ENV.ORES.ORES_NAMES.map((name: string): string =>
+      ENV.ORES.PREFIX.concat(name)
     );
 
     // get the width and height of a tile
