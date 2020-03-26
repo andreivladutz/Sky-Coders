@@ -4,10 +4,8 @@ import EnvironmentManager from "./EnvironmentManager";
 
 // the plugin used for random placement
 import RandomPlace from "../plugins/RandomPlace/RandomPlace";
-import IsoSpriteObject from "./IsoSpriteObject";
+import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 import IsoScene from "../IsoPlugin/IsoScene";
-
-import IsoTile from "../IsoPlugin/IsoTile";
 
 interface Tile {
   x: number;
@@ -180,7 +178,9 @@ export default class PlacementManager extends Manager {
 
   private _placeResources(scene: IsoScene) {
     const envManager = EnvironmentManager.getInstance(),
-      REG = CST.REGIONS;
+      REG = CST.REGIONS,
+      TREE_ID = CST.LAYERS.OBJ_ID.TREE,
+      ORE_ID = CST.LAYERS.OBJ_ID.ORE;
 
     let treesFrames = envManager.treesFrames,
       oreFrames = envManager.oreFrames,
@@ -235,7 +235,14 @@ export default class PlacementManager extends Manager {
       RandomPlace(treesCfg, {
         getPositionCallback: (out: RandomPlacedPoint) => {
           // pick a random tile to place the game resource on
-          let tile = this.RND.pick(regTiles);
+          let tile: Tile;
+
+          // but make sure it isn't a marginal tile (being on the border of the island)
+          do {
+            tile = this.RND.pick(regTiles);
+          } while (
+            isMargin(tile.x, tile.y, this.mapGrid, this.mapW, this.mapH)
+          );
 
           out.x = tile.x;
           out.y = tile.y;
@@ -258,6 +265,7 @@ export default class PlacementManager extends Manager {
               pos.x,
               pos.y,
               0,
+              TREE_ID,
               this.envTexture,
               treeFrame
             )
@@ -271,6 +279,7 @@ export default class PlacementManager extends Manager {
               pos.x,
               pos.y,
               0,
+              ORE_ID,
               this.envTexture,
               cfgObj.ore
             )
@@ -296,7 +305,11 @@ export default class PlacementManager extends Manager {
     this.mapH = mapH;
 
     this.envTexture = EnvironmentManager.getInstance().getTextureKey();
+
     this.RND = Phaser.Math.RND;
+
+    // TODO: generate this seed on the serverside and keep it the same on next logins
+    this.RND.init(["fooS33d"]);
 
     this.generateRegions();
     this._placeResources(scene);
@@ -317,4 +330,45 @@ function outOfBounds(tile: Tile, mapGrid: number[][]) {
     tile.x < 0 ||
     tile.x >= mapGrid[0].length
   );
+}
+
+function* getNeighbours(x: number, y: number): Generator<Tile> {
+  let directions = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1]
+  ];
+
+  for (let direction of directions) {
+    yield { x: x + direction[1], y: y + direction[0] };
+  }
+}
+
+// check if margin tile
+function isMargin(
+  x: number,
+  y: number,
+  mapGrid: number[][],
+  mapW: number,
+  mapH: number
+) {
+  for (let tile of getNeighbours(x, y)) {
+    if (x === 0 || x === mapW || y === mapH || y === 0) {
+      return true;
+    }
+
+    if (
+      mapGrid[tile.y] &&
+      mapGrid[tile.y][tile.x] === CST.ENVIRONMENT.EMPTY_TILE
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }

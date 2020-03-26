@@ -135,7 +135,11 @@ export default class EnvironmentManager extends Manager {
       ENV.ORES.PREFIX.concat(name)
     );
 
-    // get the width and height of a tile
+    this.setTileSize(scene);
+  }
+
+  // get the width and height of the game base tile
+  private setTileSize(scene: Phaser.Scene) {
     let frame = scene.textures.getFrame(
       this.getTextureKey(),
       this.baseFrames[0]

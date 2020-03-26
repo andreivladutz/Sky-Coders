@@ -5,13 +5,14 @@ import { IsoScene } from "../IsoPlugin/IsoPlugin";
 import Manager from "./Manager";
 import CST from "../CST";
 import EnvironmentManager from "./EnvironmentManager";
-import IsoSpriteObject from "./IsoSpriteObject";
+import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 import { IsoDebugger } from "../utils/debug";
 import IsoBoard, { TileXY } from "../IsoPlugin/IsoBoard";
 import CameraManager from "./CameraManager";
+import LayersManager from "./LayersManager";
 
-type EventEmitter = Phaser.Events.EventEmitter;
-const EventEmitter = Phaser.Events.EventEmitter;
+// Specialised emitter
+import MapEventEmitter from "../utils/MapEventEmitter";
 
 interface Point {
   x: number;
@@ -41,7 +42,7 @@ export default class MapManager extends Manager {
   private debuggingObjects: IsoSpriteObject[];
   private isoDebug: IsoDebugger;
 
-  events: EventEmitter = new EventEmitter();
+  events: MapEventEmitter = new MapEventEmitter();
 
   // register to events and emit them further
   private initEvents() {
@@ -49,10 +50,20 @@ export default class MapManager extends Manager {
     this.getIsoBoard()
       .board.setInteractive()
       .on(CST.EVENTS.MAP.MOVE, (pointer, tile: TileXY) => {
-        this.tileMap.onTileOver(tile);
         this.events.emit(CST.EVENTS.MAP.MOVE, tile);
+
+        if (this.events.shouldPreventDefault(tile)) {
+          this.tileMap.clearTintedTile();
+          return;
+        }
+
+        this.tileMap.onTileOver(tile);
       })
       .on(CST.EVENTS.MAP.TAP, (pointer, tile: TileXY) => {
+        if (this.events.shouldPreventDefault(tile)) {
+          return;
+        }
+
         // TODO: IF ON MOBILE (DETECT) then on tile over should be called
         //this.tileMap.onTileOver(tile);
         this.events.emit(CST.EVENTS.MAP.TAP, tile);
@@ -60,6 +71,11 @@ export default class MapManager extends Manager {
       .on(CST.EVENTS.MAP.PRESS, (pointer, tile: TileXY) => {
         this.events.emit(CST.EVENTS.MAP.PRESS, tile);
       });
+
+    // when
+    this.events.on(CST.EVENTS.MAP.PREVENTING, () => {
+      this.tileMap.clearTintedTile();
+    });
   }
 
   public getMapTilesize(): MapTileSize {
@@ -67,6 +83,18 @@ export default class MapManager extends Manager {
       w: this.tileMap.mapWidth,
       h: this.tileMap.mapHeight
     };
+  }
+
+  // Get the exteme tile coordinates x, y for the current view
+  // Get the extreme coordinates of the current view
+  public getExtremesTileCoords(): {
+    rightmostX: number;
+    leftmostX: number;
+    topmostY: number;
+    lowermostY: number;
+  } {
+    // use the real viewport not the internal view rect to get accurate tile extremes
+    return this.getIsoBoard().getExtremesTileCoords(true);
   }
 
   // returns the {x, y} corresponding world coords
@@ -166,6 +194,9 @@ export default class MapManager extends Manager {
       mapHeight: CST.MAP.HEIGHT,
       mapMatrix: this.mapMatrix
     });
+
+    // init the LayerManager
+    LayersManager.getInstance(this.mapMatrix);
 
     // Place the random resources on the map
     let mapSize = this.getMapTilesize();

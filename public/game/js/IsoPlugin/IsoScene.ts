@@ -1,9 +1,12 @@
 import { Scene } from "phaser";
-import IsoPlugin, { IsoSpriteBuilder, IsoPhysics } from "./IsoPlugin";
+import IsoPlugin, {
+  IsoSpriteBuilder
+  //, IsoPhysics
+} from "./IsoPlugin";
 
 // the IsoPlugin will be accesed on the scene via this.iso
 const ISO_SCENE_KEY = "iso";
-const ISO_PHYSICS_SCENE_KEY = "isoPhysics";
+// const ISO_PHYSICS_SCENE_KEY = "isoPhysics";
 
 // tell typescript that the isometric plugin is going to inject the isoSprite property on the GameObjectFactory
 interface GameObjectFactoryIso extends Phaser.GameObjects.GameObjectFactory {
@@ -16,12 +19,12 @@ export default class IsoScene extends Scene {
   // these properties will be changed by injecting the isometric plugin
   iso: IsoPlugin;
   // if physics are enabled, this will be the injected property on the scene
-  isoPhysics?: IsoPhysics;
+  //isoPhysics?: IsoPhysics;
   // the projection angle
   isometricType?: number;
 
   // are physics enabled?
-  private physicsEnabled: boolean;
+  // private physicsEnabled: boolean;
 
   /**
    *
@@ -29,8 +32,8 @@ export default class IsoScene extends Scene {
    * @param physicsEnabled Should isoPhysics also be injected on the scene? Defaults to false
    */
   constructor(
-    config: Phaser.Types.Scenes.SettingsConfig,
-    physicsEnabled: boolean = false
+    config: Phaser.Types.Scenes.SettingsConfig
+    //physicsEnabled: boolean = false
   ) {
     if (!config.mapAdd) {
       config.mapAdd = {};
@@ -38,13 +41,13 @@ export default class IsoScene extends Scene {
     // inject the "iso" key on the scene
     config.mapAdd.isoPlugin = ISO_SCENE_KEY;
 
-    if (physicsEnabled) {
-      config.mapAdd.isoPhysics = ISO_PHYSICS_SCENE_KEY;
-    }
+    // if (physicsEnabled) {
+    //   config.mapAdd.isoPhysics = ISO_PHYSICS_SCENE_KEY;
+    // }
 
     super(config);
 
-    this.physicsEnabled = physicsEnabled;
+    // this.physicsEnabled = physicsEnabled;
   }
 
   /**
@@ -53,8 +56,8 @@ export default class IsoScene extends Scene {
    * If parameters are not provided, uuids will be generated
    */
   preload(
-    isoPluginUniqueId: string = Phaser.Math.RND.uuid(),
-    physicsPluginUniqueId: string = Phaser.Math.RND.uuid()
+    isoPluginUniqueId: string = Phaser.Math.RND.uuid()
+    // physicsPluginUniqueId: string = Phaser.Math.RND.uuid()
   ) {
     // load the isometric plugin
     this.load.scenePlugin({
@@ -65,12 +68,12 @@ export default class IsoScene extends Scene {
     });
 
     // also load the physics plugin if physics are enabled
-    if (this.physicsEnabled) {
-      this.load.scenePlugin({
-        key: physicsPluginUniqueId,
-        url: IsoPhysics,
-        sceneKey: ISO_PHYSICS_SCENE_KEY
-      });
-    }
+    // if (this.physicsEnabled) {
+    //   this.load.scenePlugin({
+    //     key: physicsPluginUniqueId,
+    //     url: IsoPhysics,
+    //     sceneKey: ISO_PHYSICS_SCENE_KEY
+    //   });
+    // }
   }
 }

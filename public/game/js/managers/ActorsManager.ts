@@ -1,5 +1,5 @@
 import ACTORS_CST from "../ACTORS_CST";
-import Actor, { ActorConfig } from "./Actor";
+import Actor, { ActorConfig } from "../gameObjects/Actor";
 
 import Manager from "./Manager";
 

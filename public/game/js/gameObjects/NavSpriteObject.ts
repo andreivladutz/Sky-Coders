@@ -1,9 +1,9 @@
 import IsoSpriteObject from "./IsoSpriteObject";
-import MapManager from "./MapManager";
+import MapManager from "../managers/MapManager";
 import CST from "../CST";
 
 import MoveTo from "../plugins/MoveToPlugin/MoveTo";
-import AstarWorkerManager from "./AstarWorkerManager";
+import AstarWorkerManager from "../managers/AstarWorkerManager";
 
 interface TileXY {
   x: number;
@@ -31,10 +31,11 @@ export default class NavSpriteObject extends IsoSpriteObject {
     tileX: number,
     tileY: number,
     z: number,
+    objectId: number,
     texture: string,
     frame?: string | number
   ) {
-    super(scene, tileX, tileY, z, texture, frame);
+    super(scene, tileX, tileY, z, objectId, texture, frame);
 
     this.actorKey = actorKey;
 

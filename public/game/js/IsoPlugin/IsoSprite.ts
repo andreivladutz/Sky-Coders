@@ -108,6 +108,11 @@ export default class IsoSprite extends Sprite {
     );
   }
 
+  // get the Rectangle bounding box of this game object
+  public getAABB(): Phaser.Geom.Rectangle {
+    return Phaser.Geom.Polygon.GetAABB(this.hitPolygon);
+  }
+
   /**
    * The axonometric position of the IsoSprite on the x axis. Increasing the x coordinate will move the object down and to the right on the screen.
    *

@@ -1,17 +1,21 @@
 import CST from "../CST";
-import { IsoSprite, ISOMETRIC, Point3 } from "../IsoPlugin/IsoPlugin";
+import { ISOMETRIC } from "../IsoPlugin/IsoPlugin";
 import IsoScene from "../IsoPlugin/IsoScene";
 
 import CameraManager from "../managers/CameraManager";
 import MapManager from "../managers/MapManager";
-import Actor from "../managers/Actor";
+import Actor from "../gameObjects/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
 import TileMap from "../IsoPlugin/TileMap";
-import IsoGameObject from "../managers/IsoSpriteObject";
-import AstarWorkerManager from "../managers/AstarWorkerManager";
+
+import BuildingObject from "../gameObjects/BuildingObject";
+import BuildingsManager from "../managers/BuildingsManager";
+
+import UIComponents from "../ui/UIComponentsFactory";
+import BuildPlaceUI from "../ui/BuildPlaceUI";
 
 // TODO: remove global variables
-let actor: Actor;
+let actor: Actor, obj: BuildingObject;
 
 export default class GameScene extends IsoScene {
   tileMap: TileMap;
@@ -74,9 +78,14 @@ export default class GameScene extends IsoScene {
       .enableDebugging()
       .setScrollOverTiles(actor.tileX, actor.tileY);
     actor.enableDebugging();
+
+    obj = new BuildingObject(this, CST.BUILDINGS.TYPES.RESIDENTIAL);
+
+    UIComponents.getUIComponent(BuildPlaceUI, this).enable(obj);
   }
 
   update() {
+    // console.log(this.children.sortByDepth(actor, obj));
     // code to follow an actor
     // MapManager.getInstance().setScrollOverTiles(
     //   actor.gameObject.floatingTileX,

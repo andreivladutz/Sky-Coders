@@ -10,7 +10,7 @@ import { IsoScene } from "../IsoPlugin/IsoPlugin";
 
 import NavSpriteObject from "./NavSpriteObject";
 
-import ActorsManager from "./ActorsManager";
+import ActorsManager from "../managers/ActorsManager";
 import { TileXY } from "../IsoPlugin/IsoBoard";
 
 // mapping event to directions
@@ -68,6 +68,7 @@ export default class Actor extends NavSpriteObject {
       config.tileX,
       config.tileY,
       config.z,
+      CST.LAYERS.ACTOR_ID,
       config.actorKey,
       config.frame
     );

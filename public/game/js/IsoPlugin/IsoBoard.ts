@@ -1,7 +1,6 @@
 // TODO: NEEDS REFACTORING!!!
 import { Board } from "phaser3-rex-plugins/plugins/board-components";
 import { IsoScene, Point3 } from "./IsoPlugin";
-import BlockerFactory from "./Blocker";
 
 import CST from "../CST";
 import KDBush from "kdbush";
@@ -18,81 +17,6 @@ const BOTTOM = 1,
 export interface TileXY {
   x: number;
   y: number;
-}
-
-// projections for TileXYs
-const projX = ({ x }: TileXY) => x,
-  projY = ({ y }: TileXY) => y;
-
-// Get an array of tiles and two projection functions that get the x or the y properties of a tile
-// Sorts by the main property, then by the secondary one
-function sortTiles(
-  tiles: TileXY[],
-  mainProj: (t: TileXY) => number,
-  otherProj: (t: TileXY) => number
-) {
-  let compFunc = (a: TileXY, b: TileXY): number => {
-    let mainDiff = mainProj(a) - mainProj(b);
-
-    // sort by the secondary property
-    if (mainDiff === 0) {
-      return otherProj(a) - otherProj(b);
-    }
-
-    return mainDiff;
-  };
-
-  return tiles.sort(compFunc);
-}
-
-// returns tiles that give grid lines
-function getLinePairs(
-  tiles: TileXY[],
-  mainProj: (t: TileXY) => number,
-  otherProj: (t: TileXY) => number
-): Array<[TileXY, TileXY]> {
-  let lineTiles = [];
-
-  tiles = sortTiles(tiles, mainProj, otherProj);
-
-  // the big interval on main property
-  let currPropVal = -1,
-    // the ends of the interval on the secondary property
-    // which define the ends of a line (segment)
-    otherPropMin: TileXY = null,
-    otherPropMax: TileXY = null;
-
-  let abs = Math.abs;
-
-  for (let i = 0; i < tiles.length; i++) {
-    let tile = tiles[i];
-
-    // the main property changed, get the min and max for the secondary prop for this new interval
-    // we also have to check the continuity of the line
-    if (
-      mainProj(tile) !== currPropVal ||
-      abs(otherProj(tiles[i - 1]) - otherProj(tile)) > 1
-    ) {
-      // if this isn't the first iteration on the main property, push the ends of the found line
-      if (otherPropMax !== null && otherPropMin !== null) {
-        lineTiles.push([otherPropMin, otherPropMax]);
-      }
-
-      currPropVal = mainProj(tile);
-      otherPropMin = otherPropMax = tile;
-    } else {
-      // don't have to check if the new found tile's secondary property is bigger than the current maximum
-      // they are sorted, so we are sure this is the new max
-      otherPropMax = tile;
-    }
-  }
-
-  // don't forget to push the last tiles which are the ends to a line in the grid
-  if (otherPropMax !== null && otherPropMin !== null) {
-    lineTiles.push([otherPropMin, otherPropMax]);
-  }
-
-  return lineTiles;
 }
 
 type IndexedTileSegments = { [key: number]: Array<[TileXY, TileXY]> };
@@ -118,9 +42,6 @@ interface IsoBoardConfig {
  */
 export default class IsoBoard {
   public static instance: IsoBoard = null;
-
-  // blockerFactory used to mark unwalkable tiles and such
-  blockerFactory: BlockerFactory;
 
   // the graphics object used to draw the board grid
   private graphics: Phaser.GameObjects.Graphics;
@@ -182,9 +103,6 @@ export default class IsoBoard {
     this.board.tileXYToWroldX = this.board.tileXYToWorldX;
     this.board.tileXYToWroldY = this.board.tileXYToWorldY;
 
-    // init the blocker factory
-    this.blockerFactory = BlockerFactory.getInstance(this.board);
-
     // the real gameSize
     this.gameSize = config.scene.game.scale.gameSize;
 
@@ -205,7 +123,7 @@ export default class IsoBoard {
           alpha: CST.GRID.LINE_ALPHA
         }
       })
-      .setDepth(CST.GRID.GRID_DEPTH);
+      .setDepth(CST.LAYER_DEPTH.WORLD_GRID);
 
     // when the real camera moves, the grid should move with it
     this.camera = config.scene.cameras.main;
@@ -307,6 +225,47 @@ export default class IsoBoard {
     // );
   }
 
+  // Get the extreme coordinates of the current view
+  public getExtremesTileCoords(
+    useRealViewport: boolean = false
+  ): {
+    rightmostX: number;
+    leftmostX: number;
+    topmostY: number;
+    lowermostY: number;
+  } {
+    const mapWith = this.mapSize.w / this.mapSize.tileW - 1,
+      mapHeight = this.mapSize.h / this.mapSize.tileH - 1;
+
+    let viewRect = useRealViewport ? this.camera.worldView : this.viewRectangle;
+
+    let leftmostTile = this.board.worldXYToTileXY(viewRect.x, viewRect.y),
+      rightmostTile = this.board.worldXYToTileXY(
+        viewRect.x + viewRect.width,
+        viewRect.y + viewRect.height
+      ),
+      topmostTile = this.board.worldXYToTileXY(
+        viewRect.x + viewRect.width,
+        viewRect.y
+      ),
+      lowermostTile = this.board.worldXYToTileXY(
+        viewRect.x,
+        viewRect.y + viewRect.height
+      );
+
+    let topmostY = Math.max(topmostTile.y, 0),
+      lowermostY = Math.min(lowermostTile.y, mapHeight),
+      leftmostX = Math.max(leftmostTile.x, 0),
+      rightmostX = Math.min(rightmostTile.x, mapWith);
+
+    return {
+      rightmostX,
+      leftmostX,
+      topmostY,
+      lowermostY
+    };
+  }
+
   // init the vertical and horizontal lines of this grid internally
   private initGridLines(mapMatrix: number[][]) {
     // get all the tiles of this grid
@@ -361,21 +320,9 @@ export default class IsoBoard {
   }
 
   private getVerticalGridLines(): Array<TileLine> {
-    const mapWith = this.mapSize.w / this.mapSize.tileW - 1;
-
     let verticalLines: Array<TileLine> = [];
 
-    let leftmostTile = this.board.worldXYToTileXY(
-        this.viewRectangle.x,
-        this.viewRectangle.y
-      ),
-      rightmostTile = this.board.worldXYToTileXY(
-        this.viewRectangle.x + this.viewRectangle.width,
-        this.viewRectangle.y + this.viewRectangle.height
-      );
-
-    let leftmostX = Math.max(leftmostTile.x, 0),
-      rightmostX = Math.min(rightmostTile.x, mapWith);
+    let { leftmostX, rightmostX } = this.getExtremesTileCoords();
 
     for (let x = leftmostX; x <= rightmostX; x++) {
       verticalLines.push(...this.verticalGridLines[x]);
@@ -385,21 +332,9 @@ export default class IsoBoard {
   }
 
   private getHorizontalGridLines(): Array<TileLine> {
-    const mapHeight = this.mapSize.h / this.mapSize.tileH - 1;
+    let { topmostY, lowermostY } = this.getExtremesTileCoords();
 
     let horizontalLines = [];
-
-    let topmostTile = this.board.worldXYToTileXY(
-        this.viewRectangle.x + this.viewRectangle.width,
-        this.viewRectangle.y
-      ),
-      lowermostTile = this.board.worldXYToTileXY(
-        this.viewRectangle.x,
-        this.viewRectangle.y + this.viewRectangle.height
-      );
-
-    let topmostY = Math.max(topmostTile.y, 0),
-      lowermostY = Math.min(lowermostTile.y, mapHeight);
 
     for (let y = topmostY; y <= lowermostY; y++) {
       horizontalLines.push(...this.horizontalGridLines[y]);
@@ -588,8 +523,6 @@ export default class IsoBoard {
     this.board.forEachTileXY((tileXY: TileXY) => {
       // if there's no tile here no point in drawing grid stroke
       if (!mapMatrix[tileXY.y][tileXY.x]) {
-        this.blockerFactory.addBlockerTile(tileXY.x, tileXY.y);
-
         return;
       }
 
@@ -671,3 +604,78 @@ let GetTileXY = function(worldX: number, worldY: number): TileXY {
 
   return out;
 };
+
+// projections for TileXYs
+const projX = ({ x }: TileXY) => x,
+  projY = ({ y }: TileXY) => y;
+
+// Get an array of tiles and two projection functions that get the x or the y properties of a tile
+// Sorts by the main property, then by the secondary one
+function sortTiles(
+  tiles: TileXY[],
+  mainProj: (t: TileXY) => number,
+  otherProj: (t: TileXY) => number
+) {
+  let compFunc = (a: TileXY, b: TileXY): number => {
+    let mainDiff = mainProj(a) - mainProj(b);
+
+    // sort by the secondary property
+    if (mainDiff === 0) {
+      return otherProj(a) - otherProj(b);
+    }
+
+    return mainDiff;
+  };
+
+  return tiles.sort(compFunc);
+}
+
+// returns tiles that give grid lines
+function getLinePairs(
+  tiles: TileXY[],
+  mainProj: (t: TileXY) => number,
+  otherProj: (t: TileXY) => number
+): Array<[TileXY, TileXY]> {
+  let lineTiles = [];
+
+  tiles = sortTiles(tiles, mainProj, otherProj);
+
+  // the big interval on main property
+  let currPropVal = -1,
+    // the ends of the interval on the secondary property
+    // which define the ends of a line (segment)
+    otherPropMin: TileXY = null,
+    otherPropMax: TileXY = null;
+
+  let abs = Math.abs;
+
+  for (let i = 0; i < tiles.length; i++) {
+    let tile = tiles[i];
+
+    // the main property changed, get the min and max for the secondary prop for this new interval
+    // we also have to check the continuity of the line
+    if (
+      mainProj(tile) !== currPropVal ||
+      abs(otherProj(tiles[i - 1]) - otherProj(tile)) > 1
+    ) {
+      // if this isn't the first iteration on the main property, push the ends of the found line
+      if (otherPropMax !== null && otherPropMin !== null) {
+        lineTiles.push([otherPropMin, otherPropMax]);
+      }
+
+      currPropVal = mainProj(tile);
+      otherPropMin = otherPropMax = tile;
+    } else {
+      // don't have to check if the new found tile's secondary property is bigger than the current maximum
+      // they are sorted, so we are sure this is the new max
+      otherPropMax = tile;
+    }
+  }
+
+  // don't forget to push the last tiles which are the ends to a line in the grid
+  if (otherPropMax !== null && otherPropMin !== null) {
+    lineTiles.push([otherPropMin, otherPropMax]);
+  }
+
+  return lineTiles;
+}

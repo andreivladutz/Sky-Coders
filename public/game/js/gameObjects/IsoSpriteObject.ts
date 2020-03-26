@@ -1,8 +1,9 @@
 import IsoSprite from "../IsoPlugin/IsoSprite";
-import EnvironmentManager from "./EnvironmentManager";
-import MapManager from "./MapManager";
+import EnvironmentManager from "../managers/EnvironmentManager";
+import MapManager from "../managers/MapManager";
 import CST from "../CST";
 import { TileXY } from "../IsoPlugin/IsoBoard";
+import LayersManager from "../managers/LayersManager";
 
 enum GridColor {
   DO_NOT_DRAW = -1,
@@ -23,7 +24,19 @@ let outOfBounds = function(
   );
 };
 
+// data added by the rex board plugin
+interface RexChess {
+  $uid: number;
+}
+
 export default class IsoSpriteObject extends IsoSprite {
+  // the object id useful for the layer manager
+  // this is an identifier for the object type (tree, building..)
+  public objectId: number;
+
+  // added to the object by the rex board plugin;
+  public rexChess: RexChess;
+
   tileWidthX: number;
   tileWidthY: number;
 
@@ -35,7 +48,7 @@ export default class IsoSpriteObject extends IsoSprite {
   protected gridGraphics: Phaser.GameObjects.Graphics;
   // should we draw the grid? if so this property is a valid number
   // TODO: should default to DO_NOT_DRAW
-  protected drawingGridColor: GridColor = GridColor.DO_NOT_DRAW;
+  protected drawingGridColor: GridColor = GridColor.RED;
 
   // the tint color of this object when a pointer is over it or it is selected
   protected selectedTintColor: number = CST.ACTOR.SELECTION_TINT;
@@ -50,6 +63,7 @@ export default class IsoSpriteObject extends IsoSprite {
   protected lastDrewTileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
 
   mapManager: MapManager = MapManager.getInstance();
+  layersManager: LayersManager = LayersManager.getInstance();
 
   // the size of this tile in 3D (unprojected it is a rectangle)
   readonly TILE_SIZE3D = EnvironmentManager.getInstance().TILE_HEIGHT;
@@ -59,8 +73,12 @@ export default class IsoSpriteObject extends IsoSprite {
     tileX: number,
     tileY: number,
     z: number,
+    objectId: number,
     texture: string,
-    frame?: string | number
+    frame?: string | number,
+    // override local compute tiles
+    localTileX?: number,
+    localTileY: number = localTileX
   ) {
     super(
       scene,
@@ -71,6 +89,8 @@ export default class IsoSpriteObject extends IsoSprite {
       frame
     );
 
+    this.objectId = objectId;
+
     this.addToGridAt(tileX, tileY);
 
     this.tileCoords.x = tileX;
@@ -80,42 +100,19 @@ export default class IsoSpriteObject extends IsoSprite {
     // set the origin to default to the bottom right corner
     this.scene.add.existing(this.setOrigin(1, 1));
 
-    if (!frame) {
-      // If no frame has been provided
-      for (let frameKey in this.texture.frames) {
-        // take the first frame key that's different than base
-        // so we can set the origin of this game object correctly
-        if (
-          frameKey !== "__BASE" &&
-          this.texture.frames.hasOwnProperty(frameKey) &&
-          this.texture.frames[frameKey].pivotX &&
-          this.texture.frames[frameKey].pivotY
-        ) {
-          this.setOrigin(
-            this.texture.frames[frameKey].pivotX,
-            this.texture.frames[frameKey].pivotY
-          );
-
-          break;
-        }
-      }
-    }
-    // Otherwise, use the provided frame's pivot
-    else if (
-      this.texture.frames.hasOwnProperty(frame) &&
-      this.texture.frames[frame].pivotX &&
-      this.texture.frames[frame].pivotY
-    ) {
-      this.setOrigin(
-        this.texture.frames[frame].pivotX,
-        this.texture.frames[frame].pivotY
-      );
-    }
+    this.setOriginByFrame(frame);
 
     this.computeTileArea();
+    // override the computed local tiles
+    if (localTileX) {
+      this.overrideLocalTilePos(localTileX, localTileY);
+    }
 
-    // TODO: change this depth logic
-    this.gridGraphics = this.scene.add.graphics().setDepth(3);
+    this.layersManager.applyObjectOnLayer(this);
+
+    this.gridGraphics = this.scene.add
+      .graphics()
+      .setDepth(CST.LAYER_DEPTH.OBJECT_GRID);
 
     // the actors update on preupdate event, the tilemap updates on update event,
     // as the drawing of the tilemap sets the isoBoard's viewRectangle "not dirty"
@@ -130,6 +127,11 @@ export default class IsoSpriteObject extends IsoSprite {
     });
   }
 
+  // this is an uid of the object => generated automatically and is different for every other object
+  public getObjectUID(): number {
+    return this.rexChess.$uid + 1;
+  }
+
   // Check if the tile coords are contained in this object's grid
   public tileCoordsOnThisGrid(x: number, y: number) {
     for (let { x: tileX, y: tileY } of this.getGridTiles()) {
@@ -139,6 +141,14 @@ export default class IsoSpriteObject extends IsoSprite {
     }
 
     return false;
+  }
+
+  // Override the computed local tile coords if they are not computed correctly
+  private overrideLocalTilePos(localX: number, localY: number = localX): this {
+    this.localTileX = localX;
+    this.localTileY = localY;
+
+    return this;
   }
 
   // make this iso object selectable or unselectable
@@ -151,12 +161,14 @@ export default class IsoSpriteObject extends IsoSprite {
 
     this.setInteractive()
       .on("pointerover", () => {
-        // TODO: stop propagating move events to the underlying board
-        //event.stopPropagation();
+        // prevent tilemove events propagating to the map
+        this.mapManager.events.registerDefaultPrevention(this);
 
         this.setTint(this.selectedTintColor);
       })
       .on("pointerout", () => {
+        this.mapManager.events.unregisterDefaultPrevention();
+
         if (!this.selected) {
           this.clearTint();
         }
@@ -220,6 +232,26 @@ export default class IsoSpriteObject extends IsoSprite {
     }
 
     return gridTiles;
+  }
+
+  // Get the grid tiles in form of a matrix
+  public getGridAsMatrix(): TileXY[][] {
+    let gridMatrix = [];
+
+    // how are these tiles positioned relative to the localTileX, localTileY?
+
+    for (let y = 0; y < this.tileWidthY; y++) {
+      gridMatrix.push([]);
+
+      for (let x = 0; x < this.tileWidthX; x++) {
+        let dX = x - this.localTileX,
+          dy = y - this.localTileY;
+
+        gridMatrix[y][x] = { x: this.tileX + dX, y: this.tileY + dy };
+      }
+    }
+
+    return gridMatrix;
   }
 
   // function called on each scene update event
@@ -347,5 +379,39 @@ export default class IsoSpriteObject extends IsoSprite {
   // if body debugging is enabled, the body of this object will be drawn
   public enableDebugging() {
     this.mapManager.addToDebuggingObjects(this);
+  }
+
+  private setOriginByFrame(frame?: string | number) {
+    if (!frame) {
+      // If no frame has been provided
+      for (let frameKey in this.texture.frames) {
+        // take the first frame key that's different than base
+        // so we can set the origin of this game object correctly
+        if (
+          frameKey !== "__BASE" &&
+          this.texture.frames.hasOwnProperty(frameKey) &&
+          this.texture.frames[frameKey].pivotX &&
+          this.texture.frames[frameKey].pivotY
+        ) {
+          this.setOrigin(
+            this.texture.frames[frameKey].pivotX,
+            this.texture.frames[frameKey].pivotY
+          );
+
+          break;
+        }
+      }
+    }
+    // Otherwise, use the provided frame's pivot
+    else if (
+      this.texture.frames.hasOwnProperty(frame) &&
+      this.texture.frames[frame].pivotX &&
+      this.texture.frames[frame].pivotY
+    ) {
+      this.setOrigin(
+        this.texture.frames[frame].pivotX,
+        this.texture.frames[frame].pivotY
+      );
+    }
   }
 }
