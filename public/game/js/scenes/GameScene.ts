@@ -8,14 +8,8 @@ import Actor from "../gameObjects/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
 import TileMap from "../IsoPlugin/TileMap";
 
-import BuildingObject from "../gameObjects/BuildingObject";
-import BuildingsManager from "../managers/BuildingsManager";
-
-import UIComponents from "../ui/UIComponentsFactory";
-import BuildPlaceUI from "../ui/BuildPlaceUI";
-
 // TODO: remove global variables
-let actor: Actor, obj: BuildingObject;
+let actor: Actor;
 
 export default class GameScene extends IsoScene {
   tileMap: TileMap;
@@ -52,7 +46,10 @@ export default class GameScene extends IsoScene {
 
   create() {
     // Set the projector's world origin
-    this.iso.projector.origin.setTo(0.5, 0.2);
+    this.iso.projector.origin.setTo(
+      CST.PROJECTOR.ORIGIN.X,
+      CST.PROJECTOR.ORIGIN.Y
+    );
 
     // fire the map init
     this.tileMap = MapManager.getInstance().initMap(this);
@@ -78,10 +75,6 @@ export default class GameScene extends IsoScene {
       .enableDebugging()
       .setScrollOverTiles(actor.tileX, actor.tileY);
     actor.enableDebugging();
-
-    obj = new BuildingObject(this, CST.BUILDINGS.TYPES.RESIDENTIAL);
-
-    UIComponents.getUIComponent(BuildPlaceUI, this).enable(obj);
   }
 
   update() {

@@ -132,6 +132,14 @@ export default class MapManager extends Manager {
     this.tileMap.isoBoard.board.addChess(obj, tileX, tileY);
   }
 
+  public moveSpriteObjectToTiles(
+    obj: IsoSpriteObject,
+    tileX: number,
+    tileY: number
+  ) {
+    this.tileMap.isoBoard.board.moveChess(obj, tileX, tileY, 0);
+  }
+
   public getIsoBoard(): IsoBoard {
     return this.tileMap.isoBoard;
   }

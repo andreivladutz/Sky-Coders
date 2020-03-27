@@ -33,6 +33,13 @@ export default {
       SCENE_KEY: "iso"
     }
   },
+  // the isoScene projector found in the game and the UI scenes
+  PROJECTOR: {
+    ORIGIN: {
+      X: 0.5,
+      Y: 0.2
+    }
+  },
   // camera controller params
   CAMERA: {
     MAX_ZOOM: 1,
@@ -176,6 +183,9 @@ export default {
     OBJECT: {
       SELECT: "object.select",
       DESELECT: "object.deselect"
+    },
+    ARROWS_UI: {
+      TAP: "arrow.tapped"
     }
   },
   // layer depth for different rendering "objects"
@@ -211,7 +221,8 @@ export default {
     NORTH: 0,
     EAST: Math.PI / 2,
     SOUTH: Math.PI,
-    WEST: (3 * Math.PI) / 2
+    WEST: (3 * Math.PI) / 2,
+    Z_EFFECT: 40
   },
   UI: {
     BUILD_PLACE: {

@@ -1,0 +1,146 @@
+{
+	"textures": [
+		{
+			"image": "main_buttons-sd-0.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 121,
+				"h": 161
+			},
+			"scale": 0.25,
+			"frames": [
+				{
+					"filename": "Buttons/Settings",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 63,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 1,
+						"w": 58,
+						"h": 53
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 58,
+						"h": 53
+					}
+				},
+				{
+					"filename": "Buttons/Sound",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 63,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 3,
+						"w": 60,
+						"h": 51
+					},
+					"frame": {
+						"x": 1,
+						"y": 56,
+						"w": 60,
+						"h": 51
+					}
+				},
+				{
+					"filename": "Buttons/Build",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 63,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 3,
+						"w": 59,
+						"h": 52
+					},
+					"frame": {
+						"x": 61,
+						"y": 1,
+						"w": 59,
+						"h": 52
+					}
+				},
+				{
+					"filename": "Buttons/Logout",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 63,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 3,
+						"y": 2,
+						"w": 57,
+						"h": 52
+					},
+					"frame": {
+						"x": 63,
+						"y": 55,
+						"w": 57,
+						"h": 52
+					}
+				},
+				{
+					"filename": "Buttons/Leaderboard",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 63,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 4,
+						"w": 59,
+						"h": 51
+					},
+					"frame": {
+						"x": 1,
+						"y": 109,
+						"w": 59,
+						"h": 51
+					}
+				},
+				{
+					"filename": "Buttons/Script",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 63,
+						"h": 63
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 4,
+						"w": 57,
+						"h": 51
+					},
+					"frame": {
+						"x": 62,
+						"y": 109,
+						"w": 57,
+						"h": 51
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:861f36dd9d5f714257e56486ba7fe0bd:4d47e7fb25534c0d508390769d0af3af:56c353b78932d635f9195fd488f280a9$"
+	}
+}

@@ -3,10 +3,20 @@ import CST from "../CST";
 import PwaHandler from "../managers/PwaHandler";
 
 import UIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
+import IsoScene from "../IsoPlugin/IsoScene";
+import { ISOMETRIC } from "../IsoPlugin/Projector";
 
-export default class UIScene extends Phaser.Scene {
+import BuildingObject from "../gameObjects/BuildingObject";
+
+import UIComponents from "../ui/UIComponentsFactory";
+import BuildPlaceUI from "../ui/BuildPlaceUI";
+
+export default class UIScene extends IsoScene {
   rexUI: UIPlugin;
   buttonsContainer: any;
+
+  // the game scene this UIScene is above
+  gameScene: IsoScene;
 
   constructor() {
     const config = {
@@ -14,9 +24,13 @@ export default class UIScene extends Phaser.Scene {
     };
 
     super(config);
+
+    this.isometricType = ISOMETRIC;
   }
 
   preload() {
+    super.preload();
+
     this.load.setBaseURL("./game/assets/");
 
     this.load.setPath("image/UI/");
@@ -25,9 +39,28 @@ export default class UIScene extends Phaser.Scene {
 
   init() {
     this.scene.bringToTop();
+
+    this.gameScene = this.scene.get(CST.SCENES.GAME) as IsoScene;
   }
 
   create() {
+    // Set the projector's world origin
+    this.iso.projector.origin.setTo(
+      CST.PROJECTOR.ORIGIN.X,
+      CST.PROJECTOR.ORIGIN.Y
+    );
+
+    this.handlePwaInstallation();
+
+    let obj = new BuildingObject(
+      this.gameScene,
+      CST.BUILDINGS.TYPES.RESIDENTIAL
+    );
+
+    UIComponents.getUIComponent(BuildPlaceUI, this, this.gameScene).enable(obj);
+  }
+
+  handlePwaInstallation() {
     // TODO: real button handler
     this.buttonsContainer = this.rexUI.add
       .buttons({

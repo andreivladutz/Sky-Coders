@@ -4,6 +4,7 @@ import { IsoScene, Point3 } from "./IsoPlugin";
 
 import CST from "../CST";
 import KDBush from "kdbush";
+import CameraManager from "../managers/CameraManager";
 
 const QUAD_GRID = "quadGrid",
   ISO_GRID_TYPE = "isometric";
@@ -63,8 +64,6 @@ export default class IsoBoard {
   // if the view rectangle changed we should redraw the tiles on the screen
   public viewRectangleDirty: boolean = true;
 
-  // hold a reference to the main camera
-  camera: Phaser.Cameras.Scene2D.Camera;
   board: Board;
   // the gameSize
   gameSize: { width: number; height: number };
@@ -75,6 +74,9 @@ export default class IsoBoard {
     tileW: number;
     tileH: number;
   };
+
+  // game main camera (the one used by the cameraManager)
+  camera: Phaser.Cameras.Scene2D.Camera;
 
   // the lines that compose this grid
   // split all the tiles into lines so it requires less resources to draw the grid
@@ -125,7 +127,6 @@ export default class IsoBoard {
       })
       .setDepth(CST.LAYER_DEPTH.WORLD_GRID);
 
-    // when the real camera moves, the grid should move with it
     this.camera = config.scene.cameras.main;
 
     this.initListeners();
@@ -137,21 +138,18 @@ export default class IsoBoard {
   }
 
   private initListeners() {
-    // TODO: emit these events somewhere else, not on the camera
-    this.camera
-      .on(CST.CAMERA.MOVE_EVENT, () => {
-        //this.viewRectangleDirty = true;
-        //this.updateViewRectangle();
-      })
-      .on(CST.CAMERA.ZOOM_EVENT, (actualZoomFactor: number) => {
-        //this.updateViewRectangle();
-        //this.viewRectangleDirty = true;
+    CameraManager.EVENTS.on(CST.CAMERA.MOVE_EVENT, () => {
+      //this.viewRectangleDirty = true;
+      //this.updateViewRectangle();
+    }).on(CST.CAMERA.ZOOM_EVENT, (actualZoomFactor: number) => {
+      //this.updateViewRectangle();
+      //this.viewRectangleDirty = true;
 
-        // if the game is zoomed out too much, the grid will hide
-        if (this.camera.zoom <= CST.GRID.ZOOM_DEACTIVATE) {
-          this.hideGrid();
-        }
-      });
+      // if the game is zoomed out too much, the grid will hide
+      if (CameraManager.getInstance().camera.zoom <= CST.GRID.ZOOM_DEACTIVATE) {
+        this.hideGrid();
+      }
+    });
 
     // when the game screen resizes, the board has to be repositioned according to the projector
     this.board.scene.scale.on(
@@ -237,7 +235,9 @@ export default class IsoBoard {
     const mapWith = this.mapSize.w / this.mapSize.tileW - 1,
       mapHeight = this.mapSize.h / this.mapSize.tileH - 1;
 
-    let viewRect = useRealViewport ? this.camera.worldView : this.viewRectangle;
+    let viewRect = useRealViewport
+      ? CameraManager.getInstance().getViewRect()
+      : this.viewRectangle;
 
     let leftmostTile = this.board.worldXYToTileXY(viewRect.x, viewRect.y),
       rightmostTile = this.board.worldXYToTileXY(

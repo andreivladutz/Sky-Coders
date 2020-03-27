@@ -5,7 +5,7 @@ import CST from "../CST";
 import { TileXY } from "../IsoPlugin/IsoBoard";
 import LayersManager from "../managers/LayersManager";
 
-enum GridColor {
+export enum GridColor {
   DO_NOT_DRAW = -1,
   GREEN = CST.COLORS.GREEN,
   RED = CST.COLORS.RED

@@ -2,6 +2,8 @@ import Manager from "./Manager";
 import CST from "../CST";
 import MapManager from "./MapManager";
 import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
+import IsoScene from "../IsoPlugin/IsoScene";
+import ActorsManager from "./ActorsManager";
 
 interface Tile {
   x: number;
@@ -48,10 +50,6 @@ export default class LayersManager extends Manager {
           .board.tileXYToChessArray(tile.x, tile.y)
       );
     });
-
-    setTimeout(() => {
-      console.log(this.objectUidsGrid, this.objectLayer, this.uidsToObjects);
-    }, 10000);
   }
 
   // Get the config of the tile situated at x, y tile coords
@@ -89,14 +87,53 @@ export default class LayersManager extends Manager {
       this.objectUidsGrid[y][x] = uid;
     }
 
-    // also index the object by it's uid
+    // also index the object by its uid
     this.uidsToObjects[uid] = obj;
 
     return this;
   }
 
-  // check collision of this object on the map grid
-  public checkCollision(object: IsoSpriteObject): boolean {
+  public removeObjectFromLayer(obj: IsoSpriteObject): this {
+    if (!this.isObjectAppliedToLayer(obj)) {
+      return;
+    }
+
+    // the uid is unique to each object
+    let uid = obj.getObjectUID();
+
+    for (let tile of obj.getGridTiles()) {
+      let { x, y } = tile;
+
+      if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
+        continue;
+      }
+
+      this.objectLayer[y][x] = CST.ENVIRONMENT.EMPTY_TILE;
+      this.objectUidsGrid[y][x] = CST.ENVIRONMENT.EMPTY_TILE;
+    }
+
+    delete this.uidsToObjects[uid];
+
+    return this;
+  }
+
+  // returns whether this object has been applied to the object's layer
+  public isObjectAppliedToLayer(obj: IsoSpriteObject): boolean {
+    // the uid is unique to each object
+    let uid = obj.getObjectUID();
+
+    return typeof this.uidsToObjects[uid] !== "undefined";
+  }
+
+  /**
+   * check collision of this object on the map grid
+   * @param object the object to check collision for
+   * @param checkAgainstActors @default false if collision should be checked against actors on the map too
+   */
+  public isColliding(
+    object: IsoSpriteObject,
+    checkAgainstActors: boolean = false
+  ): boolean {
     // tiles ocuppied by this object
     let gridTiles = object.getGridTiles();
 
@@ -109,19 +146,30 @@ export default class LayersManager extends Manager {
         tile.y < 0 ||
         tile.y >= this.mapHeight
       ) {
-        return false;
+        return true;
       }
 
       if (
         this.getTileConfig(tile.x, tile.y).id === CST.ENVIRONMENT.EMPTY_TILE ||
         this.objectLayer[tile.y][tile.x] !== CST.ENVIRONMENT.EMPTY_TILE
       ) {
-        return false;
+        return true;
+      }
+
+      if (checkAgainstActors === true) {
+        // take each grid tile of each actor and check it against each tile of this building
+        for (let actor of ActorsManager.getInstance().sceneActors) {
+          for (let actorTile of actor.getGridTiles()) {
+            if (tile.x === actorTile.x && tile.y === actorTile.y) {
+              return true;
+            }
+          }
+        }
       }
     }
 
     // this tile is safe to walk on
-    return true;
+    return false;
   }
 
   // At first, the object layer is empty
@@ -183,6 +231,46 @@ export default class LayersManager extends Manager {
 
   private get mapHeight() {
     return this.tileGrid.length;
+  }
+
+  public debugLayers(scene: IsoScene) {
+    let debugGraphics = scene.add.graphics().setDepth(CST.LAYER_DEPTH.UI),
+      emptyTiles = [],
+      populatedTiles = [];
+
+    for (let y = 0; y < this.mapHeight; y++) {
+      for (let x = 0; x < this.mapWidth; x++) {
+        if (this.objectLayer[y][x] === CST.ENVIRONMENT.EMPTY_TILE) {
+          emptyTiles.push({ x, y });
+        } else {
+          populatedTiles.push({ x, y });
+        }
+      }
+    }
+
+    MapManager.getInstance()
+      .getIsoBoard()
+      .drawTilesOnGrid(
+        emptyTiles,
+        CST.COLORS.GREEN,
+        CST.GRID.LINE_WIDTH,
+        0,
+        CST.COLORS.GREEN,
+        debugGraphics
+      );
+
+    populatedTiles.forEach(tile => {
+      MapManager.getInstance()
+        .getIsoBoard()
+        .drawTilesOnGrid(
+          [tile],
+          CST.COLORS.RED,
+          CST.GRID.LINE_WIDTH,
+          CST.GRID.FILL_ALPHA,
+          CST.COLORS.RED,
+          debugGraphics
+        );
+    });
   }
 
   // TODO: the order of getInstance() IN THE APPLICATION is important

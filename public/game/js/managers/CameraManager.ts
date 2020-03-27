@@ -25,6 +25,8 @@ export default class CameraManager extends Manager {
   // utility for camera zooming
   pinch: Pinch;
 
+  public static readonly EVENTS = new Phaser.Events.EventEmitter();
+
   private window: Phaser.GameObjects.Zone;
 
   protected constructor(config: CameraControlConfig) {
@@ -118,7 +120,7 @@ export default class CameraManager extends Manager {
         this.window.x -= pan.dx / this.camera.zoom;
         this.window.y -= pan.dy / this.camera.zoom;
 
-        this.camera.emit(CST.CAMERA.MOVE_EVENT);
+        CameraManager.EVENTS.emit(CST.CAMERA.MOVE_EVENT);
       },
       this
     );
@@ -155,7 +157,7 @@ export default class CameraManager extends Manager {
 
       // emit the camera zoom event with the actual zoom factor the camera scaled
       let actualZoomFactor = this.camera.zoom / oldZoom;
-      this.camera.emit(CST.CAMERA.ZOOM_EVENT, actualZoomFactor);
+      CameraManager.EVENTS.emit(CST.CAMERA.ZOOM_EVENT, actualZoomFactor);
     };
 
     this.pinch.on(
