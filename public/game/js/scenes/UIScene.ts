@@ -10,6 +10,7 @@ import BuildingObject from "../gameObjects/BuildingObject";
 
 import UIComponents from "../ui/UIComponentsFactory";
 import BuildPlaceUI from "../ui/BuildPlaceUI";
+import MainUI from "../ui/MainUI";
 
 export default class UIScene extends IsoScene {
   rexUI: UIPlugin;
@@ -57,7 +58,12 @@ export default class UIScene extends IsoScene {
       CST.BUILDINGS.TYPES.RESIDENTIAL
     );
 
-    UIComponents.getUIComponent(BuildPlaceUI, this, this.gameScene).enable(obj);
+    // Get all ui components and enable them
+    UIComponents.getUIComponents(
+      [BuildPlaceUI, MainUI],
+      this,
+      this.gameScene
+    ).map(uiInstance => uiInstance.enable(obj));
   }
 
   handlePwaInstallation() {

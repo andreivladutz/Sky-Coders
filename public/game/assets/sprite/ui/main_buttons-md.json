@@ -4,135 +4,156 @@
 			"image": "main_buttons-md-0.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 349,
-				"h": 207
+				"w": 217,
+				"h": 110
 			},
-			"scale": 0.5,
+			"scale": 0.175,
 			"frames": [
 				{
-					"filename": "Buttons/Settings",
+					"filename": "Buttons/wood_texture",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
-						"w": 126,
-						"h": 126
+						"w": 175,
+						"h": 72
 					},
 					"spriteSourceSize": {
-						"x": 6,
-						"y": 4,
-						"w": 112,
-						"h": 103
+						"x": 0,
+						"y": 0,
+						"w": 175,
+						"h": 72
 					},
 					"frame": {
 						"x": 1,
 						"y": 1,
-						"w": 112,
-						"h": 103
-					}
-				},
-				{
-					"filename": "Buttons/Build",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 126,
-						"h": 126
-					},
-					"spriteSourceSize": {
-						"x": 5,
-						"y": 8,
-						"w": 115,
-						"h": 100
-					},
-					"frame": {
-						"x": 1,
-						"y": 106,
-						"w": 115,
-						"h": 100
+						"w": 175,
+						"h": 72
 					}
 				},
 				{
 					"filename": "Buttons/Logout",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
-						"w": 126,
-						"h": 126
+						"w": 38,
+						"h": 35
 					},
 					"spriteSourceSize": {
-						"x": 7,
-						"y": 5,
-						"w": 112,
-						"h": 102
+						"x": 0,
+						"y": 0,
+						"w": 38,
+						"h": 35
 					},
 					"frame": {
-						"x": 115,
+						"x": 178,
 						"y": 1,
-						"w": 112,
-						"h": 102
+						"w": 38,
+						"h": 35
+					}
+				},
+				{
+					"filename": "Buttons/Settings",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 38,
+						"h": 35
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 38,
+						"h": 35
+					},
+					"frame": {
+						"x": 178,
+						"y": 38,
+						"w": 38,
+						"h": 35
 					}
 				},
 				{
 					"filename": "Buttons/Sound",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
-						"w": 126,
-						"h": 126
+						"w": 41,
+						"h": 34
 					},
 					"spriteSourceSize": {
-						"x": 6,
-						"y": 7,
-						"w": 119,
-						"h": 101
+						"x": 0,
+						"y": 0,
+						"w": 41,
+						"h": 34
 					},
 					"frame": {
-						"x": 229,
-						"y": 1,
-						"w": 119,
-						"h": 101
+						"x": 1,
+						"y": 75,
+						"w": 41,
+						"h": 34
+					}
+				},
+				{
+					"filename": "Buttons/Build",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 40,
+						"h": 34
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 40,
+						"h": 34
+					},
+					"frame": {
+						"x": 44,
+						"y": 75,
+						"w": 40,
+						"h": 34
 					}
 				},
 				{
 					"filename": "Buttons/Leaderboard",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
-						"w": 126,
-						"h": 126
+						"w": 40,
+						"h": 34
 					},
 					"spriteSourceSize": {
-						"x": 4,
-						"y": 8,
-						"w": 115,
-						"h": 101
+						"x": 0,
+						"y": 0,
+						"w": 40,
+						"h": 34
 					},
 					"frame": {
-						"x": 118,
-						"y": 105,
-						"w": 115,
-						"h": 101
+						"x": 86,
+						"y": 75,
+						"w": 40,
+						"h": 34
 					}
 				},
 				{
 					"filename": "Buttons/Script",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
-						"w": 126,
-						"h": 126
+						"w": 38,
+						"h": 34
 					},
 					"spriteSourceSize": {
-						"x": 5,
-						"y": 8,
-						"w": 112,
-						"h": 100
+						"x": 0,
+						"y": 0,
+						"w": 38,
+						"h": 34
 					},
 					"frame": {
-						"x": 235,
-						"y": 104,
-						"w": 112,
-						"h": 100
+						"x": 128,
+						"y": 75,
+						"w": 38,
+						"h": 34
 					}
 				}
 			]
@@ -141,6 +162,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:861f36dd9d5f714257e56486ba7fe0bd:4d47e7fb25534c0d508390769d0af3af:56c353b78932d635f9195fd488f280a9$"
+		"smartupdate": "$TexturePacker:SmartUpdate:c5dd7301416de927df1fd53bfc536687:f1fceea9721352e54c917446f05826d8:56c353b78932d635f9195fd488f280a9$"
 	}
 }

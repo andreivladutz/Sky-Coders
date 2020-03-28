@@ -1,41 +1,21 @@
 import Manager from "./Manager";
 import CST from "../CST";
+import LoaderInjector, {
+  LoadingInjectedManager,
+  FramesMap
+} from "./LoaderInjector";
 
-export default class BuildingsManager extends Manager {
+export default class BuildingsManager extends Manager
+  implements LoadingInjectedManager {
   // the frames of the buildings indexed by their identifier i.e. "residential", etcetera..
-  buildingFrames: {
-    [key: string]: string;
-  } = {};
+  buildingFrames: FramesMap = {};
 
-  getTextureKey() {
-    return CST.BUILDINGS.ATLAS_KEY;
-  }
-
-  public generateFrames() {
-    let framesPrefix = CST.BUILDINGS.PREFIX;
-
-    // take all building types ids
-    for (let buildingId of Object.values(CST.BUILDINGS.TYPES)) {
-      this.buildingFrames[buildingId] = framesPrefix.concat(buildingId);
-    }
-  }
+  // Will be injected by the LoaderInjector class
+  loadResources: (load: Phaser.Loader.LoaderPlugin) => void;
+  getTextureKey: () => string;
 
   async preload(load: Phaser.Loader.LoaderPlugin) {
-    this.loadResources(load);
-
-    this.generateFrames();
-  }
-
-  private loadResources(load: Phaser.Loader.LoaderPlugin) {
-    const { BUILDINGS: BLDS } = CST;
-
-    load.setPath(BLDS.MULTIATLAS_PATH);
-
-    // load MULTIATLAS with ATLAS_KEY resource's identifier
-    load.multiatlas(BLDS.ATLAS_KEY, BLDS.MULTIATLAS);
-
-    // clear the path and prefix afterwards
-    load.setPath();
+    LoaderInjector.Inject(this, this.buildingFrames, CST.BUILDINGS)(load);
   }
 
   public static getInstance() {

@@ -28,15 +28,15 @@ export default class BuildPlaceUI extends UIComponent {
   // the building currently placing
   buildPlacing: BuildingObject = null;
 
-  movementArrows: IsoArrow[];
+  private movementArrows: IsoArrow[];
 
   // indexed by the direction constants above
-  arrowsTilePositions: {
+  private arrowsTilePositions: {
     [key in Directions]?: Tile;
   } = {};
 
   // the function used for preventing camera panning and tile movement
-  propagationPrevention = (
+  private propagationPrevention = (
     _ptr: Phaser.Input.Pointer,
     _lX: number,
     _lY: number,
@@ -54,17 +54,25 @@ export default class BuildPlaceUI extends UIComponent {
       new IsoArrow(uiScene, gameScene, 0, 0, ArrowDirection.SOUTH),
       new IsoArrow(uiScene, gameScene, 0, 0, ArrowDirection.WEST)
     ].map(arrow => arrow.setVisible(false));
+
+    new Buttons();
   }
 
   // Enable the UI for a building
-  enable(building: BuildingObject) {
+  enable(building: BuildingObject): this {
     this.buildPlacing = building.enableBuildPlacing();
 
     this.showArrows().enableInput();
+
+    return this;
+  }
+
+  turnOff(): this {
+    return this;
   }
 
   // Enable the input on the arrows and dragging of the building
-  enableInput() {
+  private enableInput(): this {
     // when clicking the arrows move the building accordingly
     this.movementArrows.forEach(arrow =>
       arrow.on(CST.EVENTS.ARROWS_UI.TAP, this.buildingMovementCb.bind(this))
@@ -79,18 +87,33 @@ export default class BuildPlaceUI extends UIComponent {
     });
 
     this.overrideInput();
+
+    this.gameScene.scale.on("resize", this.showArrows, this);
+
+    return this;
+  }
+
+  private disableInput(): this {
+    this.resumeInputControls();
+    this.gameScene.scale.off("resize", this.showArrows);
+
+    return this;
   }
 
   // prevent camera panning when dragging the building for placement
-  private overrideInput() {
+  private overrideInput(): this {
     this.buildPlacing.on("pointerdown", this.propagationPrevention);
     this.buildPlacing.on("pointermove", this.propagationPrevention);
+
+    return this;
   }
 
   // when the building is placed return the control
-  private resumeInputControls() {
+  private resumeInputControls(): this {
     this.buildPlacing.off("pointerdown", this.propagationPrevention);
     this.buildPlacing.off("pointermove", this.propagationPrevention);
+
+    return this;
   }
 
   // Placement arrows => each direction the building can be moved
@@ -157,3 +180,5 @@ export default class BuildPlaceUI extends UIComponent {
     this.showArrows();
   }
 }
+
+class Buttons {}

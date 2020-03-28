@@ -3,6 +3,32 @@ import WORKER_CST from "./utils/astar/WORKER_CST";
 //TODO: Change variant
 const VARIANT = "-hd";
 
+const BUTTON_TYPES = {
+  BUILD: "Build",
+  LEADERBOARD: "Leaderboard",
+  LOGOUT: "Logout",
+  SCRIPT: "Script",
+  SETTINGS: "Settings",
+  SOUND: "Sound",
+  WOOD_BG: "wood_texture"
+};
+
+export interface MultiatlasConfig {
+  // the key of the atlas resource
+  ATLAS_KEY: string;
+  // path to multiatlas
+  MULTIATLAS_PATH: string;
+  // multiatlas filename
+  MULTIATLAS: string;
+  // the prefix of the frames prepended by TexturePacker
+  PREFIX: string;
+  // multiple types of frames that will be indexed
+  // by the names provided here as property values
+  TYPES: {
+    [constant_id: string]: string;
+  };
+}
+
 export default {
   GAME: {
     WIDTH: 1920,
@@ -134,6 +160,17 @@ export default {
       }
     }
   },
+  BUTTONS: {
+    // the key of the atlas resource
+    ATLAS_KEY: "BUTTONS.ATLAS_KEY",
+    // path to multiatlas
+    MULTIATLAS_PATH: "sprite/ui/",
+    MULTIATLAS: `main_buttons${VARIANT}.json`,
+    // the prefix of all buttons' frames
+    PREFIX: "Buttons/",
+    // the types of the buttons
+    TYPES: BUTTON_TYPES
+  },
   // CSTs for the PlacementManager
   REGIONS: {
     // the number of randomly picked regions in which we place game resources
@@ -228,6 +265,28 @@ export default {
     BUILD_PLACE: {
       // arrow offset from the building
       ARROW_OFFSET: 1.5
+    },
+    MAIN_BUTTONS: {
+      // position
+      BG_ANCHOR: {
+        bottom: "bottom",
+        left: "left+10"
+      },
+      BTNS_ROWS: 2,
+      BTNS_COLS: 3,
+      BUTTON_IMGS: [
+        BUTTON_TYPES.BUILD,
+        BUTTON_TYPES.SCRIPT,
+        BUTTON_TYPES.LEADERBOARD,
+        BUTTON_TYPES.SETTINGS,
+        BUTTON_TYPES.SOUND,
+        BUTTON_TYPES.LOGOUT
+      ],
+      BTN_SCALE: 0.8,
+      BG_IMG: BUTTON_TYPES.WOOD_BG,
+      EXPAND_BTN: false,
+      ALIGN_BTN: "center",
+      TINT_COLOR: 0xffe4b5
     }
   },
   // constants imported from the worker cst

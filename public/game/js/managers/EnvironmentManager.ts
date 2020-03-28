@@ -88,13 +88,11 @@ export default class EnvironmentManager extends Manager {
     const { ENVIRONMENT: ENV } = CST;
 
     load.setPath(ENV.MULTIATLAS_PATH);
-    load.setPrefix(ENV.TEXTURE_PREFIX);
 
     load.multiatlas(ENV.ATLAS_KEY, ENV.MULTIATLAS);
 
     // clear the path and prefix afterwards
     load.setPath();
-    load.setPrefix();
   }
 
   generateFrames(scene: Phaser.Scene) {
