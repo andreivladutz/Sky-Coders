@@ -1,0 +1,45 @@
+{
+	"textures": [
+		{
+			"image": "buildings-hd-0.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 1443,
+				"h": 1202
+			},
+			"scale": 0.5,
+			"frames": [
+				{
+					"filename": "Buildings/residential",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 1566,
+						"h": 1342
+					},
+					"spriteSourceSize": {
+						"x": 38,
+						"y": 68,
+						"w": 1441,
+						"h": 1200
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 1441,
+						"h": 1200
+					},
+					"anchor": {
+						"x": 0.5300127713920817,
+						"y": 0.7119970193740686
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:d0574e50257db5152bdce863ca632319:2c8b61bf8dd3715bc01b12dc36bd28f3:12fb24c2ec3f0ef0ad613977aa4dcf5e$"
+	}
+}

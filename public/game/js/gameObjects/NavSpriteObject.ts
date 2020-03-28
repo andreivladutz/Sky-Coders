@@ -1,9 +1,9 @@
 import IsoSpriteObject from "./IsoSpriteObject";
-import MapManager from "./MapManager";
+import MapManager from "../managers/MapManager";
 import CST from "../CST";
 
-import MoveTo from "../MoveToPlugin/MoveTo";
-import AstarWorkerManager from "./AstarWorkerManager";
+import MoveTo from "../plugins/MoveToPlugin/MoveTo";
+import AstarWorkerManager from "../managers/AstarWorkerManager";
 
 interface TileXY {
   x: number;
@@ -31,10 +31,11 @@ export default class NavSpriteObject extends IsoSpriteObject {
     tileX: number,
     tileY: number,
     z: number,
+    objectId: number,
     texture: string,
     frame?: string | number
   ) {
-    super(scene, tileX, tileY, z, texture, frame);
+    super(scene, tileX, tileY, z, objectId, texture, frame);
 
     this.actorKey = actorKey;
 
@@ -71,7 +72,7 @@ export default class NavSpriteObject extends IsoSpriteObject {
 
   // find path to tileX and tileY and start moving towards there
   async navigateTo(tileX: number, tileY: number) {
-    this.pathFollowing = await this.astarWorkerManager.findPath(
+    let pathFollowing = await this.astarWorkerManager.findPath(
       this.actorKey,
       {
         x: this.tileX,
@@ -83,6 +84,8 @@ export default class NavSpriteObject extends IsoSpriteObject {
       }
     );
 
+    this.pathFollowing = pathFollowing;
+
     this.moveAlongPath();
   }
 
@@ -90,6 +93,9 @@ export default class NavSpriteObject extends IsoSpriteObject {
   private moveAlongPath() {
     // The object reached it's destination
     if (!this.pathFollowing || this.pathFollowing.length === 0) {
+      if (!this.moveTo.isRunning) {
+        this.emit(CST.NAV_OBJECT.EVENTS.IDLE);
+      }
       return;
     }
 
@@ -104,7 +110,34 @@ export default class NavSpriteObject extends IsoSpriteObject {
     // next tile in the path to move to
     let { x, y } = this.pathFollowing.shift();
 
-    //this.moveTo.setSpeed(CST.NAV_OBJECT.SPEED);
+    const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING;
+
+    let dx = x - this.tileX,
+      dy = y - this.tileY;
+
+    if (dx > 0) {
+      if (dy > 0) {
+        this.emit(WALK_EV.SE);
+      } else if (dy < 0) {
+        this.emit(WALK_EV.NE);
+      } else {
+        this.emit(WALK_EV.E);
+      }
+    } else if (dx < 0) {
+      if (dy < 0) {
+        this.emit(WALK_EV.NW);
+      } else if (dy > 0) {
+        this.emit(WALK_EV.SW);
+      } else {
+        this.emit(WALK_EV.W);
+      }
+    } else {
+      if (dy < 0) {
+        this.emit(WALK_EV.N);
+      } else if (dy > 0) {
+        this.emit(WALK_EV.S);
+      }
+    }
 
     this.moveTo.moveTo(x, y);
   }

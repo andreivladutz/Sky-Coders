@@ -5,6 +5,7 @@ import IsoTile from "./IsoTile";
 import List, { Node } from "../utils/List";
 import CST from "../CST";
 import EnvironmentManager from "../managers/EnvironmentManager";
+import LayersManager from "../managers/LayersManager";
 
 interface DynamicIsoSprite extends IsoSprite {
   [key: string]: any;
@@ -40,6 +41,10 @@ export default class TileMap {
   // for each (y, x) tilesInPlace[y][x] represents if the tile at (x, y) coords
   // is already in place, otherwise a tile should be instanced and placed at those coords
   tilesInPlace: boolean[][] = [];
+
+  // A sparse matrix kept to recognize tiles that are cliffs (i.e. they are margins of the world)
+  // if a tile is a cliff, then this matrix will keep it's IsoTile
+  cliffsSparseMatrix: { [key: number]: { [key: number]: IsoTile } } = {};
 
   // tile pools
   unusedPool: List;
@@ -89,6 +94,9 @@ export default class TileMap {
 
     // add event listeners
     this.registerToEvents();
+
+    // generate the frames for the cliffs (the margins of the world)
+    this.generateCliffs();
   }
 
   public onUpdate() {
@@ -104,13 +112,7 @@ export default class TileMap {
       y = tileXY.y;
 
     // don't forget to clear the last tile on tile exit
-    if (
-      this.lastTintedTile &&
-      (this.lastTintedTile.tileX !== x || this.lastTintedTile.tileY !== y)
-    ) {
-      this.lastTintedTile.destroy();
-      this.lastTintedTile = null;
-    }
+    this.clearTintedTile(x, y);
 
     // we are over a valid tile, different than the last tinted one
     if (
@@ -125,11 +127,34 @@ export default class TileMap {
         y * this.tileHeight,
         x,
         y,
-        this.envManager.getTextureKey(),
-        this.envManager.getGrassFrame(this.mapMatrix[y][x])
+        this.envManager.getTextureKey()
       )
         .setOrigin(0.5, 0.5)
-        .setTint(0x86bfda);
+        .setTint(0x86bfda)
+        .setDepth(CST.LAYER_DEPTH.TILES);
+
+      // Add the frame and flip the tile accordingly
+      this.preprocessTile(x, y, this.lastTintedTile);
+    }
+  }
+
+  public clearTintedTile(x?: number, y?: number) {
+    // if no (x, y) coords provided just clear the tile
+    if (typeof x === "undefined") {
+      if (this.lastTintedTile) {
+        this.lastTintedTile.destroy();
+        this.lastTintedTile = null;
+
+        return;
+      }
+    }
+
+    if (
+      this.lastTintedTile &&
+      (this.lastTintedTile.tileX !== x || this.lastTintedTile.tileY !== y)
+    ) {
+      this.lastTintedTile.destroy();
+      this.lastTintedTile = null;
     }
   }
 
@@ -139,9 +164,7 @@ export default class TileMap {
   getUnusedTile(x: number, y: number): IsoTile {
     // get this last tile from the unused pool
     let tile: IsoTile = this.unusedPool.pop(),
-      texture = this.envManager.getTextureKey(),
-      // what should be the frame of this tile
-      frame = this.envManager.getGrassFrame(this.mapMatrix[y][x]);
+      texture = this.envManager.getTextureKey();
 
     // if no tile is found, create a new one
     if (!tile) {
@@ -151,20 +174,28 @@ export default class TileMap {
         y * this.tileHeight,
         x,
         y,
-        texture,
-        frame
-      ).setOrigin(0.5, 0.5);
+        texture
+      ).setDepth(CST.LAYER_DEPTH.TILES);
     }
     // an unused tile already exists, reuse this one
     else {
       tile
-        .setFrame(frame)
         .set3DPosition(x * this.tileHeight, y * this.tileHeight, 0)
         .setTilePosition(x, y)
         .setVisible(true);
     }
 
-    return tile;
+    return this.preprocessTile(x, y, tile);
+  }
+
+  // set the correct frame to the tile and flip it if it's flipped in the game world
+  private preprocessTile(x: number, y: number, tile: IsoTile): IsoTile {
+    let tileCfg = LayersManager.getInstance().getTileConfig(x, y);
+
+    // what should be the frame of this tile
+    let frame = this.envManager.getGrassFrame(tileCfg.id);
+
+    return tile.setFrame(frame).setFlip(tileCfg.flipX, tileCfg.flipY);
   }
 
   registerToEvents() {
@@ -177,6 +208,12 @@ export default class TileMap {
         let usedTile: Node;
         while ((usedTile = this.usedPool.pop())) {
           this.unusedPool.push(usedTile);
+        }
+
+        for (let y in this.cliffsSparseMatrix) {
+          for (let x in this.cliffsSparseMatrix[y]) {
+            this.cliffsSparseMatrix[y][x].reset3DPosition();
+          }
         }
       },
       this
@@ -204,7 +241,14 @@ export default class TileMap {
 
         tile.setVisible(false);
 
-        this.tilesInPlace[tile.tileY][tile.tileX] = false;
+        let y = tile.tileY,
+          x = tile.tileX;
+
+        this.tilesInPlace[y][x] = false;
+
+        if (this.cliffsSparseMatrix[y] && this.cliffsSparseMatrix[y][x]) {
+          this.cliffsSparseMatrix[y][x].setVisible(false);
+        }
       }
     });
 
@@ -221,18 +265,19 @@ export default class TileMap {
         return;
       }
 
+      // if a cliff should be drawn underneath this tile
+      if (this.cliffsSparseMatrix[y] && this.cliffsSparseMatrix[y][x]) {
+        this.cliffsSparseMatrix[y][x].setVisible(true);
+      }
+      //   let cliffTile = this.getUnusedTile(x, y, this.cliffsSparseMatrix[y][x]);
+
+      //   cliffTile.setDepth(-1);
+
+      //   this.usedPool.push(cliffTile);
+      // }
+
       // get an unused tile at x, y tile coords
       let tile = this.getUnusedTile(x, y);
-
-      let flip = Phaser.Math.RND.between(0, 3);
-      if (flip == 0) {
-        tile.flipX = true;
-      } else if (flip === 1) {
-        tile.flipY = true;
-      } else if (flip == 2) {
-        tile.flipX = true;
-        tile.flipY = true;
-      }
 
       // push this tile in the pool of used tiles and mark it as being in place
       this.usedPool.push(tile);
@@ -242,6 +287,40 @@ export default class TileMap {
     // redrew tiles, this viewRectangle is not dirty anymore
     this.isoBoard.viewRectangleDirty = false;
     return this;
+  }
+
+  private generateCliffs() {
+    for (let y = 0; y < this.mapHeight; y++) {
+      for (let x = 0; x < this.mapWidth; x++) {
+        if (this.mapMatrix[y][x] !== CST.ENVIRONMENT.EMPTY_TILE) {
+          if (
+            isMargin(x, y, this.mapMatrix) ||
+            x === this.mapWidth - 1 ||
+            y === this.mapHeight - 1
+          ) {
+            if (!this.cliffsSparseMatrix[y]) {
+              this.cliffsSparseMatrix[y] = {};
+            }
+
+            // this.cliffsSparseMatrix[y][x] = Phaser.Math.RND.pick(
+            //   this.envManager.cliffFrames
+            // );
+
+            this.cliffsSparseMatrix[y][x] = new IsoTile(
+              this.scene,
+              x * this.tileHeight,
+              y * this.tileHeight,
+              x,
+              y,
+              this.envManager.getTextureKey(),
+              Phaser.Math.RND.pick(this.envManager.cliffFrames)
+            )
+              .setDepth(CST.LAYER_DEPTH.CLIFFS)
+              .setVisible(false);
+          }
+        }
+      }
+    }
   }
 
   // no tile is in place at first, so init a matrix of false values
@@ -255,4 +334,35 @@ export default class TileMap {
       }
     }
   }
+}
+
+function* getNeighbours(x: number, y: number): Generator<TileXY> {
+  let directions = [
+    [-1, -1],
+    [-1, 0],
+    [-1, 1],
+    [0, -1],
+    [0, 1],
+    [1, -1],
+    [1, 0],
+    [1, 1]
+  ];
+
+  for (let direction of directions) {
+    yield { x: x + direction[1], y: y + direction[0] };
+  }
+}
+
+// check if margin tile
+function isMargin(x: number, y: number, mapGrid: number[][]) {
+  for (let tile of getNeighbours(x, y)) {
+    if (
+      mapGrid[tile.y] &&
+      mapGrid[tile.y][tile.x] === CST.ENVIRONMENT.EMPTY_TILE
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }

@@ -24,7 +24,7 @@
 
 import TickTask from "phaser3-rex-plugins/plugins/utils/ticktask/TickTask.js";
 import GetSceneObject from "phaser3-rex-plugins/plugins/utils/system/GetSceneObject.js";
-import MapManager from "../managers/MapManager";
+import MapManager from "../../managers/MapManager";
 
 const GetValue = Phaser.Utils.Objects.GetValue;
 const DistanceBetween = Phaser.Math.Distance.Between;

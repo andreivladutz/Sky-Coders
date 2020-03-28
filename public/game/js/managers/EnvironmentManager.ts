@@ -3,6 +3,9 @@ import Phaser from "phaser";
 import Manager from "./Manager";
 import CST from "../CST";
 
+import PlacementManager from "./PlacementManager";
+import IsoScene from "../IsoPlugin/IsoScene";
+
 type Frame = Phaser.Types.Animations.AnimationFrame;
 type FrameGen = Phaser.Types.Animations.GenerateFrameNames;
 
@@ -19,6 +22,10 @@ export default class EnvironmentManager extends Manager {
   public treesFrames: string[];
   public grassFrames: string[];
   public baseFrames: string[];
+  // The frames of the cliff margins
+  public cliffFrames: string[];
+  // The frames of the various ores found in the game
+  public oreFrames: string[];
 
   // CONSTANTS:
   public readonly GRASS_TILES_COUNT = CST.ENVIRONMENT.GRASS_TILES_COUNT;
@@ -29,6 +36,13 @@ export default class EnvironmentManager extends Manager {
 
   public TILE_WIDTH: number;
   public TILE_HEIGHT: number;
+
+  placementManager: PlacementManager;
+
+  protected constructor() {
+    super();
+    this.placementManager = PlacementManager.getInstance();
+  }
 
   getTextureKey() {
     return CST.ENVIRONMENT.ATLAS_KEY;
@@ -56,6 +70,16 @@ export default class EnvironmentManager extends Manager {
     }
   }
 
+  // Just call the method on the placement manager
+  public placeRandomResources(
+    scene: IsoScene,
+    mapGrid: number[][],
+    mapW: number,
+    mapH: number
+  ) {
+    this.placementManager.placeRandomResources(scene, mapGrid, mapW, mapH);
+  }
+
   async preload(load: Phaser.Loader.LoaderPlugin) {
     this.loadResources(load);
   }
@@ -64,13 +88,11 @@ export default class EnvironmentManager extends Manager {
     const { ENVIRONMENT: ENV } = CST;
 
     load.setPath(ENV.MULTIATLAS_PATH);
-    load.setPrefix(ENV.TEXTURE_PREFIX);
 
     load.multiatlas(ENV.ATLAS_KEY, ENV.MULTIATLAS);
 
     // clear the path and prefix afterwards
     load.setPath();
-    load.setPrefix();
   }
 
   generateFrames(scene: Phaser.Scene) {
@@ -103,7 +125,19 @@ export default class EnvironmentManager extends Manager {
       ENV.TREES.PREFIX.concat(name)
     );
 
-    // get the width and height of a tile
+    this.cliffFrames = ENV.CLIFFS.CLIFF_NAMES.map((name: string): string =>
+      ENV.CLIFFS.PREFIX.concat(name)
+    );
+
+    this.oreFrames = ENV.ORES.ORES_NAMES.map((name: string): string =>
+      ENV.ORES.PREFIX.concat(name)
+    );
+
+    this.setTileSize(scene);
+  }
+
+  // get the width and height of the game base tile
+  private setTileSize(scene: Phaser.Scene) {
     let frame = scene.textures.getFrame(
       this.getTextureKey(),
       this.baseFrames[0]

@@ -3,6 +3,32 @@ import WORKER_CST from "./utils/astar/WORKER_CST";
 //TODO: Change variant
 const VARIANT = "-hd";
 
+const BUTTON_TYPES = {
+  BUILD: "Build",
+  LEADERBOARD: "Leaderboard",
+  LOGOUT: "Logout",
+  SCRIPT: "Script",
+  SETTINGS: "Settings",
+  SOUND: "Sound",
+  WOOD_BG: "wood_texture"
+};
+
+export interface MultiatlasConfig {
+  // the key of the atlas resource
+  ATLAS_KEY: string;
+  // path to multiatlas
+  MULTIATLAS_PATH: string;
+  // multiatlas filename
+  MULTIATLAS: string;
+  // the prefix of the frames prepended by TexturePacker
+  PREFIX: string;
+  // multiple types of frames that will be indexed
+  // by the names provided here as property values
+  TYPES: {
+    [constant_id: string]: string;
+  };
+}
+
 export default {
   GAME: {
     WIDTH: 1920,
@@ -33,9 +59,16 @@ export default {
       SCENE_KEY: "iso"
     }
   },
+  // the isoScene projector found in the game and the UI scenes
+  PROJECTOR: {
+    ORIGIN: {
+      X: 0.5,
+      Y: 0.2
+    }
+  },
   // camera controller params
   CAMERA: {
-    MAX_ZOOM: 3,
+    MAX_ZOOM: 1,
     MIN_ZOOM: 0.1,
     PAN_THRESHOLD: 10,
     // smoother camera drag
@@ -45,7 +78,9 @@ export default {
     MOVE_EVENT: "camera.moved",
     ZOOM_EVENT: "camera.zoomed",
     // how many tiles around the view area to add when computing which tiles are visible
-    VIEWRECT_TILE_PAD: 10
+    VIEWRECT_TILE_PAD: 10,
+    // don t let the user scroll outside of the map
+    PANLIMIT_RATIO: 4
   },
   // options for the board grid
   GRID: {
@@ -55,8 +90,6 @@ export default {
     LINE_ALPHA: 1,
     // if the game is zoomed out too much, the grid will hide
     ZOOM_DEACTIVATE: 0.2,
-    // the grid should be drawn on top of the tile layer
-    GRID_DEPTH: 2,
     // fill alpha for game objects' grid
     FILL_ALPHA: 0.3
   },
@@ -89,6 +122,14 @@ export default {
       PREFIX: "Trees/",
       TREE_NAMES: ["PineTree", "Tree", "Tree1", "Tree2"]
     },
+    CLIFFS: {
+      PREFIX: "Cliffs/",
+      CLIFF_NAMES: ["cliff1", "cliff2", "cliff3"]
+    },
+    ORES: {
+      PREFIX: "Ores/",
+      ORES_NAMES: ["black_ore", "crystal"]
+    },
     // the empty tile's index
     EMPTY_TILE: 0,
     EMPTY_TILE_RATIO: 0.3,
@@ -100,26 +141,152 @@ export default {
     BASE_OFFSET: 1,
     GRASS_OFFSET: 6
   },
+  BUILDINGS: {
+    // the key of the atlas resource
+    ATLAS_KEY: "BUILDINGS.ATLAS_KEY",
+    // path to multiatlas
+    MULTIATLAS_PATH: "sprite/buildings/",
+    MULTIATLAS: `buildings${VARIANT}.json`,
+    // the prefix of all buildings' frames
+    PREFIX: "Buildings/",
+    TYPES: {
+      RESIDENTIAL: "residential"
+    },
+    // each building type has a config
+    CONFIG: {
+      ["residential"]: {
+        localTileX: 3,
+        localTileY: 3
+      }
+    }
+  },
+  BUTTONS: {
+    // the key of the atlas resource
+    ATLAS_KEY: "BUTTONS.ATLAS_KEY",
+    // path to multiatlas
+    MULTIATLAS_PATH: "sprite/ui/",
+    MULTIATLAS: `main_buttons${VARIANT}.json`,
+    // the prefix of all buttons' frames
+    PREFIX: "Buttons/",
+    // the types of the buttons
+    TYPES: BUTTON_TYPES
+  },
+  // CSTs for the PlacementManager
+  REGIONS: {
+    // the number of randomly picked regions in which we place game resources
+    N_REG: 8,
+    // how wide a region should be in tiles
+    MAXSIZE: 30,
+    // how many trees should be inside a region
+    MAXTREES: 30,
+    MINTREES: 8,
+    // how many tiles should be around the trees
+    TREE_RADIUS: 1,
+    ORE_RADIUS: 5
+  },
   ACTOR: {
     SELECTION_TINT: 0xd0f5e9
   },
   NAV_OBJECT: {
-    SPEED: 4000
+    SPEED: 400,
+    EVENTS: {
+      WALKING: {
+        S: "walking.S",
+        SE: "walking.SE",
+        SW: "walking.SW",
+        N: "walking.N",
+        NE: "walking.NE",
+        NW: "walking.NW",
+        E: "walking.E",
+        W: "walking.W"
+      },
+      IDLE: "idle"
+    }
   },
   COLORS: {
     WHITE: 0xffffff,
     RED: 0xff0000,
-    GREEN: 0x00ff00
+    GREEN: 0x00ff00,
+    YELLOW: 0xffff00,
+    LIME: 0xd5ff00
   },
   EVENTS: {
     MAP: {
       TAP: "tiletap",
       MOVE: "tilemove",
-      PRESS: "tilepressstart"
+      PRESS: "tilepressstart",
+      PREVENTING: "startedpreventingevents"
     },
     OBJECT: {
       SELECT: "object.select",
       DESELECT: "object.deselect"
+    },
+    ARROWS_UI: {
+      TAP: "arrow.tapped"
+    }
+  },
+  // layer depth for different rendering "objects"
+  LAYER_DEPTH: {
+    CLIFFS: 0,
+    TILES: 1,
+    WORLD_GRID: 2,
+    OBJECT_GRID: 3,
+    UI: Infinity
+  },
+  // CONSTANTS FOR THE LAYER MANAGER
+  LAYERS: {
+    // ids for the game objects. they do not need a layer because they compute their own depth
+    OBJ_ID: {
+      TREE: 4,
+      ORE: 5,
+      BUILDING: 6
+    },
+    ACTOR_ID: 100,
+    // Represent the map grid efficiently using only 8 bits per tile
+    // first two bits represent if the tile should be flipped on the x and y axis
+    MASK: {
+      FLIPX_BIT: 7,
+      FLIPY_BIT: 6,
+      TILE_ID_MASK: 63
+    }
+  },
+  ARROW_SHAPE: {
+    BASEW: 100,
+    BASEH: 150,
+    HEADW: 100,
+    ARROWH: 300,
+    NORTH: 0,
+    EAST: Math.PI / 2,
+    SOUTH: Math.PI,
+    WEST: (3 * Math.PI) / 2,
+    Z_EFFECT: 40
+  },
+  UI: {
+    BUILD_PLACE: {
+      // arrow offset from the building
+      ARROW_OFFSET: 1.5
+    },
+    MAIN_BUTTONS: {
+      // position
+      BG_ANCHOR: {
+        bottom: "bottom",
+        left: "left+10"
+      },
+      BTNS_ROWS: 2,
+      BTNS_COLS: 3,
+      BUTTON_IMGS: [
+        BUTTON_TYPES.BUILD,
+        BUTTON_TYPES.SCRIPT,
+        BUTTON_TYPES.LEADERBOARD,
+        BUTTON_TYPES.SETTINGS,
+        BUTTON_TYPES.SOUND,
+        BUTTON_TYPES.LOGOUT
+      ],
+      BTN_SCALE: 0.8,
+      BG_IMG: BUTTON_TYPES.WOOD_BG,
+      EXPAND_BTN: false,
+      ALIGN_BTN: "center",
+      TINT_COLOR: 0xffe4b5
     }
   },
   // constants imported from the worker cst

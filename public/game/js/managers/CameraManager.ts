@@ -3,6 +3,7 @@ import { Pan, Pinch } from "phaser3-rex-plugins/plugins/gestures";
 
 import Manager from "./Manager";
 import CST from "../CST";
+import MapManager from "./MapManager";
 
 type Camera = Phaser.Cameras.Scene2D.Camera;
 
@@ -23,6 +24,8 @@ export default class CameraManager extends Manager {
   pan: Pan;
   // utility for camera zooming
   pinch: Pinch;
+
+  public static readonly EVENTS = new Phaser.Events.EventEmitter();
 
   private window: Phaser.GameObjects.Zone;
 
@@ -58,6 +61,16 @@ export default class CameraManager extends Manager {
     return this;
   }
 
+  // get the world coords that this camera is currently focused on
+  getWorldPointAtCenter(): { x: number; y: number } {
+    let view = this.camera.worldView;
+
+    return {
+      x: view.x + view.width / 2,
+      y: view.y + view.height / 2
+    };
+  }
+
   enablePan(): this {
     let { width, height } = this.scene.game.scale.gameSize;
 
@@ -77,12 +90,37 @@ export default class CameraManager extends Manager {
     this.pan.on(
       "pan",
       (pan: Pan) => {
+        const mapManager = MapManager.getInstance();
+
+        // limit the panning to the map's size
+        let {
+            leftmostX,
+            rightmostX,
+            topmostY,
+            lowermostY
+          } = mapManager.getExtremesTileCoords(),
+          { w, h } = mapManager.getMapTilesize();
+
+        let panlimit = (1 / this.camera.zoom) * CST.CAMERA.PANLIMIT_RATIO;
+
+        if (pan.dx > 0 && rightmostX <= panlimit) {
+          pan.dx = 0;
+        } else if (pan.dx < 0 && leftmostX >= w - panlimit) {
+          pan.dx = 0;
+        }
+
+        if (pan.dy > 0 && lowermostY <= panlimit) {
+          pan.dy = 0;
+        } else if (pan.dx < 0 && topmostY >= h - panlimit) {
+          pan.dy = 0;
+        }
+
         // using the inverse of the zoom so when the camera is zoomed out
         // the player can pan the camera faster
-        this.window.x -= (pan.dx * 1) / this.camera.zoom;
-        this.window.y -= (pan.dy * 1) / this.camera.zoom;
+        this.window.x -= pan.dx / this.camera.zoom;
+        this.window.y -= pan.dy / this.camera.zoom;
 
-        this.camera.emit(CST.CAMERA.MOVE_EVENT);
+        CameraManager.EVENTS.emit(CST.CAMERA.MOVE_EVENT);
       },
       this
     );
@@ -119,7 +157,7 @@ export default class CameraManager extends Manager {
 
       // emit the camera zoom event with the actual zoom factor the camera scaled
       let actualZoomFactor = this.camera.zoom / oldZoom;
-      this.camera.emit(CST.CAMERA.ZOOM_EVENT, actualZoomFactor);
+      CameraManager.EVENTS.emit(CST.CAMERA.ZOOM_EVENT, actualZoomFactor);
     };
 
     this.pinch.on(

@@ -1,5 +1,5 @@
 import ACTORS_CST from "../ACTORS_CST";
-import Actor, { ActorConfig } from "./Actor";
+import Actor, { ActorConfig } from "../gameObjects/Actor";
 
 import Manager from "./Manager";
 
@@ -18,6 +18,12 @@ export default class ActorsManager extends Manager {
     }
 
     this.selectedActor = actor;
+  }
+
+  public onActorDeselected(actor: Actor) {
+    if (this.selectedActor === actor) {
+      this.selectedActor = null;
+    }
   }
 
   // called in the preload() method of LoadingScene

@@ -1,14 +1,12 @@
 import CST from "../CST";
-import { IsoSprite, ISOMETRIC, Point3 } from "../IsoPlugin/IsoPlugin";
+import { ISOMETRIC } from "../IsoPlugin/IsoPlugin";
 import IsoScene from "../IsoPlugin/IsoScene";
 
 import CameraManager from "../managers/CameraManager";
 import MapManager from "../managers/MapManager";
-import Actor from "../managers/Actor";
+import Actor from "../gameObjects/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
 import TileMap from "../IsoPlugin/TileMap";
-import IsoGameObject from "../managers/IsoSpriteObject";
-import AstarWorkerManager from "../managers/AstarWorkerManager";
 
 // TODO: remove global variables
 let actor: Actor;
@@ -20,8 +18,8 @@ export default class GameScene extends IsoScene {
     const config = {
       key: CST.SCENES.GAME
     };
-    // TODO: deactivate physics if not used anymore
-    super(config, true);
+
+    super(config);
 
     // set the isometric projection to be true isometric
     this.isometricType = ISOMETRIC;
@@ -48,7 +46,10 @@ export default class GameScene extends IsoScene {
 
   create() {
     // Set the projector's world origin
-    this.iso.projector.origin.setTo(0.5, 0.2);
+    this.iso.projector.origin.setTo(
+      CST.PROJECTOR.ORIGIN.X,
+      CST.PROJECTOR.ORIGIN.Y
+    );
 
     // fire the map init
     this.tileMap = MapManager.getInstance().initMap(this);
@@ -68,7 +69,7 @@ export default class GameScene extends IsoScene {
       scene: this
     });
 
-    actor.idleAnim(ACTOR_DIRECTIONS.SE);
+    actor.idleAnim();
 
     MapManager.getInstance()
       .enableDebugging()
@@ -77,6 +78,7 @@ export default class GameScene extends IsoScene {
   }
 
   update() {
+    // console.log(this.children.sortByDepth(actor, obj));
     // code to follow an actor
     // MapManager.getInstance().setScrollOverTiles(
     //   actor.gameObject.floatingTileX,

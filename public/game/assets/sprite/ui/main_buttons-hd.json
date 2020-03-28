@@ -1,0 +1,167 @@
+{
+	"textures": [
+		{
+			"image": "main_buttons-hd-0.png",
+			"format": "RGBA8888",
+			"size": {
+				"w": 431,
+				"h": 215
+			},
+			"scale": 0.35,
+			"frames": [
+				{
+					"filename": "Buttons/wood_texture",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 350,
+						"h": 144
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 1,
+						"w": 350,
+						"h": 142
+					},
+					"frame": {
+						"x": 1,
+						"y": 1,
+						"w": 350,
+						"h": 142
+					}
+				},
+				{
+					"filename": "Buttons/Logout",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 77,
+						"h": 70
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 77,
+						"h": 70
+					},
+					"frame": {
+						"x": 353,
+						"y": 1,
+						"w": 77,
+						"h": 70
+					}
+				},
+				{
+					"filename": "Buttons/Settings",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 77,
+						"h": 70
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 77,
+						"h": 70
+					},
+					"frame": {
+						"x": 353,
+						"y": 73,
+						"w": 77,
+						"h": 70
+					}
+				},
+				{
+					"filename": "Buttons/Sound",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 81,
+						"h": 69
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 81,
+						"h": 69
+					},
+					"frame": {
+						"x": 1,
+						"y": 145,
+						"w": 81,
+						"h": 69
+					}
+				},
+				{
+					"filename": "Buttons/Build",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 79,
+						"h": 69
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 79,
+						"h": 69
+					},
+					"frame": {
+						"x": 84,
+						"y": 145,
+						"w": 79,
+						"h": 69
+					}
+				},
+				{
+					"filename": "Buttons/Leaderboard",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 79,
+						"h": 68
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 79,
+						"h": 68
+					},
+					"frame": {
+						"x": 165,
+						"y": 145,
+						"w": 79,
+						"h": 68
+					}
+				},
+				{
+					"filename": "Buttons/Script",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 77,
+						"h": 68
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 77,
+						"h": 68
+					},
+					"frame": {
+						"x": 246,
+						"y": 145,
+						"w": 77,
+						"h": 68
+					}
+				}
+			]
+		}
+	],
+	"meta": {
+		"app": "https://www.codeandweb.com/texturepacker",
+		"version": "3.0",
+		"smartupdate": "$TexturePacker:SmartUpdate:c5dd7301416de927df1fd53bfc536687:f1fceea9721352e54c917446f05826d8:56c353b78932d635f9195fd488f280a9$"
+	}
+}
