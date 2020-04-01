@@ -44,11 +44,14 @@ export default class IsoSpriteObject extends IsoSprite {
   localTileX: number;
   localTileY: number;
 
+  // tells us whether this object has been applied to the layer or not
+  isAppliedToLayer: boolean = false;
+
   // the graphics used to draw this object's grid
   protected gridGraphics: Phaser.GameObjects.Graphics;
   // should we draw the grid? if so this property is a valid number
   // TODO: should default to DO_NOT_DRAW
-  protected drawingGridColor: GridColor = GridColor.RED;
+  protected drawingGridColor: GridColor = GridColor.DO_NOT_DRAW;
 
   // the tint color of this object when a pointer is over it or it is selected
   protected selectedTintColor: number = CST.ACTOR.SELECTION_TINT;
@@ -68,6 +71,7 @@ export default class IsoSpriteObject extends IsoSprite {
   // the size of this tile in 3D (unprojected it is a rectangle)
   readonly TILE_SIZE3D = EnvironmentManager.getInstance().TILE_HEIGHT;
 
+  //@ts-ignore
   constructor(
     scene: Phaser.Scene,
     tileX: number,
@@ -76,6 +80,8 @@ export default class IsoSpriteObject extends IsoSprite {
     objectId: number,
     texture: string,
     frame?: string | number,
+    // pass false to this argument to skip applying object to the grid layers
+    shouldBeAppliedToLayer: boolean = true,
     // override local compute tiles
     localTileX?: number,
     localTileY: number = localTileX
@@ -88,7 +94,6 @@ export default class IsoSpriteObject extends IsoSprite {
       texture,
       frame
     );
-
     this.objectId = objectId;
 
     this.addToGridAt(tileX, tileY);
@@ -108,7 +113,9 @@ export default class IsoSpriteObject extends IsoSprite {
       this.overrideLocalTilePos(localTileX, localTileY);
     }
 
-    this.layersManager.applyObjectOnLayer(this);
+    if (shouldBeAppliedToLayer) {
+      this.applyToLayer();
+    }
 
     this.gridGraphics = this.scene.add
       .graphics()
@@ -125,6 +132,13 @@ export default class IsoSpriteObject extends IsoSprite {
     this.scene.scale.on("resize", () => {
       this.lastDrewTileCoords.x = -1;
     });
+  }
+
+  public applyToLayer(): this {
+    this.layersManager.applyObjectOnLayer(this);
+
+    this.isAppliedToLayer = true;
+    return this;
   }
 
   // this is an uid of the object => generated automatically and is different for every other object
@@ -301,6 +315,8 @@ export default class IsoSpriteObject extends IsoSprite {
 
   disableGridDrawing() {
     this.drawingGridColor = GridColor.DO_NOT_DRAW;
+
+    this.gridGraphics.clear();
   }
 
   // compute the tile area occupied by this game object

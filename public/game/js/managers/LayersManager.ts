@@ -4,6 +4,7 @@ import MapManager from "./MapManager";
 import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 import IsoScene from "../IsoPlugin/IsoScene";
 import ActorsManager from "./ActorsManager";
+import AstarWorkerManager from "./AstarWorkerManager";
 
 interface Tile {
   x: number;
@@ -64,7 +65,14 @@ export default class LayersManager extends Manager {
     };
   }
 
-  // Apply the object's id on the objectLayer
+  /*
+   * Notify the astar worker to also apply this layer
+   */
+  public notifyAstarWorker(layer: Tile[]) {
+    AstarWorkerManager.getInstance().applyLayer(layer);
+  }
+
+  // Apply the object's id on the objectLayer ONLY IF there isn't another object there already
   public applyObjectOnLayer(obj: IsoSpriteObject): this {
     // the id is the id of the object's type
     let id = obj.objectId,
@@ -76,15 +84,25 @@ export default class LayersManager extends Manager {
       return;
     }
 
-    for (let tile of obj.getGridTiles()) {
+    let objLayerTiles = obj.getGridTiles();
+    for (let tile of objLayerTiles) {
       let { x, y } = tile;
 
       if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
         continue;
       }
 
+      if (this.objectUidsGrid[y][x] !== CST.ENVIRONMENT.EMPTY_TILE) {
+        continue;
+      }
+
       this.objectLayer[y][x] = id;
       this.objectUidsGrid[y][x] = uid;
+    }
+
+    // notify astar worker to apply the layer but apply only buildings
+    if (id === CST.LAYERS.OBJ_ID.BUILDING) {
+      this.notifyAstarWorker(objLayerTiles);
     }
 
     // also index the object by its uid
@@ -93,6 +111,7 @@ export default class LayersManager extends Manager {
     return this;
   }
 
+  // removes itself from the layer ONLY if its uid is there
   public removeObjectFromLayer(obj: IsoSpriteObject): this {
     if (!this.isObjectAppliedToLayer(obj)) {
       return;
@@ -106,6 +125,10 @@ export default class LayersManager extends Manager {
 
       if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
         continue;
+      }
+
+      if (this.objectUidsGrid[y][x] !== uid) {
+        return this;
       }
 
       this.objectLayer[y][x] = CST.ENVIRONMENT.EMPTY_TILE;

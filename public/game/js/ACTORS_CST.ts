@@ -6,6 +6,8 @@ export enum ACTOR_NAMES {
   MALLACK = "Mallack"
 }
 
+export const ACTOR_NAMES_ARR = [ACTOR_NAMES.MALLACK];
+
 export enum ACTOR_STATES {
   WALK = "WALK",
   IDLE = "IDLE"

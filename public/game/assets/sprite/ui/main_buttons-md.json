@@ -4,7 +4,7 @@
 			"image": "main_buttons-md-0.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 217,
+				"w": 265,
 				"h": 110
 			},
 			"scale": 0.175,
@@ -31,6 +31,27 @@
 					}
 				},
 				{
+					"filename": "Buttons/Ok",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 46,
+						"h": 47
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 46,
+						"h": 47
+					},
+					"frame": {
+						"x": 178,
+						"y": 1,
+						"w": 46,
+						"h": 47
+					}
+				},
+				{
 					"filename": "Buttons/Logout",
 					"rotated": false,
 					"trimmed": false,
@@ -45,7 +66,7 @@
 						"h": 35
 					},
 					"frame": {
-						"x": 178,
+						"x": 226,
 						"y": 1,
 						"w": 38,
 						"h": 35
@@ -66,10 +87,52 @@
 						"h": 35
 					},
 					"frame": {
-						"x": 178,
+						"x": 226,
 						"y": 38,
 						"w": 38,
 						"h": 35
+					}
+				},
+				{
+					"filename": "Buttons/Cancel",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 45,
+						"h": 46
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 45,
+						"h": 46
+					},
+					"frame": {
+						"x": 178,
+						"y": 50,
+						"w": 45,
+						"h": 46
+					}
+				},
+				{
+					"filename": "Buttons/Script",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 38,
+						"h": 34
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 38,
+						"h": 34
+					},
+					"frame": {
+						"x": 225,
+						"y": 75,
+						"w": 38,
+						"h": 34
 					}
 				},
 				{
@@ -136,24 +199,24 @@
 					}
 				},
 				{
-					"filename": "Buttons/Script",
+					"filename": "Buttons/wood_plank",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 38,
-						"h": 34
+						"w": 47,
+						"h": 26
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 38,
-						"h": 34
+						"w": 47,
+						"h": 26
 					},
 					"frame": {
 						"x": 128,
 						"y": 75,
-						"w": 38,
-						"h": 34
+						"w": 47,
+						"h": 26
 					}
 				}
 			]
@@ -162,6 +225,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:c5dd7301416de927df1fd53bfc536687:f1fceea9721352e54c917446f05826d8:56c353b78932d635f9195fd488f280a9$"
+		"smartupdate": "$TexturePacker:SmartUpdate:1034aace0ec8ace78aea8df65f748d49:0ae6cf8e13750bc6a19860a48a55d542:56c353b78932d635f9195fd488f280a9$"
 	}
 }

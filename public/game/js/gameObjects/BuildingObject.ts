@@ -30,30 +30,55 @@ export default class BuildingObject extends IsoSpriteObject {
       textureKey = buildManager.getTextureKey(),
       { localTileX, localTileY } = CST.BUILDINGS.CONFIG[buildingType];
 
-    let { x, y } = CameraManager.getInstance().getWorldPointAtCenter();
-
-    let { x: tileX, y: tileY } = MapManager.getInstance().worldToTileCoords(
-      x,
-      y
-    );
-
-    // TODO: remove hardcoded values. CAN BE OUT OF BOUNDS ^^^
-    tileX = tileY = 50;
-
     super(
       scene,
-      tileX,
-      tileY,
+      0,
+      0,
       0,
       CST.LAYERS.OBJ_ID.BUILDING,
       textureKey,
       buildingFrame,
+      // Do not place it on the layer of objects
+      false,
       // override local computed tiles
       localTileX,
       localTileY
     );
 
+    // Try to position this building at the center of the screen
+    let { x, y } = CameraManager.getInstance().getWorldPointAtCenter();
+
+    let mapManager = MapManager.getInstance(),
+      mapSize = mapManager.getMapTilesize();
+
+    let { x: tileX, y: tileY } = mapManager.worldToTileCoords(x, y);
+
+    let halfWidthX = this.tileWidthX - this.localTileX,
+      halfWidthY = this.tileWidthY - this.localTileY;
+
+    // the tile coords of the screen mid can be out out bounds, clamp them to the bounds
+    tileX = Phaser.Math.Clamp(tileX, halfWidthX, mapSize.w - halfWidthX - 1);
+    tileY = Phaser.Math.Clamp(tileY, halfWidthY, mapSize.h - halfWidthY - 1);
+
+    this.setTilePosition(tileX, tileY);
+
     // this.layersManager.debugLayers(scene);
+  }
+
+  public canBePlaced() {
+    return this.canBePlacedHere;
+  }
+
+  // removes this building permanently
+  public removeBuilding() {
+    if (!this.movementEnabled) {
+      this.layersManager.removeObjectFromLayer(this);
+    }
+
+    this.mapManager.removeSpriteObjectFromBoard(this);
+    this.destroy();
+    // also destroy the grid graphics
+    this.gridGraphics.destroy();
   }
 
   // drag this game object to worldX worldY position
@@ -65,13 +90,34 @@ export default class BuildingObject extends IsoSpriteObject {
     return this.moveBuilding(deltaX, deltaY);
   }
 
+  // returns whether the building can be placed or not
+  // if it cannot be placed, it will be REMOVED permanently
+  // and if it can be, then it also places it in the spot it is in
+  placeBuilding(): boolean {
+    if (!this.canBePlacedHere) {
+      this.removeBuilding();
+
+      return false;
+    }
+
+    // hide the grid
+    this.disableGridDrawing();
+    this.applyToLayer();
+    this.movementEnabled = false;
+
+    // the building could be placed
+    return true;
+  }
+
   // enable the placement of this building with the ui elements
   enableBuildPlacing(): this {
     // remove this particular building object from the layer
     // before starting to move it => and then add it back to the grid
 
     // if the object hasn't been already placed on the grid this method is safe as it exits
-    this.layersManager.removeObjectFromLayer(this);
+    if (this.isAppliedToLayer) {
+      this.layersManager.removeObjectFromLayer(this);
+    }
 
     this.movementEnabled = true;
     this.checkGridColor();

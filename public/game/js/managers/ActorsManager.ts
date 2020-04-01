@@ -1,4 +1,4 @@
-import ACTORS_CST from "../ACTORS_CST";
+import ACTORS_CST, { ACTOR_NAMES_ARR } from "../ACTORS_CST";
 import Actor, { ActorConfig } from "../gameObjects/Actor";
 
 import Manager from "./Manager";
@@ -24,6 +24,10 @@ export default class ActorsManager extends Manager {
     if (this.selectedActor === actor) {
       this.selectedActor = null;
     }
+  }
+
+  public static getAllActorsNames() {
+    return ACTOR_NAMES_ARR;
   }
 
   // called in the preload() method of LoadingScene

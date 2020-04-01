@@ -6,11 +6,7 @@ import UIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 import IsoScene from "../IsoPlugin/IsoScene";
 import { ISOMETRIC } from "../IsoPlugin/Projector";
 
-import BuildingObject from "../gameObjects/BuildingObject";
-
 import UIComponents from "../ui/UIComponentsFactory";
-import BuildPlaceUI from "../ui/BuildPlaceUI";
-import MainUI from "../ui/MainUI";
 
 export default class UIScene extends IsoScene {
   rexUI: UIPlugin;
@@ -53,17 +49,7 @@ export default class UIScene extends IsoScene {
 
     this.handlePwaInstallation();
 
-    let obj = new BuildingObject(
-      this.gameScene,
-      CST.BUILDINGS.TYPES.RESIDENTIAL
-    );
-
-    // Get all ui components and enable them
-    UIComponents.getUIComponents(
-      [BuildPlaceUI, MainUI],
-      this,
-      this.gameScene
-    ).map(uiInstance => uiInstance.enable(obj));
+    UIComponents.initUIStateMachine(this, this.gameScene);
   }
 
   handlePwaInstallation() {

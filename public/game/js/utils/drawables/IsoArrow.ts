@@ -86,11 +86,12 @@ export default class IsoArrow extends Phaser.GameObjects.Polygon {
           this.setTilePosition();
         }
       })
-      .on("pointerdown", () => {
+      .on("pointerdown", (ptr, lx, ly, event: Phaser.Types.Input.EventData) => {
         this.zEffect = -CST.ARROW_SHAPE.Z_EFFECT;
         this.setTilePosition();
 
         this.emit(CST.EVENTS.ARROWS_UI.TAP, this);
+        event.stopPropagation();
       })
       .on("pointerup", () => {
         this.zEffect = 0;
@@ -117,6 +118,22 @@ export default class IsoArrow extends Phaser.GameObjects.Polygon {
 
     this.bounds.x = this.x + this.boundsOffset.x;
     this.bounds.y = this.y + this.boundsOffset.y;
+
+    return this;
+  }
+
+  // show the arrow again and make it interactive
+  public show(): this {
+    this.setVisible(true);
+    this.bounds.setInteractive();
+
+    return this;
+  }
+
+  // hide the arrow and turn off interaction
+  public hide(): this {
+    this.setVisible(false);
+    this.bounds.disableInteractive();
 
     return this;
   }

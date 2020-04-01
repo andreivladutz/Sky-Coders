@@ -1,12 +1,15 @@
 globalThis.WORKER_CST = {
   MSG: {
     PATH_FOUND: 0,
-    INIT: 1,
-    FIND_PATH: 2
+    INIT_MAP: 1,
+    INIT_ACTOR: 2,
+    FIND_PATH: 3,
+    APPLY_LAYER: 4
   },
   // Format of a message
   MESSAGE_TYPE: "messageType",
   DATA: "dataSent",
+  // maximum iterations done by the astar algorithm
   ITERATIONS_PER_CALCULATION: 5000
 };
 

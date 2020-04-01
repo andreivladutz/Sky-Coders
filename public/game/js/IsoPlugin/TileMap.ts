@@ -78,7 +78,7 @@ export default class TileMap {
       mapWidth: config.mapWidth,
       mapHeight: config.mapHeight,
       mapMatrix: config.mapMatrix
-    }).showGrid();
+    });
 
     // the map data with tile indices
     this.mapMatrix = config.mapMatrix;

@@ -19,8 +19,12 @@ let Worker = new (class AstarWorker {
     // every message has a "header" that tells the type of the message
     switch (message[WORKER_CST.MESSAGE_TYPE]) {
       // initialisation process
-      case WORKER_CST.MSG.INIT:
-        this.init(messageData);
+      case WORKER_CST.MSG.INIT_MAP:
+        // first, init the map
+        this.initMap(messageData);
+        break;
+      case WORKER_CST.MSG.INIT_ACTOR:
+        this.initActor(messageData);
         break;
       case WORKER_CST.MSG.FIND_PATH:
         this.findPath(
@@ -29,12 +33,15 @@ let Worker = new (class AstarWorker {
           messageData.requestId
         );
         break;
+      case WORKER_CST.MSG.APPLY_LAYER:
+        this.applyLayer(messageData);
+        break;
       default:
         throw new Error("MESSAGE TYPE NOT RECOGNISED BY THIS WEB WORKER.");
     }
   }
 
-  init(config) {
+  initMap(config) {
     // init the helper and the easystar instance
     this.navObject = new NavObjectHelpers(config);
 
@@ -48,6 +55,16 @@ let Worker = new (class AstarWorker {
       .setIterationsPerCalculation(WORKER_CST.ITERATIONS_PER_CALCULATION)
       // the callback used to determine if the object can walk on a tile or not
       .setCanWalkOnCb(this.navObject.walkableCallback, this.navObject);
+  }
+
+  initActor(actorConfig) {
+    // init the helper with actor details
+    this.navObject.configureActor(actorConfig);
+  }
+
+  // just apply the layer to the nav object's object grid
+  applyLayer(tiles) {
+    this.navObject.applyLayer(tiles);
   }
 
   // each path finding instance has a request id where it came from

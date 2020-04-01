@@ -13,6 +13,8 @@ import LayersManager from "./LayersManager";
 
 // Specialised emitter
 import MapEventEmitter from "../utils/MapEventEmitter";
+import AstarWorkerManager from "./AstarWorkerManager";
+import ActorsManager from "./ActorsManager";
 
 interface Point {
   x: number;
@@ -132,6 +134,7 @@ export default class MapManager extends Manager {
     this.tileMap.isoBoard.board.addChess(obj, tileX, tileY);
   }
 
+  // Moves a spirte object on the underlying game board
   public moveSpriteObjectToTiles(
     obj: IsoSpriteObject,
     tileX: number,
@@ -140,8 +143,23 @@ export default class MapManager extends Manager {
     this.tileMap.isoBoard.board.moveChess(obj, tileX, tileY, 0);
   }
 
+  // Removes and destroys the "chess object" of this sprite from the underlying board
+  public removeSpriteObjectFromBoard(obj: IsoSpriteObject) {
+    this.tileMap.isoBoard.board.removeChess(obj, null, null, null, true);
+  }
+
   public getIsoBoard(): IsoBoard {
     return this.tileMap.isoBoard;
+  }
+
+  public showMapGrid(): this {
+    this.getIsoBoard().showGrid();
+    return this;
+  }
+
+  public hideMapGrid(): this {
+    this.getIsoBoard().hideGrid();
+    return this;
   }
 
   public onUpdate() {
@@ -206,8 +224,20 @@ export default class MapManager extends Manager {
     // init the LayerManager
     LayersManager.getInstance(this.mapMatrix);
 
-    // Place the random resources on the map
     let mapSize = this.getMapTilesize();
+
+    // Init the astar worker with map details
+    AstarWorkerManager.getInstance().initWorkersWithMap(
+      ActorsManager.getAllActorsNames(),
+      {
+        mapWidth: mapSize.w,
+        mapHeight: mapSize.h,
+        mapGrid: this.mapMatrix,
+        unwalkableTile: CST.ENVIRONMENT.EMPTY_TILE
+      }
+    );
+
+    // Place the random resources on the map
     this.envManager.placeRandomResources(
       gameScene,
       this.mapMatrix,

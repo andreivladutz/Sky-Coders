@@ -9,25 +9,31 @@ const WK_CST = CST.WORKER;
 // TODO: check browser worker compatibility
 const Worker = globalThis.Worker;
 
-interface WorkerInitConfig {
-  localTileX: number;
-  localTileY: number;
-
-  tileWidthX: number;
-  tileWidthY: number;
-
+interface WorkerMapConfig {
   mapWidth: number;
   mapHeight: number;
   mapGrid: number[][];
   unwalkableTile: number;
 }
 
+interface WorkerActorConfig {
+  localTileX: number;
+  localTileY: number;
+
+  tileWidthX: number;
+  tileWidthY: number;
+}
 export default class AstarWorkerManager extends Manager {
   // the workers that handle the astar
   // TODO: each type of actor will have its own worker
   astarWorkers: {
     // the key is the actor key, the value is the worker handling the astar for this object
     [key: string]: any;
+  } = {};
+
+  // whether the workers have been inited by the actors with their particular details
+  workersActorInited: {
+    [key: string]: boolean;
   } = {};
 
   // for any path finding request a promise is created
@@ -42,18 +48,32 @@ export default class AstarWorkerManager extends Manager {
     super();
   }
 
+  // global initialisation of all the workers for each type of actor
+  // it inits the map for the helper objects of the workers
+  initWorkersWithMap(actorKeys: string[], mapConfig: WorkerMapConfig) {
+    for (let actorKey of actorKeys) {
+      this.astarWorkers[actorKey] = new Worker(
+        "./game/js/utils/astar/astarWebWorker.js"
+      );
+
+      this.workersActorInited[actorKey] = false;
+      this.sendMessage(actorKey, WK_CST.MSG.INIT_MAP, mapConfig);
+    }
+  }
+
   getWorker(actorKey: string) {
     return this.astarWorkers[actorKey];
   }
 
-  initWorker(actorKey: string, config: WorkerInitConfig) {
-    this.astarWorkers[actorKey] = new Worker(
-      "./game/js/utils/astar/astarWebWorker.js"
-    );
+  isWorkerActorInited(actorKey: string) {
+    return this.workersActorInited[actorKey];
+  }
 
+  // initialisation done by each actor
+  initWorkerWithActor(actorKey: string, config: WorkerActorConfig) {
     // initialize the internal logic of the worker
     // send a config object for the navObjectHelpers
-    this.sendMessage(actorKey, WK_CST.MSG.INIT, config);
+    this.sendMessage(actorKey, WK_CST.MSG.INIT_ACTOR, config);
 
     this.astarWorkers[actorKey].onmessage = e => {
       this.handleMessage(e.data);
@@ -88,6 +108,13 @@ export default class AstarWorkerManager extends Manager {
     return new Promise((resolve, reject) => {
       this.pathFindingPromiseResolvers[requestId] = resolve;
     });
+  }
+
+  // all workers should apply this layer
+  applyLayer(layer: TileXY[]) {
+    for (let actorKey in this.astarWorkers) {
+      this.sendMessage(actorKey, WK_CST.MSG.APPLY_LAYER, layer);
+    }
   }
 
   resolveFoundPath(path: TileXY[], requestId: number) {

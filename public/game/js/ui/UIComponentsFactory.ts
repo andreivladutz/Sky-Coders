@@ -10,6 +10,8 @@ import LoaderInjector, {
   FramesMap
 } from "../managers/LoaderInjector";
 
+import UIStateMachine from "./UIStateMachine";
+
 type UIComponentConstructor = new (
   uiScene: UIScene,
   gameScene: IsoScene
@@ -23,6 +25,8 @@ export default class UIComponents extends Manager
   implements LoadingInjectedManager {
   // Instances of all the different components, indexed by their class name
   private static UIInstances: UIComponentsMap = {};
+
+  public static uiStateMachine: UIStateMachine;
 
   /**
    * Provide the desired UIComponent(s) class(es) and this factory function will return its(their) singleton instance
@@ -58,6 +62,20 @@ export default class UIComponents extends Manager
     }
 
     return uiInstances;
+  }
+
+  // init the global ui state machine
+  public static initUIStateMachine(
+    uiScene: UIScene,
+    gameScene: IsoScene
+  ): UIStateMachine {
+    this.uiStateMachine = new UIStateMachine(uiScene, gameScene);
+
+    return this.uiStateMachine;
+  }
+
+  public static getUIStateMachine(): UIStateMachine {
+    return this.uiStateMachine;
   }
 
   // the frames of the buttons indexed by their identifier i.e. "Settings", etcetera..

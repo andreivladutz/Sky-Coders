@@ -1,14 +1,15 @@
 import IsoScene from "../IsoPlugin/IsoScene";
 import UIScene from "../scenes/UIScene";
 import UIComponents from "./UIComponentsFactory";
+import CST from "../CST";
 
 export default abstract class UIComponent {
   // Keep track of the UIScene, as well as the gameScene
   uiScene: UIScene;
   gameScene: IsoScene;
 
-  abstract enable(...args: any[]): this;
-  abstract turnOff(...args: any[]): this;
+  abstract enable(...args: any[]): any;
+  abstract turnOff(...args: any[]): any;
 
   constructor(uiScene: UIScene, gameScene: IsoScene) {
     this.uiScene = uiScene;
@@ -21,7 +22,7 @@ const Image = Phaser.GameObjects.Image;
 // static UI element that just prevents propagating events
 export class UIImage extends Image {
   constructor(
-    scene: UIScene,
+    scene: Phaser.Scene,
     x: number,
     y: number,
     texture: string,
@@ -42,15 +43,26 @@ export class UIImage extends Image {
 }
 
 // button identifier
-export class ButtonImage extends UIImage {
+export class ButtonImage<T extends UIComponent> extends UIImage {
+  // a reference to the parent UI
+  parentUI: T;
   btnName: string;
 
-  onHover: () => void;
-  onHoverEnd: () => void;
+  // default behaviour is to tint the button
+  onHover() {
+    this.setTint(CST.UI.BUTTONS.TINT_COLOR);
+  }
+
+  // default behaviour is to clear the tint
+  onHoverEnd() {
+    this.setTint();
+  }
+
   onTap: () => void;
 
   constructor(
     scene: UIScene,
+    parentUI: T,
     x: number,
     y: number,
     texture: string,
@@ -65,6 +77,7 @@ export class ButtonImage extends UIImage {
       frame ? frame : UIComponents.getInstance().buttonsFrames[btnName]
     );
 
+    this.parentUI = parentUI;
     this.btnName = btnName;
   }
 

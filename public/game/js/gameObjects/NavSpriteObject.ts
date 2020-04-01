@@ -35,7 +35,8 @@ export default class NavSpriteObject extends IsoSpriteObject {
     texture: string,
     frame?: string | number
   ) {
-    super(scene, tileX, tileY, z, objectId, texture, frame);
+    // This type of object doesn't get applied to the layer as it travels all the time
+    super(scene, tileX, tileY, z, objectId, texture, frame, false);
 
     this.actorKey = actorKey;
 
@@ -47,25 +48,21 @@ export default class NavSpriteObject extends IsoSpriteObject {
       blockerTest: false
     });
 
-    let mapMgrInstance = MapManager.getInstance();
-
     // the size of the map in tiles, useful for walkable checking
-    ({ w: this.mapWidth, h: this.mapHeight } = mapMgrInstance.getMapTilesize());
+    ({
+      w: this.mapWidth,
+      h: this.mapHeight
+    } = this.mapManager.getMapTilesize());
 
     this.astarWorkerManager = AstarWorkerManager.getInstance();
 
-    // if this worker hasn't been initialised yet by other actors, initialise it
-    if (!this.astarWorkerManager.getWorker(this.actorKey)) {
-      this.astarWorkerManager.initWorker(this.actorKey, {
+    // if this worker hasn't been initialised yet by other actors of the same type, initialise it
+    if (!this.astarWorkerManager.isWorkerActorInited(this.actorKey)) {
+      this.astarWorkerManager.initWorkerWithActor(this.actorKey, {
         localTileX: this.localTileX,
         localTileY: this.localTileY,
         tileWidthX: this.tileWidthX,
-        tileWidthY: this.tileWidthY,
-        mapWidth: this.mapWidth,
-        mapHeight: this.mapHeight,
-        // TODO: In the future there should be some layered approach
-        mapGrid: mapMgrInstance.mapMatrix,
-        unwalkableTile: CST.ENVIRONMENT.EMPTY_TILE
+        tileWidthY: this.tileWidthY
       });
     }
   }

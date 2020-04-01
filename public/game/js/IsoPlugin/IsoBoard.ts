@@ -147,7 +147,7 @@ export default class IsoBoard {
 
       // if the game is zoomed out too much, the grid will hide
       if (CameraManager.getInstance().camera.zoom <= CST.GRID.ZOOM_DEACTIVATE) {
-        this.hideGrid();
+        //this.hideGrid();
       }
     });
 

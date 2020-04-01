@@ -5,6 +5,9 @@ import IsoScene from "../IsoPlugin/IsoScene";
 import UIComponent from "./UIComponent";
 import CST from "../CST";
 import UIScene from "../scenes/UIScene";
+import BuildMenuUI from "./BuildMenuUI";
+import UIComponents from "./UIComponentsFactory";
+import MapManager from "../managers/MapManager";
 
 interface Tile {
   x: number;
@@ -53,31 +56,75 @@ export default class BuildPlaceUI extends UIComponent {
       new IsoArrow(uiScene, gameScene, 0, 0, ArrowDirection.EAST),
       new IsoArrow(uiScene, gameScene, 0, 0, ArrowDirection.SOUTH),
       new IsoArrow(uiScene, gameScene, 0, 0, ArrowDirection.WEST)
-    ].map(arrow => arrow.setVisible(false));
+    ].map(arrow => arrow.hide());
 
-    new Buttons();
+    this.turnOnArrowsInteraction();
+  }
+
+  public turnOnArrowsInteraction() {
+    // when clicking the arrows move the building accordingly
+    this.movementArrows.forEach(arrow =>
+      arrow.on(CST.EVENTS.ARROWS_UI.TAP, this.buildingMovementCb.bind(this))
+    );
+  }
+
+  // check if the building can be placed
+  checkBuildingPlaceable(): boolean {
+    return this.buildPlacing.canBePlaced();
+  }
+
+  // If the user chooses another building to place while placing
+  // another building, then remove that and replace it with the new building
+  chooseAnotherBuilding(building: BuildingObject): this {
+    if (this.buildPlacing) {
+      // remove the building and turn off interaction for the old building
+      this.turnOff(false);
+    }
+
+    this.enable(building);
+
+    return this;
   }
 
   // Enable the UI for a building
   enable(building: BuildingObject): this {
     this.buildPlacing = building.enableBuildPlacing();
-
     this.showArrows().enableInput();
+    // show the grid and prevent events like tap and tile move from emitting
+    MapManager.getInstance()
+      .showMapGrid()
+      .events.blockEvents();
 
     return this;
   }
 
-  turnOff(): this {
+  /**
+   *
+   * @param placeBuilding If the user hits CANCEL do not place building and remove it
+   * Otherwise, if the user hits OK try to place the building
+   */
+  turnOff(placeBuilding: boolean): this {
+    if (placeBuilding) {
+      this.buildPlacing.placeBuilding();
+    }
+
+    this.hideArrows().disableInput();
+    MapManager.getInstance()
+      .hideMapGrid()
+      .events.stopBlockingEvents();
+
+    // after disabling the input, we can remove the building
+    if (!placeBuilding) {
+      this.buildPlacing.removeBuilding();
+    }
+
+    this.buildPlacing = null;
+
     return this;
   }
 
   // Enable the input on the arrows and dragging of the building
   private enableInput(): this {
-    // when clicking the arrows move the building accordingly
-    this.movementArrows.forEach(arrow =>
-      arrow.on(CST.EVENTS.ARROWS_UI.TAP, this.buildingMovementCb.bind(this))
-    );
-
     // enable the building for dragging
     this.gameScene.input.setDraggable(this.buildPlacing.setInteractive());
 
@@ -96,6 +143,10 @@ export default class BuildPlaceUI extends UIComponent {
   private disableInput(): this {
     this.resumeInputControls();
     this.gameScene.scale.off("resize", this.showArrows);
+
+    // turn off building dragging
+    this.buildPlacing.off("drag");
+    this.gameScene.input.setDraggable(this.buildPlacing, false);
 
     return this;
   }
@@ -116,13 +167,21 @@ export default class BuildPlaceUI extends UIComponent {
     return this;
   }
 
+  private hideArrows(): this {
+    for (let arrow of this.movementArrows) {
+      arrow.hide();
+    }
+
+    return this;
+  }
+
   // Placement arrows => each direction the building can be moved
   private showArrows(): this {
     this.computeArrowsPosition();
 
     for (let direction of [NORTH, SOUTH, EAST, WEST]) {
       let { x, y } = this.arrowsTilePositions[direction];
-      this.movementArrows[direction].setTilePosition(x, y).setVisible(true);
+      this.movementArrows[direction].setTilePosition(x, y).show();
     }
 
     return this;
@@ -180,5 +239,3 @@ export default class BuildPlaceUI extends UIComponent {
     this.showArrows();
   }
 }
-
-class Buttons {}

@@ -10,7 +10,10 @@ const BUTTON_TYPES = {
   SCRIPT: "Script",
   SETTINGS: "Settings",
   SOUND: "Sound",
-  WOOD_BG: "wood_texture"
+  WOOD_BG: "wood_texture",
+  WOOD_PLANK: "wood_plank",
+  CANCEL: "Cancel",
+  OK: "Ok"
 };
 
 export interface MultiatlasConfig {
@@ -85,7 +88,7 @@ export default {
   // options for the board grid
   GRID: {
     // 2 px for the line width
-    LINE_WIDTH: 2,
+    LINE_WIDTH: 5,
     LINE_COLOR: 0xffffff,
     LINE_ALPHA: 1,
     // if the game is zoomed out too much, the grid will hide
@@ -208,7 +211,10 @@ export default {
     RED: 0xff0000,
     GREEN: 0x00ff00,
     YELLOW: 0xffff00,
-    LIME: 0xd5ff00
+    LIME: 0xd5ff00,
+    MAROON: 0x4e342e,
+    LIGHT_MAROON: 0x7b5e57,
+    DARK_MAROON: 0x260e04
   },
   EVENTS: {
     MAP: {
@@ -262,9 +268,22 @@ export default {
     Z_EFFECT: 40
   },
   UI: {
+    BUTTONS: {
+      TINT_COLOR: 0xffe4b5
+    },
     BUILD_PLACE: {
       // arrow offset from the building
       ARROW_OFFSET: 1.5
+    },
+    CONFIRM_BUTTONS: {
+      ANCHOR: {
+        top: "top",
+        left: "center"
+      },
+      ORIENTATION: "x",
+      SPACE: 5,
+      ALIGN: "center",
+      SCALE: 0.7
     },
     MAIN_BUTTONS: {
       // position
@@ -282,12 +301,42 @@ export default {
         BUTTON_TYPES.SOUND,
         BUTTON_TYPES.LOGOUT
       ],
-      BTN_SCALE: 0.8,
+      BTN_SCALE: 0.7,
+      BG_SCALE_Y: 0.9,
+      TILED_DECORATION_SCALE_Y: 0.9,
       BG_IMG: BUTTON_TYPES.WOOD_BG,
       EXPAND_BTN: false,
-      ALIGN_BTN: "center",
-      TINT_COLOR: 0xffe4b5
+      ALIGN_BTN: "center"
+    },
+    BUILD_MENU: {
+      SIZER: {
+        ORIENTATION: "y"
+      },
+      ANCHOR: {
+        left: "left",
+        top: "top"
+      },
+      // vertical scrolling
+      SCROLL_MODE: 0,
+      // shrink the real buildings to use them as buttons
+      BUTTONS_SIZE: 0.1
+    },
+    DEPTH: {
+      DECORATIONS: 0,
+      BG: 1,
+      BUTTONS: 2
+    },
+    // buttons transitioning in and out of screen
+    MOVEMENT: {
+      DURATION: 750,
+      // moving inside and outside of the screen
+      DEFAULT_DISTANCE: 200
     }
+  },
+  STATES: {
+    MAIN_UI: "mainUIState",
+    BUILD_MENU: "buildMenuState",
+    BUILD_PLACING: "buildPlacingState"
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST
