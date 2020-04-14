@@ -67,6 +67,11 @@ export default class NavSpriteObject extends IsoSpriteObject {
     }
   }
 
+  // a way to cancel this object's movement
+  public cancelMovement() {
+    this.pathFollowing = null;
+  }
+
   // find path to tileX and tileY and start moving towards there
   async navigateTo(tileX: number, tileY: number) {
     let pathFollowing = await this.astarWorkerManager.findPath(

@@ -7,6 +7,7 @@ import IsoScene from "../IsoPlugin/IsoScene";
 import BuildMenuUI from "./BuildMenuUI";
 import CST from "../CST";
 import BuildingObject from "../gameObjects/BuildingObject";
+import ActorsManager from "../managers/ActorsManager";
 
 const STATES = CST.STATES;
 
@@ -78,6 +79,9 @@ export default class UIStateMachine {
       })
       // if the user chooses a building to place
       .addTransition(STATES.BUILD_PLACING, (buildingName: string) => {
+        // Cancel all actors' movement
+        ActorsManager.getInstance().cancelAllMovement();
+
         // show the Ok button which can be used to place the building
         this.buildMenuUI.showOkButton();
         // enable placing

@@ -26,6 +26,13 @@ export default class ActorsManager extends Manager {
     }
   }
 
+  // Cancels the movement of all actors
+  public cancelAllMovement() {
+    for (let actor of this.sceneActors) {
+      actor.cancelMovement();
+    }
+  }
+
   public static getAllActorsNames() {
     return ACTOR_NAMES_ARR;
   }

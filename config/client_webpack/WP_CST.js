@@ -11,10 +11,10 @@ let CST = {
 };
 
 /* eslint-disable no-undef */
-CST.PUBLIC_PATH = path.resolve(__dirname, `../${CST.PUBLIC_FOLDER}`);
+CST.PUBLIC_PATH = path.resolve(__dirname, `../../${CST.PUBLIC_FOLDER}`);
 CST.SERVICE_WORKER_DEST = `${CST.PUBLIC_PATH}/sw-build.js`;
 
-// append "build" to evert file cached by the service worker
+// append "build" to every file cached by the service worker
 CST.APPEND_BUILD_DIR = async manifestEntries => {
   const manifest = manifestEntries.map(entry => {
     const buildDir = "/build/";

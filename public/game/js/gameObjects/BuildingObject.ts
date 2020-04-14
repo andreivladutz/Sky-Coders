@@ -103,6 +103,9 @@ export default class BuildingObject extends IsoSpriteObject {
     // hide the grid
     this.disableGridDrawing();
     this.applyToLayer();
+    // also apply it to rexBoard
+    this.addToGridAt(this.tileX, this.tileY);
+
     this.movementEnabled = false;
 
     // the building could be placed
@@ -118,6 +121,8 @@ export default class BuildingObject extends IsoSpriteObject {
     if (this.isAppliedToLayer) {
       this.layersManager.removeObjectFromLayer(this);
     }
+
+    this.mapManager.kickOutSpriteObjectFromBoard(this);
 
     this.movementEnabled = true;
     this.checkGridColor();
@@ -142,7 +147,8 @@ export default class BuildingObject extends IsoSpriteObject {
     }
 
     super.setTilePosition(tileX, tileY);
-    this.mapManager.moveSpriteObjectToTiles(this, tileX, tileY);
+    // keeping the building on the board while moving caused problems to actors
+    // this.mapManager.moveSpriteObjectToTiles(this, tileX, tileY);
 
     this.checkGridColor();
 

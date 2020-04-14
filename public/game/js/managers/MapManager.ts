@@ -148,6 +148,11 @@ export default class MapManager extends Manager {
     this.tileMap.isoBoard.board.removeChess(obj, null, null, null, true);
   }
 
+  // Temporarily remove an object from the underlying board
+  public kickOutSpriteObjectFromBoard(obj: IsoSpriteObject) {
+    this.tileMap.isoBoard.board.removeChess(obj);
+  }
+
   public getIsoBoard(): IsoBoard {
     return this.tileMap.isoBoard;
   }
