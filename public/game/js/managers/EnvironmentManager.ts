@@ -75,9 +75,16 @@ export default class EnvironmentManager extends Manager {
     scene: IsoScene,
     mapGrid: number[][],
     mapW: number,
-    mapH: number
+    mapH: number,
+    seed: string
   ) {
-    this.placementManager.placeRandomResources(scene, mapGrid, mapW, mapH);
+    this.placementManager.placeRandomResources(
+      scene,
+      mapGrid,
+      mapW,
+      mapH,
+      seed
+    );
   }
 
   async preload(load: Phaser.Loader.LoaderPlugin) {

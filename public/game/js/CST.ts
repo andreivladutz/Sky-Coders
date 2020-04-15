@@ -338,6 +338,12 @@ export default {
     BUILD_MENU: "buildMenuState",
     BUILD_PLACING: "buildPlacingState"
   },
+  // SOCKET.IO CONSTANTS
+  IO: {
+    EVENTS: {
+      CONNECT: "connect"
+    }
+  },
   // constants imported from the worker cst
   WORKER: WORKER_CST
 };

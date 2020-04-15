@@ -298,7 +298,8 @@ export default class PlacementManager extends Manager {
     scene: IsoScene,
     mapGrid: number[][],
     mapW: number,
-    mapH: number
+    mapH: number,
+    seed: string
   ): this {
     this.mapGrid = mapGrid;
     this.mapW = mapW;
@@ -307,9 +308,7 @@ export default class PlacementManager extends Manager {
     this.envTexture = EnvironmentManager.getInstance().getTextureKey();
 
     this.RND = Phaser.Math.RND;
-
-    // TODO: generate this seed on the serverside and keep it the same on next logins
-    this.RND.init(["fooS33d"]);
+    this.RND.init([seed]);
 
     this.generateRegions();
     this._placeResources(scene);

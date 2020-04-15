@@ -15,6 +15,7 @@ import LayersManager from "./LayersManager";
 import MapEventEmitter from "../utils/MapEventEmitter";
 import AstarWorkerManager from "./AstarWorkerManager";
 import ActorsManager from "./ActorsManager";
+import GameManager from "../online/GameManager";
 
 interface Point {
   x: number;
@@ -31,6 +32,8 @@ interface MapTileSize {
  *
  */
 export default class MapManager extends Manager {
+  private gameSeed: string;
+
   // tile map container class
   tileMap: TileMap;
   // the matrix of tiles where map data is held
@@ -247,7 +250,8 @@ export default class MapManager extends Manager {
       gameScene,
       this.mapMatrix,
       mapSize.w,
-      mapSize.h
+      mapSize.h,
+      this.gameSeed
     );
 
     // for (let region of this.envManager.placementManager.regions) {
@@ -272,9 +276,10 @@ export default class MapManager extends Manager {
 
   // the simplex noise based terrain generator
   private generateIsland() {
-    // TODO: change the seed with a server-generated seed
+    this.gameSeed = GameManager.getInstance().seed;
+
     let terrainGen = TerrainGenerator.getInstance({
-      seed: "nice",
+      seed: this.gameSeed,
       width: CST.MAP.WIDTH,
       height: CST.MAP.HEIGHT,
       frequency: CST.MAP.DEFAULT_CFG.frequency

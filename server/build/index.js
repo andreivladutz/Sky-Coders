@@ -86,6 +86,52 @@
 /************************************************************************/
 /******/ ({
 
+/***/ "./node_modules/randomstring/index.js":
+/*!********************************************!*\
+  !*** ./node_modules/randomstring/index.js ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("module.exports = __webpack_require__(/*! ./lib/randomstring */ \"./node_modules/randomstring/lib/randomstring.js\");\n\n//# sourceURL=webpack:///./node_modules/randomstring/index.js?");
+
+/***/ }),
+
+/***/ "./node_modules/randomstring/lib/charset.js":
+/*!**************************************************!*\
+  !*** ./node_modules/randomstring/lib/charset.js ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+eval("var arrayUniq = __webpack_require__(/*! array-uniq */ \"array-uniq\");\n\nfunction Charset() {\n  this.chars = '';\n}\n\nCharset.prototype.setType = function(type) {\n  var chars;\n  \n  var numbers    = '0123456789';\n  var charsLower = 'abcdefghijklmnopqrstuvwxyz';\n  var charsUpper = charsLower.toUpperCase();\n  var hexChars   = 'abcdef';\n  \n  if (type === 'alphanumeric') {\n    chars = numbers + charsLower + charsUpper;\n  }\n  else if (type === 'numeric') {\n    chars = numbers;\n  }\n  else if (type === 'alphabetic') {\n    chars = charsLower + charsUpper;\n  }\n  else if (type === 'hex') {\n    chars = numbers + hexChars;\n  }\n  else {\n    chars = type;\n  }\n  \n  this.chars = chars;\n}\n\nCharset.prototype.removeUnreadable = function() {\n  var unreadableChars = /[0OIl]/g;\n  this.chars = this.chars.replace(unreadableChars, '');\n}\n\nCharset.prototype.setcapitalization = function(capitalization) {\n  if (capitalization === 'uppercase') {\n    this.chars = this.chars.toUpperCase();\n  }\n  else if (capitalization === 'lowercase') {\n    this.chars = this.chars.toLowerCase();\n  }\n}\n\nCharset.prototype.removeDuplicates = function() {\n  var charMap = this.chars.split('');\n  charMap = arrayUniq(charMap);\n  this.chars = charMap.join('');\n}\n\nmodule.exports = exports = Charset;\n\n//# sourceURL=webpack:///./node_modules/randomstring/lib/charset.js?");
+
+/***/ }),
+
+/***/ "./node_modules/randomstring/lib/randomstring.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/randomstring/lib/randomstring.js ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+eval("\n\nvar crypto  = __webpack_require__(/*! crypto */ \"crypto\");\nvar Charset = __webpack_require__(/*! ./charset.js */ \"./node_modules/randomstring/lib/charset.js\");\n\nfunction safeRandomBytes(length) {\n  while (true) {\n    try {\n      return crypto.randomBytes(length);\n    } catch(e) {\n      continue;\n    }\n  }\n}\n\nexports.generate = function(options) {\n  \n  var charset = new Charset();\n  \n  var length, chars, capitalization, string = '';\n  \n  // Handle options\n  if (typeof options === 'object') {\n    length = options.length || 32;\n    \n    if (options.charset) {\n      charset.setType(options.charset);\n    }\n    else {\n      charset.setType('alphanumeric');\n    }\n    \n    if (options.capitalization) {\n      charset.setcapitalization(options.capitalization);\n    }\n    \n    if (options.readable) {\n      charset.removeUnreadable();\n    }\n    \n    charset.removeDuplicates();\n  }\n  else if (typeof options === 'number') {\n    length = options;\n    charset.setType('alphanumeric');\n  }\n  else {\n    length = 32;\n    charset.setType('alphanumeric');\n  }\n  \n  // Generate the string\n  var charsLen = charset.chars.length;\n  var maxByte = 256 - (256 % charsLen);\n  while (length > 0) {\n    var buf = safeRandomBytes(Math.ceil(length * 256 / maxByte));\n    for (var i = 0; i < buf.length && length > 0; i++) {\n      var randomByte = buf.readUInt8(i);\n      if (randomByte < maxByte) {\n        string += charset.chars.charAt(randomByte % charsLen);\n        length--;\n      }\n    }\n  }\n\n  return string;\n};\n\n\n//# sourceURL=webpack:///./node_modules/randomstring/lib/randomstring.js?");
+
+/***/ }),
+
+/***/ "./public/common/MessageTypes.ts":
+/*!***************************************!*\
+  !*** ./public/common/MessageTypes.ts ***!
+  \***************************************/
+/*! exports provided: GameInit */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"GameInit\", function() { return GameInit; });\nvar GameInit;\n(function (GameInit) {\n    GameInit.EVENT = \"game_init\";\n})(GameInit || (GameInit = {}));\n\n\n//# sourceURL=webpack:///./public/common/MessageTypes.ts?");
+
+/***/ }),
+
 /***/ "./server/SERVER_CST.ts":
 /*!******************************!*\
   !*** ./server/SERVER_CST.ts ***!
@@ -122,6 +168,18 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) *
 
 /***/ }),
 
+/***/ "./server/game/GameInstance.ts":
+/*!*************************************!*\
+  !*** ./server/game/GameInstance.ts ***!
+  \*************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return GameInstance; });\n/* harmony import */ var _public_common_MessageTypes__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../public/common/MessageTypes */ \"./public/common/MessageTypes.ts\");\n/* harmony import */ var randomstring__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! randomstring */ \"./node_modules/randomstring/index.js\");\n/* harmony import */ var randomstring__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(randomstring__WEBPACK_IMPORTED_MODULE_1__);\n\n\n// An instance of a game for a particular user\nclass GameInstance {\n    constructor(socket) {\n        this.socket = socket;\n        this.listenForInit();\n    }\n    // Start listening for the initialisation event\n    listenForInit() {\n        // generate a random 32 length string\n        this.seed = randomstring__WEBPACK_IMPORTED_MODULE_1___default.a.generate();\n        // When the game init event is received, response immediately\n        this.socket.on(_public_common_MessageTypes__WEBPACK_IMPORTED_MODULE_0__[\"GameInit\"].EVENT, (response) => {\n            response({\n                seed: this.seed\n            });\n        });\n    }\n}\n\n\n//# sourceURL=webpack:///./server/game/GameInstance.ts?");
+
+/***/ }),
+
 /***/ "./server/index.ts":
 /*!*************************!*\
   !*** ./server/index.ts ***!
@@ -130,7 +188,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) *
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ \"express\");\n/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var express_ejs_layouts__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! express-ejs-layouts */ \"express-ejs-layouts\");\n/* harmony import */ var express_ejs_layouts__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(express_ejs_layouts__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var connect_flash__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! connect-flash */ \"connect-flash\");\n/* harmony import */ var connect_flash__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(connect_flash__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var express_session__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! express-session */ \"express-session\");\n/* harmony import */ var express_session__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(express_session__WEBPACK_IMPORTED_MODULE_3__);\n/* harmony import */ var passport__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! passport */ \"passport\");\n/* harmony import */ var passport__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(passport__WEBPACK_IMPORTED_MODULE_4__);\n/* harmony import */ var _authentication_configurePassport__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./authentication/configurePassport */ \"./server/authentication/configurePassport.ts\");\n/* harmony import */ var _authentication_authenticateMiddleware__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./authentication/authenticateMiddleware */ \"./server/authentication/authenticateMiddleware.ts\");\n/* harmony import */ var _routes_authRouter__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./routes/authRouter */ \"./server/routes/authRouter.ts\");\n/* harmony import */ var _routes_gameRouter__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./routes/gameRouter */ \"./server/routes/gameRouter.ts\");\n/* harmony import */ var _SERVER_CST__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./SERVER_CST */ \"./server/SERVER_CST.ts\");\n/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! mongoose */ \"mongoose\");\n/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_10___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_10__);\n/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! dotenv */ \"dotenv\");\n/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_11___default = /*#__PURE__*/__webpack_require__.n(dotenv__WEBPACK_IMPORTED_MODULE_11__);\n/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! path */ \"path\");\n/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_12___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_12__);\n\n\n\n\n\n\n\n\n\n\n\n\n\n// Load the environment config from .env file\nlet { parsed: dotenvCfg } = dotenv__WEBPACK_IMPORTED_MODULE_11__[\"config\"]({\n    path: path__WEBPACK_IMPORTED_MODULE_12__[\"join\"](__dirname, \"/../../config/.env\"),\n    debug: true\n});\nmongoose__WEBPACK_IMPORTED_MODULE_10__[\"connect\"](dotenvCfg.MONGO_URI, {\n    useNewUrlParser: true,\n    useUnifiedTopology: true\n});\nconst PORT = process.env.PORT || 8080;\n// Add the local strategy and serialization / deserialization to passport\nObject(_authentication_configurePassport__WEBPACK_IMPORTED_MODULE_5__[\"default\"])(passport__WEBPACK_IMPORTED_MODULE_4__);\nlet app = express__WEBPACK_IMPORTED_MODULE_0__();\n// Set the ejs view engine\napp.set(\"view engine\", \"ejs\");\napp.use(express_ejs_layouts__WEBPACK_IMPORTED_MODULE_1__);\n// Express session middleware\napp.use(express_session__WEBPACK_IMPORTED_MODULE_3__({\n    secret: \"keyboard cat\",\n    resave: true,\n    saveUninitialized: true\n}));\n// Use passport middleware for auth\napp.use(passport__WEBPACK_IMPORTED_MODULE_4__[\"initialize\"]());\napp.use(passport__WEBPACK_IMPORTED_MODULE_4__[\"session\"]());\n// Connect flash for temporary data\n// Useful for sending messages to the client when redirecting\napp.use(connect_flash__WEBPACK_IMPORTED_MODULE_2___default()());\n// Temporary messages stored with flash\n// Pass them to locals so ejs can render the messages on the page\napp.use((req, res, next) => {\n    // Temp messages coming from the /users/register route\n    res.locals[_SERVER_CST__WEBPACK_IMPORTED_MODULE_9__[\"default\"].TEMP_MSG.SUCCESS] = req.flash(_SERVER_CST__WEBPACK_IMPORTED_MODULE_9__[\"default\"].TEMP_MSG.SUCCESS);\n    res.locals[_SERVER_CST__WEBPACK_IMPORTED_MODULE_9__[\"default\"].TEMP_MSG.ERROR] = req.flash(_SERVER_CST__WEBPACK_IMPORTED_MODULE_9__[\"default\"].TEMP_MSG.ERROR);\n    // The flash error message coming from passport\n    res.locals[_SERVER_CST__WEBPACK_IMPORTED_MODULE_9__[\"default\"].TEMP_MSG.ERROR] = req.flash(_SERVER_CST__WEBPACK_IMPORTED_MODULE_9__[\"default\"].TEMP_MSG.PASSPORT_ERR);\n    next();\n});\napp\n    .get(_SERVER_CST__WEBPACK_IMPORTED_MODULE_9__[\"default\"].WEB_MANIFEST, (req, res) => {\n    res.sendFile(path__WEBPACK_IMPORTED_MODULE_12__[\"join\"](__dirname, _SERVER_CST__WEBPACK_IMPORTED_MODULE_9__[\"default\"].MANIFEST_FILE));\n})\n    // the login / register path\n    .use(\"/users\", _routes_authRouter__WEBPACK_IMPORTED_MODULE_7__[\"default\"])\n    // authenticated game route\n    .use(_authentication_authenticateMiddleware__WEBPACK_IMPORTED_MODULE_6__[\"default\"], _routes_gameRouter__WEBPACK_IMPORTED_MODULE_8__[\"default\"])\n    // static files that do not require authentication\n    //.use(\"/no_auth\", express.static(CST.PUBLIC_FOLDER))\n    .listen(PORT, () => {\n    console.log(`App listening on ${PORT}.`);\n});\n\n\n//# sourceURL=webpack:///./server/index.ts?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express */ \"express\");\n/* harmony import */ var express__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! dotenv */ \"dotenv\");\n/* harmony import */ var dotenv__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(dotenv__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! path */ \"path\");\n/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var _authentication_authenticateMiddleware__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./authentication/authenticateMiddleware */ \"./server/authentication/authenticateMiddleware.ts\");\n/* harmony import */ var _routes_authRouter__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./routes/authRouter */ \"./server/routes/authRouter.ts\");\n/* harmony import */ var _routes_gameRouter__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./routes/gameRouter */ \"./server/routes/gameRouter.ts\");\n/* harmony import */ var _SERVER_CST__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./SERVER_CST */ \"./server/SERVER_CST.ts\");\n/* harmony import */ var _utils_configure__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./utils/configure */ \"./server/utils/configure.ts\");\n/* harmony import */ var _game_GameInstance__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./game/GameInstance */ \"./server/game/GameInstance.ts\");\n\n\n\n\n// Routers\n\n\n\n\n\n// Load the environment config from .env file\ndotenv__WEBPACK_IMPORTED_MODULE_1__[\"config\"]({\n    path: path__WEBPACK_IMPORTED_MODULE_2__[\"join\"](__dirname, \"/../../config/.env\"),\n    debug: true\n});\nconst PORT = Number(process.env.PORT) || 8080;\nlet app = _utils_configure__WEBPACK_IMPORTED_MODULE_7__[\"default\"].configureMongoose().configureExpress(express__WEBPACK_IMPORTED_MODULE_0__());\nlet io = _utils_configure__WEBPACK_IMPORTED_MODULE_7__[\"default\"].configureSocketIo(app, PORT);\nio.on(\"connection\", (socket) => {\n    console.log(socket.id);\n    new _game_GameInstance__WEBPACK_IMPORTED_MODULE_8__[\"default\"](socket);\n});\napp\n    .get(_SERVER_CST__WEBPACK_IMPORTED_MODULE_6__[\"default\"].WEB_MANIFEST, (req, res) => {\n    res.sendFile(path__WEBPACK_IMPORTED_MODULE_2__[\"join\"](__dirname, _SERVER_CST__WEBPACK_IMPORTED_MODULE_6__[\"default\"].MANIFEST_FILE));\n})\n    // the login / register path\n    .use(\"/users\", _routes_authRouter__WEBPACK_IMPORTED_MODULE_4__[\"default\"])\n    // authenticated game route\n    .use(_authentication_authenticateMiddleware__WEBPACK_IMPORTED_MODULE_3__[\"default\"], _routes_gameRouter__WEBPACK_IMPORTED_MODULE_5__[\"default\"]);\n// static files that do not require authentication\n//.use(\"/no_auth\", express.static(CST.PUBLIC_FOLDER))\n\n\n//# sourceURL=webpack:///./server/index.ts?");
 
 /***/ }),
 
@@ -170,6 +228,18 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var expr
 
 /***/ }),
 
+/***/ "./server/utils/configure.ts":
+/*!***********************************!*\
+  !*** ./server/utils/configure.ts ***!
+  \***********************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"default\", function() { return ConfigManager; });\n/* harmony import */ var express_ejs_layouts__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! express-ejs-layouts */ \"express-ejs-layouts\");\n/* harmony import */ var express_ejs_layouts__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(express_ejs_layouts__WEBPACK_IMPORTED_MODULE_0__);\n/* harmony import */ var socket_io__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! socket.io */ \"socket.io\");\n/* harmony import */ var socket_io__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(socket_io__WEBPACK_IMPORTED_MODULE_1__);\n/* harmony import */ var http__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! http */ \"http\");\n/* harmony import */ var http__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(http__WEBPACK_IMPORTED_MODULE_2__);\n/* harmony import */ var connect_flash__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! connect-flash */ \"connect-flash\");\n/* harmony import */ var connect_flash__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(connect_flash__WEBPACK_IMPORTED_MODULE_3__);\n/* harmony import */ var express_session__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! express-session */ \"express-session\");\n/* harmony import */ var express_session__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(express_session__WEBPACK_IMPORTED_MODULE_4__);\n/* harmony import */ var passport__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! passport */ \"passport\");\n/* harmony import */ var passport__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(passport__WEBPACK_IMPORTED_MODULE_5__);\n/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! mongoose */ \"mongoose\");\n/* harmony import */ var mongoose__WEBPACK_IMPORTED_MODULE_6___default = /*#__PURE__*/__webpack_require__.n(mongoose__WEBPACK_IMPORTED_MODULE_6__);\n/* harmony import */ var _authentication_configurePassport__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../authentication/configurePassport */ \"./server/authentication/configurePassport.ts\");\n/* harmony import */ var _SERVER_CST__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../SERVER_CST */ \"./server/SERVER_CST.ts\");\n\n\n\n\n\n\n\n\n\nclass ConfigManager {\n    static configureMongoose() {\n        mongoose__WEBPACK_IMPORTED_MODULE_6__[\"connect\"](process.env.MONGO_URI, {\n            useNewUrlParser: true,\n            useUnifiedTopology: true\n        });\n        return this;\n    }\n    static configureSocketIo(app, port) {\n        let server = http__WEBPACK_IMPORTED_MODULE_2__[\"createServer\"](app);\n        let io = socket_io__WEBPACK_IMPORTED_MODULE_1___default()(server);\n        server.listen(port, () => {\n            console.log(`App listening on ${port}.`);\n        });\n        return io;\n    }\n    static configureExpress(app) {\n        // Add the local strategy and serialization / deserialization to passport\n        Object(_authentication_configurePassport__WEBPACK_IMPORTED_MODULE_7__[\"default\"])(passport__WEBPACK_IMPORTED_MODULE_5__);\n        // Set the ejs view engine\n        app.set(\"view engine\", \"ejs\");\n        app.use(express_ejs_layouts__WEBPACK_IMPORTED_MODULE_0__);\n        // Express session middleware\n        app.use(express_session__WEBPACK_IMPORTED_MODULE_4__({\n            secret: process.env.SESSION_SECRET,\n            resave: true,\n            saveUninitialized: true\n        }));\n        // Use passport middleware for auth\n        app.use(passport__WEBPACK_IMPORTED_MODULE_5__[\"initialize\"]());\n        app.use(passport__WEBPACK_IMPORTED_MODULE_5__[\"session\"]());\n        // Connect flash for temporary data\n        // Useful for sending messages to the client when redirecting\n        app.use(connect_flash__WEBPACK_IMPORTED_MODULE_3___default()());\n        // Temporary messages stored with flash\n        // Pass them to locals so ejs can render the messages on the page\n        app.use((req, res, next) => {\n            // Temp messages coming from the /users/register route\n            res.locals[_SERVER_CST__WEBPACK_IMPORTED_MODULE_8__[\"default\"].TEMP_MSG.SUCCESS] = req.flash(_SERVER_CST__WEBPACK_IMPORTED_MODULE_8__[\"default\"].TEMP_MSG.SUCCESS);\n            res.locals[_SERVER_CST__WEBPACK_IMPORTED_MODULE_8__[\"default\"].TEMP_MSG.ERROR] = req.flash(_SERVER_CST__WEBPACK_IMPORTED_MODULE_8__[\"default\"].TEMP_MSG.ERROR);\n            // The flash error message coming from passport\n            res.locals[_SERVER_CST__WEBPACK_IMPORTED_MODULE_8__[\"default\"].TEMP_MSG.ERROR] = req.flash(_SERVER_CST__WEBPACK_IMPORTED_MODULE_8__[\"default\"].TEMP_MSG.PASSPORT_ERR);\n            next();\n        });\n        return app;\n    }\n}\n\n\n//# sourceURL=webpack:///./server/utils/configure.ts?");
+
+/***/ }),
+
 /***/ "./server/validation/UserValidation.ts":
 /*!*********************************************!*\
   !*** ./server/validation/UserValidation.ts ***!
@@ -179,6 +249,17 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var expr
 
 "use strict";
 eval("__webpack_require__.r(__webpack_exports__);\n/* harmony import */ var _SERVER_CST__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../SERVER_CST */ \"./server/SERVER_CST.ts\");\n/* harmony import */ var _models_User__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../models/User */ \"./server/models/User.ts\");\n/* eslint-disable no-inner-declarations */\n\n\nconst PASS = {\n    MIN: _SERVER_CST__WEBPACK_IMPORTED_MODULE_0__[\"default\"].USERS.PASS_MINLENGTH,\n    MAX: _SERVER_CST__WEBPACK_IMPORTED_MODULE_0__[\"default\"].USERS.PASS_MAXLENGTH\n};\nvar UserValidation;\n(function (UserValidation) {\n    // An error message caused by failed validation\n    class ErrorMessage {\n        constructor(fieldName, message) {\n            this.fieldName = fieldName;\n            this.message = message;\n        }\n    }\n    UserValidation.ErrorMessage = ErrorMessage;\n    async function validateUser(reqBody, userDocument) {\n        let duplicateEmailErr = await checkEmailDuplicates(userDocument);\n        if (duplicateEmailErr !== null) {\n            return [duplicateEmailErr];\n        }\n        // First, validate the password\n        let errorMessages = validatePassword(reqBody.password, reqBody.password_confirm);\n        // Use mongoose internal validation to validate name and email\n        let err = userDocument.validateSync();\n        if (typeof err !== \"undefined\") {\n            Object.entries(err.errors).forEach(([fieldName, error]) => {\n                errorMessages.push(new ErrorMessage(fieldName, error.message));\n            });\n        }\n        return errorMessages;\n    }\n    UserValidation.validateUser = validateUser;\n    // creates a required message error for mongoose validation\n    UserValidation.required = (fieldName) => [\n        true,\n        `${fieldName} cannot be empty`\n    ];\n    // Validate the password before creating a mongoose document\n    function validatePassword(password, confirmPassword) {\n        let errorMessages = [];\n        let pushErr = (errMsg) => errorMessages.push(new ErrorMessage(\"password\", errMsg));\n        if (password !== confirmPassword) {\n            pushErr(\"Passwords do not match\");\n        }\n        if (password.length < PASS.MIN) {\n            pushErr(`Password must be longer than ${PASS.MIN} characters`);\n        }\n        if (password.length > PASS.MAX) {\n            pushErr(`Password must be at most ${PASS.MAX} characters long`);\n        }\n        return errorMessages;\n    }\n    // Check if an user with this email already exists in the db\n    async function checkEmailDuplicates(userDocument) {\n        let duplicateUser = await _models_User__WEBPACK_IMPORTED_MODULE_1__[\"default\"].findOne({ email: userDocument.email });\n        if (duplicateUser) {\n            return new ErrorMessage(\"email\", \"There is already an user with that email registered!\");\n        }\n        return null;\n    }\n})(UserValidation || (UserValidation = {}));\n/* harmony default export */ __webpack_exports__[\"default\"] = (UserValidation);\n\n\n//# sourceURL=webpack:///./server/validation/UserValidation.ts?");
+
+/***/ }),
+
+/***/ "array-uniq":
+/*!*****************************!*\
+  !*** external "array-uniq" ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = require(\"array-uniq\");\n\n//# sourceURL=webpack:///external_%22array-uniq%22?");
 
 /***/ }),
 
@@ -201,6 +282,17 @@ eval("module.exports = require(\"bcryptjs\");\n\n//# sourceURL=webpack:///extern
 /***/ (function(module, exports) {
 
 eval("module.exports = require(\"connect-flash\");\n\n//# sourceURL=webpack:///external_%22connect-flash%22?");
+
+/***/ }),
+
+/***/ "crypto":
+/*!*************************!*\
+  !*** external "crypto" ***!
+  \*************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = require(\"crypto\");\n\n//# sourceURL=webpack:///external_%22crypto%22?");
 
 /***/ }),
 
@@ -248,6 +340,17 @@ eval("module.exports = require(\"express-session\");\n\n//# sourceURL=webpack://
 
 /***/ }),
 
+/***/ "http":
+/*!***********************!*\
+  !*** external "http" ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = require(\"http\");\n\n//# sourceURL=webpack:///external_%22http%22?");
+
+/***/ }),
+
 /***/ "mongoose":
 /*!***************************!*\
   !*** external "mongoose" ***!
@@ -289,6 +392,17 @@ eval("module.exports = require(\"passport-local\");\n\n//# sourceURL=webpack:///
 /***/ (function(module, exports) {
 
 eval("module.exports = require(\"path\");\n\n//# sourceURL=webpack:///external_%22path%22?");
+
+/***/ }),
+
+/***/ "socket.io":
+/*!****************************!*\
+  !*** external "socket.io" ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+eval("module.exports = require(\"socket.io\");\n\n//# sourceURL=webpack:///external_%22socket.io%22?");
 
 /***/ })
 
