@@ -5,7 +5,7 @@
 			"format": "RGBA8888",
 			"size": {
 				"w": 127,
-				"h": 128
+				"h": 129
 			},
 			"scale": 0.125,
 			"frames": [
@@ -73,7 +73,7 @@
 					}
 				},
 				{
-					"filename": "Buttons/Sound",
+					"filename": "Buttons/Leaderboard",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -94,6 +94,27 @@
 					}
 				},
 				{
+					"filename": "Buttons/Sound",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 29,
+						"h": 25
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 29,
+						"h": 25
+					},
+					"frame": {
+						"x": 36,
+						"y": 55,
+						"w": 29,
+						"h": 25
+					}
+				},
+				{
 					"filename": "Buttons/Build",
 					"rotated": false,
 					"trimmed": false,
@@ -108,10 +129,73 @@
 						"h": 25
 					},
 					"frame": {
-						"x": 36,
+						"x": 66,
+						"y": 82,
+						"w": 28,
+						"h": 25
+					}
+				},
+				{
+					"filename": "Buttons/Logout",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 28,
+						"h": 25
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 28,
+						"h": 25
+					},
+					"frame": {
+						"x": 67,
 						"y": 55,
 						"w": 28,
 						"h": 25
+					}
+				},
+				{
+					"filename": "Buttons/Settings",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 28,
+						"h": 25
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 28,
+						"h": 25
+					},
+					"frame": {
+						"x": 97,
+						"y": 55,
+						"w": 28,
+						"h": 25
+					}
+				},
+				{
+					"filename": "Buttons/Script",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 28,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 28,
+						"h": 24
+					},
+					"frame": {
+						"x": 96,
+						"y": 82,
+						"w": 28,
+						"h": 24
 					}
 				},
 				{
@@ -130,93 +214,9 @@
 					},
 					"frame": {
 						"x": 66,
-						"y": 55,
+						"y": 109,
 						"w": 34,
 						"h": 19
-					}
-				},
-				{
-					"filename": "Buttons/Logout",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 27,
-						"h": 25
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 27,
-						"h": 25
-					},
-					"frame": {
-						"x": 66,
-						"y": 76,
-						"w": 27,
-						"h": 25
-					}
-				},
-				{
-					"filename": "Buttons/Leaderboard",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 28,
-						"h": 24
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 28,
-						"h": 24
-					},
-					"frame": {
-						"x": 66,
-						"y": 103,
-						"w": 28,
-						"h": 24
-					}
-				},
-				{
-					"filename": "Buttons/Settings",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 27,
-						"h": 25
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 27,
-						"h": 25
-					},
-					"frame": {
-						"x": 95,
-						"y": 76,
-						"w": 27,
-						"h": 25
-					}
-				},
-				{
-					"filename": "Buttons/Script",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 27,
-						"h": 24
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 27,
-						"h": 24
-					},
-					"frame": {
-						"x": 96,
-						"y": 103,
-						"w": 27,
-						"h": 24
 					}
 				}
 			]
@@ -225,6 +225,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:1034aace0ec8ace78aea8df65f748d49:0ae6cf8e13750bc6a19860a48a55d542:56c353b78932d635f9195fd488f280a9$"
+		"smartupdate": "$TexturePacker:SmartUpdate:49873b3b25be105a03e4a5373fa427aa:5a50c3ba8e2fd50cfe9533d77157d082:56c353b78932d635f9195fd488f280a9$"
 	}
 }

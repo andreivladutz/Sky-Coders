@@ -4,8 +4,8 @@
 			"image": "main_buttons-md-0.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 265,
-				"h": 110
+				"w": 266,
+				"h": 111
 			},
 			"scale": 0.175,
 			"frames": [
@@ -52,44 +52,44 @@
 					}
 				},
 				{
-					"filename": "Buttons/Logout",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 38,
-						"h": 35
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 38,
-						"h": 35
-					},
-					"frame": {
-						"x": 226,
-						"y": 1,
-						"w": 38,
-						"h": 35
-					}
-				},
-				{
 					"filename": "Buttons/Settings",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 38,
+						"w": 39,
+						"h": 36
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 39,
+						"h": 36
+					},
+					"frame": {
+						"x": 226,
+						"y": 1,
+						"w": 39,
+						"h": 36
+					}
+				},
+				{
+					"filename": "Buttons/Logout",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 39,
 						"h": 35
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 38,
+						"w": 39,
 						"h": 35
 					},
 					"frame": {
 						"x": 226,
-						"y": 38,
-						"w": 38,
+						"y": 39,
+						"w": 39,
 						"h": 35
 					}
 				},
@@ -115,23 +115,23 @@
 					}
 				},
 				{
-					"filename": "Buttons/Script",
+					"filename": "Buttons/Build",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 38,
+						"w": 40,
 						"h": 34
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 38,
+						"w": 40,
 						"h": 34
 					},
 					"frame": {
 						"x": 225,
-						"y": 75,
-						"w": 38,
+						"y": 76,
+						"w": 40,
 						"h": 34
 					}
 				},
@@ -141,23 +141,23 @@
 					"trimmed": false,
 					"sourceSize": {
 						"w": 41,
-						"h": 34
+						"h": 35
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
 						"w": 41,
-						"h": 34
+						"h": 35
 					},
 					"frame": {
 						"x": 1,
 						"y": 75,
 						"w": 41,
-						"h": 34
+						"h": 35
 					}
 				},
 				{
-					"filename": "Buttons/Build",
+					"filename": "Buttons/Leaderboard",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -178,23 +178,23 @@
 					}
 				},
 				{
-					"filename": "Buttons/Leaderboard",
+					"filename": "Buttons/Script",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 40,
+						"w": 39,
 						"h": 34
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 40,
+						"w": 39,
 						"h": 34
 					},
 					"frame": {
 						"x": 86,
 						"y": 75,
-						"w": 40,
+						"w": 39,
 						"h": 34
 					}
 				},
@@ -213,7 +213,7 @@
 						"h": 26
 					},
 					"frame": {
-						"x": 128,
+						"x": 127,
 						"y": 75,
 						"w": 47,
 						"h": 26
@@ -225,6 +225,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:1034aace0ec8ace78aea8df65f748d49:0ae6cf8e13750bc6a19860a48a55d542:56c353b78932d635f9195fd488f280a9$"
+		"smartupdate": "$TexturePacker:SmartUpdate:49873b3b25be105a03e4a5373fa427aa:5a50c3ba8e2fd50cfe9533d77157d082:56c353b78932d635f9195fd488f280a9$"
 	}
 }

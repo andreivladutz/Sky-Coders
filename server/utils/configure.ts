@@ -68,7 +68,9 @@ export default class ConfigManager {
       res.locals[CST.TEMP_MSG.ERROR] = req.flash(CST.TEMP_MSG.ERROR);
 
       // The flash error message coming from passport
-      res.locals[CST.TEMP_MSG.ERROR] = req.flash(CST.TEMP_MSG.PASSPORT_ERR);
+      res.locals[CST.TEMP_MSG.PASSPORT_ERR] = req.flash(
+        CST.TEMP_MSG.PASSPORT_ERR
+      );
 
       next();
     });

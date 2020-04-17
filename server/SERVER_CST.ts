@@ -11,5 +11,9 @@ export default {
     SUCCESS: "success_msg",
     ERROR: "error_msg",
     PASSPORT_ERR: "error"
+  },
+  // The cookie set on user login with the user's encrypted db id
+  SESSION_COOKIE: {
+    ID: "sessId"
   }
 };

@@ -5,8 +5,6 @@ import CST from "../CST";
 import BuildingsManager from "../managers/BuildingsManager";
 import { MoveUIUtility, MoveUIDirection } from "./UIMovement";
 import UIComponents from "./UIComponentsFactory";
-import UIStateMachine from "./UIStateMachine";
-import BuildingObject from "../gameObjects/BuildingObject";
 import BuildPlaceUI from "./BuildPlaceUI";
 
 const BUILD_MENU = CST.UI.BUILD_MENU;
@@ -67,6 +65,14 @@ export default class BuildMenuUI extends UIComponent {
     ).map((buildUI): BuildPlaceUI => buildUI as BuildPlaceUI);
 
     this.createSidePanel().createConfirmButtons();
+
+    // Resize the side menu on game resize
+    this.uiScene.scale.on("resize", () => {
+      let gameScale = this.uiScene.game.scale;
+
+      this.scrollPanel.layout(undefined, undefined, gameScale.height);
+      //let slider = this.scrollPanel.childrenMap.slider;
+    });
   }
 
   enable(): Promise<void> {

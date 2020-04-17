@@ -12,19 +12,19 @@ export default class GameInstance {
   constructor(socket: SocketIO.Socket) {
     this.socket = socket;
 
-    this.listenForInit();
+    this.initClient();
   }
 
-  // Start listening for the initialisation event
-  private listenForInit() {
+  // Fire the initialisation event
+  private initClient() {
     // generate a random 32 length string
     this.seed = randomstring.generate();
 
+    let gameConfig: GameInit.Config = {
+      seed: this.seed
+    };
+
     // When the game init event is received, response immediately
-    this.socket.on(GameInit.EVENT, (response: GameInit.ackFunc) => {
-      response({
-        seed: this.seed
-      });
-    });
+    this.socket.emit(GameInit.EVENT, gameConfig);
   }
 }

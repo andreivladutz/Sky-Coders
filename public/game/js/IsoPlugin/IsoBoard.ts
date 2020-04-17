@@ -522,7 +522,7 @@ export default class IsoBoard {
     // take the mid point of each tile
     this.board.forEachTileXY((tileXY: TileXY) => {
       // if there's no tile here no point in drawing grid stroke
-      if (!mapMatrix[tileXY.y][tileXY.x]) {
+      if (!mapMatrix[tileXY.y] || !mapMatrix[tileXY.y][tileXY.x]) {
         return;
       }
 

@@ -292,6 +292,15 @@ export default class MapManager extends Manager {
       emptyTileRatio: CST.ENVIRONMENT.EMPTY_TILE_RATIO,
       tileConfigs: this.envManager.getTilesIndicesConfigs()
     });
+
+    // Some tiles remain undefined. For those falsy values, just convert them to empty tiles
+    for (let y = 0; y < CST.MAP.HEIGHT; y++) {
+      for (let x = 0; x < CST.MAP.WIDTH; x++) {
+        if (this.mapMatrix[y] && !this.mapMatrix[y][x]) {
+          this.mapMatrix[y][x] = CST.ENVIRONMENT.EMPTY_TILE;
+        }
+      }
+    }
   }
 
   // terrain generation happens in the loading stage of the game

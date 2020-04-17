@@ -19,19 +19,17 @@ export default class GameManager extends Manager {
     this.socketManager = SocketManager.getInstance();
     // When connected to the server, send game init event
     this.socketManager.events.on(CST.IO.EVENTS.CONNECT, () => {
-      this.initGame();
+      this.listenForInitEvent();
     });
   }
 
-  // Emit the game init event, and expect a response with the initial game config
-  private initGame() {
-    let onAcknowledged: GameInit.ackFunc = (initConfig: GameInit.Config) => {
+  // Listen for the init event and expect the initial game config
+  private listenForInitEvent() {
+    this.socketManager.on(GameInit.EVENT, (initConfig: GameInit.Config) => {
       ({ seed: this.seed } = initConfig);
 
       this.gameInstance = new Phaser.Game(gameConfig);
-    };
-
-    this.socketManager.emit(GameInit.EVENT, onAcknowledged);
+    });
   }
 
   public static getInstance(): GameManager {

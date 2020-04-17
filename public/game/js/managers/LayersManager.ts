@@ -45,11 +45,13 @@ export default class LayersManager extends Manager {
     this.initObjectLayer(mapGrid[0].length, mapGrid.length);
 
     MapManager.getInstance().events.on(CST.EVENTS.MAP.MOVE, (tile: Tile) => {
-      console.log(
-        MapManager.getInstance()
-          .getIsoBoard()
-          .board.tileXYToChessArray(tile.x, tile.y)
-      );
+      // console.log(
+      //   MapManager.getInstance()
+      //     .getIsoBoard()
+      //     .board.tileXYToChessArray(tile.x, tile.y)
+      // );
+      // console.log(this.getTileConfig(tile.x, tile.y).id);
+      // console.log(MapManager.getInstance().mapMatrix[tile.y][tile.x]);
     });
   }
 

@@ -147,11 +147,18 @@ export default class Actor extends NavSpriteObject {
     // if the actor is already walking we want to keep the progress of the animation
     // not "begining to walk" again
     let progress = 0;
+    let nextAnimKey = `${this.actorKey}.${ACTOR_STATES.WALK}.${direction}`;
+
     if (this.walking) {
+      // Already playig the same animation, return
+      if (this.anims.getCurrentKey() === nextAnimKey) {
+        return this;
+      }
+
       progress = this.anims.getProgress();
     }
 
-    this.play(`${this.actorKey}.${ACTOR_STATES.WALK}.${direction}`);
+    this.play(nextAnimKey);
 
     this.anims.setProgress(progress);
 

@@ -114,8 +114,8 @@ export default class NavSpriteObject extends IsoSpriteObject {
 
     const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING;
 
-    let dx = x - this.tileX,
-      dy = y - this.tileY;
+    let dx = Math.floor(x - this.tileCoords.x),
+      dy = Math.floor(y - this.tileCoords.y);
 
     if (dx > 0) {
       if (dy > 0) {

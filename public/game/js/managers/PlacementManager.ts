@@ -174,6 +174,11 @@ export default class PlacementManager extends Manager {
     for (let region of this.regions) {
       region.extendRegion(this.mapGrid);
     }
+
+    // filter out all empty regions
+    this.regions = this.regions.filter(region => {
+      return region.regionTiles.length !== 0;
+    });
   }
 
   private _placeResources(scene: IsoScene) {
