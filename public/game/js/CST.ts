@@ -229,6 +229,9 @@ export default {
     },
     ARROWS_UI: {
       TAP: "arrow.tapped"
+    },
+    LOAD_SCENE: {
+      LOAD_COMPLETE: "loadcomplete"
     }
   },
   // layer depth for different rendering "objects"

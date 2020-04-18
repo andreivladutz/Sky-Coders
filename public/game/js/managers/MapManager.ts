@@ -224,8 +224,8 @@ export default class MapManager extends Manager {
       scene: this.gameScene,
       tileWidth: this.envManager.TILE_WIDTH,
       tileHeight: this.envManager.TILE_HEIGHT,
-      mapWidth: CST.MAP.WIDTH,
-      mapHeight: CST.MAP.HEIGHT,
+      mapWidth: this.mapMatrix[0].length,
+      mapHeight: this.mapMatrix.length,
       mapMatrix: this.mapMatrix
     });
 

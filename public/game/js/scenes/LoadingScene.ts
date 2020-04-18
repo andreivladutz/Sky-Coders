@@ -8,6 +8,7 @@ import "../managers/ActorsManager";
 import "../managers/MapManager";
 import "../managers/EnvironmentManager";
 import Manager from "../managers/Manager";
+import EventEmitter = Phaser.Events.EventEmitter;
 
 interface rexAwaitLoader extends Phaser.Loader.LoaderPlugin {
   rexAwait: AwaitLoaderPlugin;
@@ -16,6 +17,7 @@ interface rexAwaitLoader extends Phaser.Loader.LoaderPlugin {
 export default class LoadingScene extends Phaser.Scene {
   graphics: Phaser.GameObjects.Graphics;
   load: rexAwaitLoader;
+  events = new EventEmitter();
 
   constructor() {
     super({
@@ -27,6 +29,8 @@ export default class LoadingScene extends Phaser.Scene {
     this.load.on("progress", this.onLoaderProgress, this);
     this.load.on("complete", () => {
       this.scene.start(CONSTANTS.SCENES.GAME);
+
+      this.events.emit(CONSTANTS.EVENTS.LOAD_SCENE.LOAD_COMPLETE);
     });
 
     this.game.scale.setGameSize(this.game.scale.width, this.game.scale.height);

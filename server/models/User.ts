@@ -1,4 +1,6 @@
 import * as mongoose from "mongoose";
+import GameSubDoc, { GameType } from "./GameSchema";
+
 import { default as validate } from "../validation/UserValidation";
 // Hash the password before saving it to the db
 import * as bcrypt from "bcryptjs";
@@ -10,6 +12,7 @@ export interface UserType extends Document {
   email: string;
   password: string;
   date?: Date;
+  game?: GameType;
 
   hashPassword(): Promise<void>;
   // Check if the stored password matches the plaintext one
@@ -34,7 +37,8 @@ const UserSchema = new mongoose.Schema({
   date: {
     type: Date,
     default: Date.now
-  }
+  },
+  game: GameSubDoc
 });
 
 UserSchema.method({

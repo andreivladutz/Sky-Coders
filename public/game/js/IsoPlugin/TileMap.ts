@@ -116,6 +116,7 @@ export default class TileMap {
 
     // we are over a valid tile, different than the last tinted one
     if (
+      this.mapMatrix[y] &&
       this.mapMatrix[y][x] &&
       (!this.lastTintedTile ||
         this.lastTintedTile.tileX !== x ||
@@ -292,7 +293,10 @@ export default class TileMap {
   private generateCliffs() {
     for (let y = 0; y < this.mapHeight; y++) {
       for (let x = 0; x < this.mapWidth; x++) {
-        if (this.mapMatrix[y][x] !== CST.ENVIRONMENT.EMPTY_TILE) {
+        if (
+          this.mapMatrix[y] &&
+          this.mapMatrix[y][x] !== CST.ENVIRONMENT.EMPTY_TILE
+        ) {
           if (
             isMargin(x, y, this.mapMatrix) ||
             x === this.mapWidth - 1 ||

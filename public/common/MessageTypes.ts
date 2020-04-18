@@ -12,3 +12,7 @@ export namespace Redirect {
   export const EVENT = "redirect";
   export type Path = string;
 }
+
+export namespace GameLoaded {
+  export const EVENT = "game_loaded";
+}

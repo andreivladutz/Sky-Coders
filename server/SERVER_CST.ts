@@ -15,5 +15,18 @@ export default {
   // The cookie set on user login with the user's encrypted db id
   SESSION_COOKIE: {
     ID: "sessId"
+  },
+  EVENTS: {
+    GAME: {
+      INITED: "gameinited"
+    }
+  },
+  ROUTES: {
+    LOGOUT_PARAM: {
+      REASON: "reason"
+    }
+  },
+  GAME_CONFIG: {
+    INITIAL_COINS: 100
   }
 };

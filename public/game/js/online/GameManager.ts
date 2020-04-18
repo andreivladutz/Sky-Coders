@@ -1,7 +1,7 @@
 import Manager from "../managers/Manager";
 import gameConfig from "../system/gameConfig";
 import SocketManager from "./SocketManager";
-import { GameInit } from "../../../common/MessageTypes";
+import { GameInit, GameLoaded } from "../../../common/MessageTypes";
 
 import CST from "../CST";
 
@@ -26,10 +26,42 @@ export default class GameManager extends Manager {
   // Listen for the init event and expect the initial game config
   private listenForInitEvent() {
     this.socketManager.on(GameInit.EVENT, (initConfig: GameInit.Config) => {
+      // If for some reason, this event fires multiple times
+      // and the game is already running, just ignore it
+      if (this.gameInstance) {
+        // But fire the load event because the game is already loaded
+        this.socketManager.emit(GameLoaded.EVENT);
+
+        return;
+      }
+
       ({ seed: this.seed } = initConfig);
 
       this.gameInstance = new Phaser.Game(gameConfig);
+      this.waitForGameLoad();
     });
+  }
+
+  // Wait for Game Load to send the gameloaded event to the server
+  private waitForGameLoad() {
+    // Start a coroutine
+    (async () => {
+      // Wait until the game starts running
+      while (!this.gameInstance.isRunning) {
+        await new Promise(resolve => {
+          setTimeout(resolve, 0);
+        });
+      }
+
+      // Subscribe to the loadcomplete event on the Loading Scene
+      // Once the game loaded successfully, emit an event to the server
+      this.gameInstance.scene.keys[CST.SCENES.LOAD].events.once(
+        CST.EVENTS.LOAD_SCENE.LOAD_COMPLETE,
+        () => {
+          this.socketManager.emit(GameLoaded.EVENT);
+        }
+      );
+    })();
   }
 
   public static getInstance(): GameManager {

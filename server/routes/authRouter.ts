@@ -7,6 +7,7 @@ import User, { UserType } from "../models/User";
 import { redirectToLogin } from "../authentication/authenticateMiddleware";
 import { default as validation } from "../validation/UserValidation";
 import CST from "../SERVER_CST";
+import GamesManager from "../game/GamesManager";
 
 // If debugging is active this will write logs to the console
 const debug = Debug("authRouter");
@@ -38,13 +39,26 @@ function redirectAuthenticatedMw(
 }
 
 function logoutMw(req: express.Request, res: express.Response) {
-  debug(`User ${(req.user as UserType).name} logged out.`);
+  let user = req.user as UserType;
+
+  if (user) {
+    debug(`User ${user.name} logged out.`);
+
+    GamesManager.getInstance().onUserLoggedOut(user.id);
+  }
 
   // Clear the seesion cookie before logging out
   res.clearCookie(CST.SESSION_COOKIE.ID);
   req.logout();
 
-  redirectToLogin(req, res, "You have been logged out!");
+  let logoutMessage = "You have been logged out!",
+    reason: string;
+
+  if ((reason = req.query[CST.ROUTES.LOGOUT_PARAM.REASON])) {
+    logoutMessage += ` Reason: ${reason}`;
+  }
+
+  redirectToLogin(req, res, logoutMessage);
 }
 
 async function registrationMw(req: express.Request, res: express.Response) {
