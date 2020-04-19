@@ -1,11 +1,15 @@
-import { GameInit, GameLoaded } from "../../public/common/MessageTypes";
+import {
+  GameInit,
+  GameLoaded,
+  BuildingPlacement
+} from "../../public/common/MessageTypes";
 import randomstring from "randomstring";
 import { EventEmitter } from "events";
 
 import CST from "../SERVER_CST";
 import GamesManager from "./GamesManager";
 import { UserType } from "../models/User";
-import Island, { IslandType } from "../models/Island";
+import Island, { IslandType, BuildingType } from "../models/Island";
 
 // An instance of a game for a particular user
 export default class GameInstance extends EventEmitter {
@@ -35,17 +39,52 @@ export default class GameInstance extends EventEmitter {
    * A @param reason message can be provided for logging out
    */
   public logout(reason?: string) {
-    GamesManager.getInstance().logoutUser(this.socket, reason);
     this.isLoggedOut = true;
+
+    GamesManager.getInstance()
+      .logoutUser(this.socket, reason)
+      .onUserLoggedOut(this.userDocument.id);
   }
 
   private initListeners() {
     // Event emitted when the game on the client completely loaded
-    this.socket.on(GameLoaded.EVENT, () => {
+    this.socket.once(GameLoaded.EVENT, () => {
       this.isGameInited = true;
 
       this.emit(CST.EVENTS.GAME.INITED);
     });
+
+    // Client player placed a building on the map
+    this.socket.on(
+      BuildingPlacement.REQUEST_EVENT,
+      async (buildingInfo: BuildingType) => {
+        console.log(
+          `User ${this.userDocument.name}, id: ${this.userDocument.id} placed a ${buildingInfo.buildingType} building at (${buildingInfo.position.x}, ${buildingInfo.position.y})`
+        );
+
+        this.userDocument.game.islands[0].buildings.push(buildingInfo);
+
+        try {
+          await this.userDocument.game.islands[0].save();
+        } catch (err) {
+          this.handleDbError(
+            err,
+            "Failed to save island after pushing new building object to island"
+          );
+        }
+
+        let resourcesAfterPlacement: BuildingPlacement.ResourcesAfterPlacement = {
+          coins: this.userDocument.game.resources.coins,
+          // Pass the building position so it can be identified on the client-side
+          buildingPosition: buildingInfo.position
+        };
+
+        this.socket.emit(
+          BuildingPlacement.APPROVE_EVENT,
+          resourcesAfterPlacement
+        );
+      }
+    );
   }
 
   // Fire the initialisation event
@@ -102,7 +141,8 @@ export default class GameInstance extends EventEmitter {
   private async createIsland() {
     let islandDoc = new Island({
       // generate a random 32 length string
-      seed: randomstring.generate()
+      seed: randomstring.generate(),
+      buildings: []
     });
 
     // Save the island document

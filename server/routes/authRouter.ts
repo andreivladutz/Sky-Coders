@@ -43,8 +43,6 @@ function logoutMw(req: express.Request, res: express.Response) {
 
   if (user) {
     debug(`User ${user.name} logged out.`);
-
-    GamesManager.getInstance().onUserLoggedOut(user.id);
   }
 
   // Clear the seesion cookie before logging out

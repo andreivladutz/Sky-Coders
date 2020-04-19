@@ -13,6 +13,7 @@ export default class SocketManager extends Manager {
   public events: EventEmitter = new EventEmitter();
 
   public on: Socket["on"];
+  public once: Socket["once"];
   public off: Socket["off"];
   public emit: Socket["emit"];
   public send: Socket["send"];
@@ -23,9 +24,15 @@ export default class SocketManager extends Manager {
     this.io = socketIoClient();
     this.delegateMethods();
 
-    this.on("connect", () => {
+    // WARNING: THE CONNECT EVENT FIRES MULTIPLE TIME FOR THE CLIENT
+    // ALONG THE LIFETIME OF THE GAME INSTANCE. DUE TO INTERNET CONNECTION
+    // SOCKET CONNECTION TO THE SERVER CAN BE TEMPORARILY LOST. ON RECONNECT, ANOTHER SOCKET
+    // ON THE SERVER-SIDE IS ALLOCATED AND THIS EVENT FIRES AGAIN
+    this.once("connect", () => {
       this.events.emit(CST.IO.EVENTS.CONNECT);
     });
+
+    // this.on("reconnect", () => {});
 
     this.listenToSystemEvents();
   }
@@ -41,6 +48,7 @@ export default class SocketManager extends Manager {
   // Delegate io's methods to this
   private delegateMethods() {
     this.on = this.io.on.bind(this.io);
+    this.once = this.io.once.bind(this.io);
     this.off = this.io.off.bind(this.io);
     this.emit = this.io.emit.bind(this.io);
     this.send = this.io.send.bind(this.io);

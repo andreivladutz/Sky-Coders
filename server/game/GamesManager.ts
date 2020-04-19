@@ -37,18 +37,24 @@ export default class GamesManager {
       this.connectedGames[user.id] = [];
     }
 
+    for (let otherCons of this.connectedGames[user.id]) {
+      if (socket === otherCons.socket) {
+        console.log("IT S THE SAME SOCKET! " + socket.id);
+      }
+    }
+
     let newGameInstance = new GameInstance(socket, user);
     this.connectedGames[user.id].push(newGameInstance);
 
     // Check if the user is already connected from another device / page
     // When the new game completely loads, disconnect the other devices
-    newGameInstance.on(CST.EVENTS.GAME.INITED, () => {
+    newGameInstance.once(CST.EVENTS.GAME.INITED, () => {
       if (newGameInstance.isLoggedOut) {
         return;
       }
 
       let otherGames = this.connectedGames[user.id];
-
+      console.log("Other games length = " + otherGames.length);
       for (let otherDeviceGame of otherGames) {
         if (otherDeviceGame !== newGameInstance) {
           otherDeviceGame.logout("This account connected on another device");
@@ -61,7 +67,8 @@ export default class GamesManager {
    *  A @param reason for logging out can be provided, in which case,
    *  a message will be shown to the user after logging out
    */
-  public logoutUser(socket: SocketIO.Socket, reason?: string) {
+  public logoutUser(socket: SocketIO.Socket, reason?: string): this {
+    console.log("LOGOUT HANDLER");
     let logoutRoute = "/users/logout";
 
     if (reason) {
@@ -69,11 +76,15 @@ export default class GamesManager {
     }
 
     socket.emit(Redirect.EVENT, logoutRoute);
+
+    return this;
   }
 
   // Called from the authentication router /users/logout
   // Remove the game instance when the user logged out
-  public onUserLoggedOut(userId: string) {
+  public onUserLoggedOut(userId: string): this {
+    debug(`User logout cleanup for userid: ${userId}`);
+
     // Discard the logged out users
     this.connectedGames[userId] = this.connectedGames[userId].filter(
       game => !game.isLoggedOut
@@ -83,6 +94,8 @@ export default class GamesManager {
     if (this.connectedGames[userId].length === 0) {
       delete this.connectedGames[userId];
     }
+
+    return this;
   }
 
   private async getUserFromCookie(socket: SocketIO.Socket): Promise<UserType> {

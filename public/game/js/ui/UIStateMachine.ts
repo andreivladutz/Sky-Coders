@@ -6,8 +6,10 @@ import UIScene from "../scenes/UIScene";
 import IsoScene from "../IsoPlugin/IsoScene";
 import BuildMenuUI from "./BuildMenuUI";
 import CST from "../CST";
-import BuildingObject from "../gameObjects/BuildingObject";
 import ActorsManager from "../managers/ActorsManager";
+
+import BuildingsManager from "../managers/BuildingsManager";
+import { BuildNames } from "../../../common/BuildingTypes";
 
 const STATES = CST.STATES;
 
@@ -78,7 +80,7 @@ export default class UIStateMachine {
         this.buildMenuUI.turnOff().then(() => this.mainUI.enable());
       })
       // if the user chooses a building to place
-      .addTransition(STATES.BUILD_PLACING, (buildingName: string) => {
+      .addTransition(STATES.BUILD_PLACING, (buildingName: BuildNames) => {
         // Cancel all actors' movement
         ActorsManager.getInstance().cancelAllMovement();
 
@@ -86,7 +88,7 @@ export default class UIStateMachine {
         this.buildMenuUI.showOkButton();
         // enable placing
         this.buildPlaceUI.enable(
-          new BuildingObject(this.gameScene, buildingName)
+          BuildingsManager.getInstance().create(this.gameScene, buildingName)
         );
       })
       .getMachine()
@@ -110,9 +112,9 @@ export default class UIStateMachine {
       })
       // transition to itself when use chooses another building from the build menu
       // have to change the old building and remove that one
-      .addTransition(CST.STATES.BUILD_PLACING, (buildingName: string) => {
+      .addTransition(CST.STATES.BUILD_PLACING, (buildingName: BuildNames) => {
         this.buildPlaceUI.chooseAnotherBuilding(
-          new BuildingObject(this.gameScene, buildingName)
+          BuildingsManager.getInstance().create(this.gameScene, buildingName)
         );
       })
       .getMachine();

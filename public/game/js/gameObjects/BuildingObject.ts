@@ -5,7 +5,8 @@ import BuildingsManager from "../managers/BuildingsManager";
 import CameraManager from "../managers/CameraManager";
 import MapManager from "../managers/MapManager";
 import IsoScene from "../IsoPlugin/IsoScene";
-import LayersManager from "../managers/LayersManager";
+// import LayersManager from "../managers/LayersManager";
+import BuildingTypes, { BuildNames } from "../../../common/BuildingTypes";
 
 interface Tile {
   x: number;
@@ -13,23 +14,26 @@ interface Tile {
 }
 
 export default class BuildingObject extends IsoSpriteObject {
+  public buildingType: BuildNames;
+  // The last time this building produced resources (were collected)
+  public lastProdTime: number;
+
   // whether this building can be moved
-  movementEnabled: boolean = false;
+  private movementEnabled: boolean = false;
   // whether the building can be placed at current tile positions or not
-  canBePlacedHere: boolean = false;
+  private canBePlacedHere: boolean = false;
 
   /**
    * @param buildingType from CST.BUILDING.TYPES
    */
-  //@ts-ignore
-  constructor(scene: IsoScene, buildingType: string) {
-    const buildManager = BuildingsManager.getInstance();
-
-    // get the details of this specific building => frame, texture and localTiles of the grid
-    let buildingFrame = buildManager.buildingFrames[buildingType],
-      textureKey = buildManager.getTextureKey(),
-      { localTileX, localTileY } = CST.BUILDINGS.CONFIG[buildingType];
-
+  constructor(
+    scene: IsoScene,
+    buildingType: BuildNames,
+    textureKey: string,
+    buildingFrame: string | number,
+    localTileX: number,
+    localTileY: number
+  ) {
     super(
       scene,
       0,
@@ -45,6 +49,14 @@ export default class BuildingObject extends IsoSpriteObject {
       localTileY
     );
 
+    this.buildingType = buildingType;
+
+    this.positionToCenter();
+
+    // this.layersManager.debugLayers(scene);
+  }
+
+  private positionToCenter() {
     // Try to position this building at the center of the screen
     let { x, y } = CameraManager.getInstance().getWorldPointAtCenter();
 
@@ -56,13 +68,11 @@ export default class BuildingObject extends IsoSpriteObject {
     let halfWidthX = this.tileWidthX - this.localTileX,
       halfWidthY = this.tileWidthY - this.localTileY;
 
-    // the tile coords of the screen mid can be out out bounds, clamp them to the bounds
+    // the tile coords of the screen mid can be out out bounds, clamp them to the world bounds
     tileX = Phaser.Math.Clamp(tileX, halfWidthX, mapSize.w - halfWidthX - 1);
     tileY = Phaser.Math.Clamp(tileY, halfWidthY, mapSize.h - halfWidthY - 1);
 
     this.setTilePosition(tileX, tileY);
-
-    // this.layersManager.debugLayers(scene);
   }
 
   public canBePlaced() {
@@ -107,6 +117,12 @@ export default class BuildingObject extends IsoSpriteObject {
     this.addToGridAt(this.tileX, this.tileY);
 
     this.movementEnabled = false;
+
+    // The building can now start producing resources
+    this.lastProdTime = Date.now();
+
+    // Let the buildings manager know a building has been placed
+    BuildingsManager.getInstance().onBuildingPlaced(this);
 
     // the building could be placed
     return true;

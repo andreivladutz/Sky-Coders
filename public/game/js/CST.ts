@@ -154,13 +154,6 @@ export default {
     PREFIX: "Buildings/",
     TYPES: {
       RESIDENTIAL: "residential"
-    },
-    // each building type has a config
-    CONFIG: {
-      ["residential"]: {
-        localTileX: 3,
-        localTileY: 3
-      }
     }
   },
   BUTTONS: {

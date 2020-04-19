@@ -6,6 +6,7 @@ import BuildingsManager from "../managers/BuildingsManager";
 import { MoveUIUtility, MoveUIDirection } from "./UIMovement";
 import UIComponents from "./UIComponentsFactory";
 import BuildPlaceUI from "./BuildPlaceUI";
+import { BuildNames } from "../../../common/BuildingTypes";
 
 const BUILD_MENU = CST.UI.BUILD_MENU;
 
@@ -14,7 +15,7 @@ const BUILD_MENU = CST.UI.BUILD_MENU;
 class SideMenuButton extends ButtonImage<BuildMenuUI> {
   // define the logic for button clicking
   onTap = () => {
-    let buildingNames = Object.values(CST.BUILDINGS.TYPES);
+    let buildingNames = Object.values(BuildNames);
     let stateMachine = UIComponents.getUIStateMachine();
 
     switch (this.btnName) {
@@ -260,7 +261,7 @@ export default class BuildMenuUI extends UIComponent {
   private initBuildingsButtons(sizer: any) {
     const buildingManager = BuildingsManager.getInstance();
 
-    for (let frameName of Object.values(CST.BUILDINGS.TYPES)) {
+    for (let frameName of Object.values(BuildNames)) {
       let buttonImage = new SideMenuButton(
         this.uiScene,
         this,

@@ -1,11 +1,13 @@
 import * as mongoose from "mongoose";
 import { IslandType } from "./Island";
 
+// The Resources interface
+import * as BuildingTypes from "../../public/common/BuildingTypes";
+import Resources = BuildingTypes.Resources;
+
 export interface GameType {
   islands: IslandType[];
-  resources: {
-    coins: number;
-  };
+  resources: Resources;
 }
 
 const ResourceSchema = new mongoose.Schema({
