@@ -1,5 +1,20 @@
 import * as BuildingTypes from "./BuildingTypes";
 
+//  The server doesn't differentiate between a connection and a reconnection
+export namespace Connection {
+  export const CONNECT_EVENT = "first_connect";
+  export const RECONNECT_EVENT = "client_reconnect";
+
+  export const INIT_UIDS_EVENT = "init_uids";
+
+  // These uids are transmitted on first connection from the server
+  // to the client (via the GameInit event). On reconnection, the client sends them back to the sv
+  export interface Uids {
+    socketUid: string;
+    userUid: string;
+  }
+}
+
 // The first message sent by the server to the client for initialising the game
 export namespace GameInit {
   export interface Config {

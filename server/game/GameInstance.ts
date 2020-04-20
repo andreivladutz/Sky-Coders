@@ -11,13 +11,19 @@ import GamesManager from "./GamesManager";
 import { UserType } from "../models/User";
 import Island, { IslandType, BuildingType } from "../models/Island";
 
+import MessageSender from "../utils/MessageSender";
+
 // An instance of a game for a particular user
 export default class GameInstance extends EventEmitter {
   // The user document from the db associated with this game instance
   private userDocument: UserType;
 
-  // The connection to this user
-  public socket: SocketIO.Socket;
+  public get user() {
+    return this.userDocument;
+  }
+
+  // The message sender abstraction over the connection socket to this user
+  public sender: MessageSender;
   // The random seed used by the user's game
   public seed: string;
   // Is the game on the client side completely initialised and loaded
@@ -28,7 +34,7 @@ export default class GameInstance extends EventEmitter {
   constructor(socket: SocketIO.Socket, userDocument: UserType) {
     super();
 
-    this.socket = socket;
+    this.sender = new MessageSender(socket);
     this.userDocument = userDocument;
 
     this.initListeners();
@@ -42,20 +48,32 @@ export default class GameInstance extends EventEmitter {
     this.isLoggedOut = true;
 
     GamesManager.getInstance()
-      .logoutUser(this.socket, reason)
+      .logoutUser(this.sender, reason)
       .onUserLoggedOut(this.userDocument.id);
+  }
+
+  // Replace the socket used for comunicating to this particular user (on socket reconnect)
+  public replaceSocket(newSocket: SocketIO.Socket) {
+    this.sender.replaceSocket(newSocket);
+
+    // Add listeners on the new socket
+    this.initListeners();
   }
 
   private initListeners() {
     // Event emitted when the game on the client completely loaded
-    this.socket.once(GameLoaded.EVENT, () => {
+    this.sender.once(GameLoaded.EVENT, () => {
+      if (this.isGameInited) {
+        return;
+      }
+
       this.isGameInited = true;
 
       this.emit(CST.EVENTS.GAME.INITED);
     });
 
     // Client player placed a building on the map
-    this.socket.on(
+    this.sender.on(
       BuildingPlacement.REQUEST_EVENT,
       async (buildingInfo: BuildingType) => {
         console.log(
@@ -79,7 +97,7 @@ export default class GameInstance extends EventEmitter {
           buildingPosition: buildingInfo.position
         };
 
-        this.socket.emit(
+        this.sender.emit(
           BuildingPlacement.APPROVE_EVENT,
           resourcesAfterPlacement
         );
@@ -105,15 +123,14 @@ export default class GameInstance extends EventEmitter {
       return;
     }
 
-    // TODO: In the future, if more islands get genrated, replace the hardcoded 0
+    // TODO: In the future, if more islands get generated, replace the hardcoded 0
     this.seed = this.userDocument.game.islands[0].seed;
 
     let gameConfig: GameInit.Config = {
       seed: this.seed
     };
 
-    // When the game init event is received, response immediately
-    this.socket.emit(GameInit.EVENT, gameConfig);
+    this.sender.emit(GameInit.EVENT, gameConfig);
   }
 
   // The first time a user connects, they don't have a game subdocument created

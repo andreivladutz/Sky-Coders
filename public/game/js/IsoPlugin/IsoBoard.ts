@@ -325,7 +325,9 @@ export default class IsoBoard {
     let { leftmostX, rightmostX } = this.getExtremesTileCoords();
 
     for (let x = leftmostX; x <= rightmostX; x++) {
-      verticalLines.push(...this.verticalGridLines[x]);
+      if (this.verticalGridLines[x]) {
+        verticalLines.push(...this.verticalGridLines[x]);
+      }
     }
 
     return verticalLines;
@@ -337,7 +339,9 @@ export default class IsoBoard {
     let horizontalLines = [];
 
     for (let y = topmostY; y <= lowermostY; y++) {
-      horizontalLines.push(...this.horizontalGridLines[y]);
+      if (this.horizontalGridLines[y]) {
+        horizontalLines.push(...this.horizontalGridLines[y]);
+      }
     }
 
     return horizontalLines;

@@ -337,7 +337,8 @@ export default {
   // SOCKET.IO CONSTANTS
   IO: {
     EVENTS: {
-      CONNECT: "connect"
+      CONNECT: "connect",
+      RECONNECT: "reconnect"
     }
   },
   // constants imported from the worker cst

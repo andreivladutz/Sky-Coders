@@ -17,21 +17,28 @@ dotenv.config({
 
 const PORT = Number(process.env.PORT) || 8080;
 
-let app = ConfigManager.configureMongoose().configureExpress(express());
-let io = ConfigManager.configureSocketIo(app, PORT);
+(async () => {
+  // Wait for mongoose to connect to the db
+  await ConfigManager.configureMongoose();
 
-// On a new connection, init a new game instance
-io.on("connection", socket =>
-  GamesManager.getInstance().initGameInstance(socket)
-);
+  let app = ConfigManager.configureExpress(express());
+  let io = ConfigManager.configureSocketIo(app, PORT);
 
-app
-  .get(CST.WEB_MANIFEST, (req, res) => {
-    res.sendFile(path.join(__dirname, CST.MANIFEST_FILE));
-  })
-  // the login / register path
-  .use("/users", authRouter)
-  // authenticated game route
-  .use(authenticate, gameRouter);
-// static files that do not require authentication
-//.use("/no_auth", express.static(CST.PUBLIC_FOLDER))
+  // On a new connection, wait to see if it is
+  // a new user connected (or same user on another device/ page),
+  // or a user reconnecting (due to loss of internet connection or smth)
+  io.on("connection", socket => {
+    GamesManager.getInstance().initSocket(socket);
+  });
+
+  app
+    .get(CST.WEB_MANIFEST, (req, res) => {
+      res.sendFile(path.join(__dirname, CST.MANIFEST_FILE));
+    })
+    // the login / register path
+    .use("/users", authRouter)
+    // authenticated game route
+    .use(authenticate, gameRouter);
+  // static files that do not require authentication
+  //.use("/no_auth", express.static(CST.PUBLIC_FOLDER))
+})();

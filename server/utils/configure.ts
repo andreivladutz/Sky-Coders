@@ -12,13 +12,11 @@ import configurePassport from "../authentication/configurePassport";
 import CST from "../SERVER_CST";
 
 export default class ConfigManager {
-  public static configureMongoose(): typeof ConfigManager {
+  public static async configureMongoose() {
     mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
       useUnifiedTopology: true
     });
-
-    return this;
   }
 
   public static configureSocketIo(
