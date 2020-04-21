@@ -1,44 +1,74 @@
 import {
   GameInit,
   GameLoaded,
-  BuildingPlacement
+  BuildingPlacement,
+  Connection
 } from "../../public/common/MessageTypes";
 import randomstring from "randomstring";
 import { EventEmitter } from "events";
-
 import CST from "../SERVER_CST";
 import GamesManager from "./GamesManager";
 import { UserType } from "../models/User";
 import Island, { IslandType, BuildingType } from "../models/Island";
+import BufferMessenger from "../../public/common/MessageHandlers/BufferMessenger";
 
-import MessageSender from "../utils/MessageSender";
+import * as mongoose from "mongoose";
+import Document = mongoose.Document;
+
+import { NamespaceDebugger } from "../utils/debug";
+const debug = new NamespaceDebugger("GameInstance");
 
 // An instance of a game for a particular user
 export default class GameInstance extends EventEmitter {
   // The user document from the db associated with this game instance
   private userDocument: UserType;
-
   public get user() {
     return this.userDocument;
   }
 
-  // The message sender abstraction over the connection socket to this user
-  public sender: MessageSender;
-  // The random seed used by the user's game
-  public seed: string;
-  // Is the game on the client side completely initialised and loaded
-  public isGameInited = false;
+  public get currIslandDocument() {
+    return this.userDocument?.game?.islands[this.currentIsland];
+  }
+
+  // The messages with buffering abstraction over the connection socket to this user
+  public sender: BufferMessenger;
+
+  private updateInterval: any;
+
   // The gamesManager has to know when this instance has logged out
   public isLoggedOut = false;
+  // Is the game on the client side completely initialised and loaded
+  private _isGameInited = false;
+  public get isGameInited() {
+    return this._isGameInited;
+  }
+  // The random seed used by the user's game
+  public seed: string;
+  // TODO: In the future, if more islands get generated, replace the hardcoded 0
+  private currentIsland = 0;
 
-  constructor(socket: SocketIO.Socket, userDocument: UserType) {
+  constructor(
+    socket: SocketIO.Socket,
+    userDocument: UserType,
+    isUserReconnect = false
+  ) {
     super();
 
-    this.sender = new MessageSender(socket);
+    this.sender = new BufferMessenger(socket);
     this.userDocument = userDocument;
+
+    // If the user is just reconnecting, then the game is already
+    // inited on the client side
+    this._isGameInited = isUserReconnect;
 
     this.initListeners();
     this.initClient();
+
+    // Update this game instance on an interval
+    this.updateInterval = setInterval(
+      this.update.bind(this),
+      CST.GAME_INSTANCE.UPDATE_INTERVAL
+    );
   }
 
   /** Logout this current user instance
@@ -50,6 +80,9 @@ export default class GameInstance extends EventEmitter {
     GamesManager.getInstance()
       .logoutUser(this.sender, reason)
       .onUserLoggedOut(this.userDocument.id);
+
+    // Stop the update interval
+    clearInterval(this.updateInterval);
   }
 
   // Replace the socket used for comunicating to this particular user (on socket reconnect)
@@ -63,33 +96,28 @@ export default class GameInstance extends EventEmitter {
   private initListeners() {
     // Event emitted when the game on the client completely loaded
     this.sender.once(GameLoaded.EVENT, () => {
-      if (this.isGameInited) {
+      if (this._isGameInited) {
         return;
       }
 
-      this.isGameInited = true;
-
+      this._isGameInited = true;
       this.emit(CST.EVENTS.GAME.INITED);
+    });
+
+    this.sender.socket.on("disconnect", () => {
+      this.saveDocumentsToDb();
     });
 
     // Client player placed a building on the map
     this.sender.on(
       BuildingPlacement.REQUEST_EVENT,
       async (buildingInfo: BuildingType) => {
-        console.log(
-          `User ${this.userDocument.name}, id: ${this.userDocument.id} placed a ${buildingInfo.buildingType} building at (${buildingInfo.position.x}, ${buildingInfo.position.y})`
+        debug.userHas(
+          this.userDocument,
+          `placed a ${buildingInfo.buildingType} building at (${buildingInfo.position.x}, ${buildingInfo.position.y})`
         );
 
-        this.userDocument.game.islands[0].buildings.push(buildingInfo);
-
-        try {
-          await this.userDocument.game.islands[0].save();
-        } catch (err) {
-          this.handleDbError(
-            err,
-            "Failed to save island after pushing new building object to island"
-          );
-        }
+        this.currIslandDocument.buildings.push(buildingInfo);
 
         let resourcesAfterPlacement: BuildingPlacement.ResourcesAfterPlacement = {
           coins: this.userDocument.game.resources.coins,
@@ -106,31 +134,39 @@ export default class GameInstance extends EventEmitter {
   }
 
   // Fire the initialisation event
+  // ON SERVER RESTART, this is still called
+  // even for clients that were ALREADY connected
   private async initClient() {
-    if (!this.userDocument.game) {
+    if (!this.userDocument.game || !this.userDocument.game.islands.length) {
       await this.createGameSubdoc();
     }
 
-    try {
-      // Join the islands on the document
-      await this.userDocument.populate("game.islands").execPopulate();
-    } catch (err) {
-      this.handleDbError(
-        err,
-        "Failed populating islands path on user document in gameInstance"
-      );
-
+    if (!(await this.populateIslandsPath())) {
       return;
     }
 
-    // TODO: In the future, if more islands get generated, replace the hardcoded 0
-    this.seed = this.userDocument.game.islands[0].seed;
+    // This method is being called on client reconnection
+    // after a sv restart. No need to reinit the client
+    if (this._isGameInited) {
+      return;
+    }
 
+    this.seed = this.currIslandDocument.seed;
+
+    // Init the game on the client side by sending the intial cfg
     let gameConfig: GameInit.Config = {
       seed: this.seed
     };
 
     this.sender.emit(GameInit.EVENT, gameConfig);
+
+    // Send the uids used to identify the client
+    let uids: Connection.Uids = {
+      socketUid: this.sender.socket.id,
+      userUid: this.userDocument.id
+    };
+
+    this.sender.emit(Connection.INIT_UIDS_EVENT, uids);
   }
 
   // The first time a user connects, they don't have a game subdocument created
@@ -141,15 +177,6 @@ export default class GameInstance extends EventEmitter {
       },
       islands: []
     };
-
-    try {
-      await this.userDocument.save();
-    } catch (err) {
-      this.handleDbError(
-        err,
-        "Failed saving game subdocument on user document in gameInstance"
-      );
-    }
 
     await this.createIsland();
   }
@@ -162,22 +189,75 @@ export default class GameInstance extends EventEmitter {
       buildings: []
     });
 
+    // Save the new island document so it can be found on the next join
+    await this.saveDbDoc(
+      islandDoc,
+      "Failed saving generated island in gameInstance"
+    );
+
+    this.userDocument.game.islands.push(islandDoc.id);
+  }
+
+  // Update the game instance
+  // * save the user doc and the island
+  private update() {
+    // If the socket is currently disconnected, don't update
+    if (this.sender.socket.disconnected) {
+      return;
+    }
+
+    this.saveDocumentsToDb();
+  }
+
+  // Save the user document and island
+  private async saveDocumentsToDb() {
     // Save the island document
+    await this.saveCurrentIslandDoc();
+    // Save the user document
+    await this.saveUserDoc();
+
+    debug.userHas(this.userDocument, "saved progress to db");
+  }
+
+  // Retrieve all islands from the db for this user using mongoose(it executes a join)
+  private async populateIslandsPath() {
     try {
-      await islandDoc.save();
+      // Join the islands on the document
+      await this.userDocument.populate("game.islands").execPopulate();
     } catch (err) {
       this.handleDbError(
         err,
-        "Failed saving generated island on user document in gameInstance"
+        "Failed populating islands path on user document in gameInstance"
       );
+
+      return false;
     }
 
-    this.userDocument.game.islands.push(islandDoc.id);
-    // After pushing the island's id on it, save the user document
+    return true;
+  }
+
+  // Save the current islandDocument to the db
+  private async saveCurrentIslandDoc() {
+    await this.saveDbDoc(
+      this.currIslandDocument,
+      "Failed saving island document in gameInstance"
+    );
+  }
+
+  // Save the userDocument to the db
+  private async saveUserDoc() {
+    await this.saveDbDoc(
+      this.userDocument,
+      "Failed to save user document in gameInstance"
+    );
+  }
+
+  // General save doc with error handling
+  private async saveDbDoc(doc: Document, errMsg: string) {
     try {
-      await this.userDocument.save();
+      await doc.save();
     } catch (err) {
-      this.handleDbError(err, "Failed to save user document in gameInstance");
+      this.handleDbError(err, errMsg);
     }
   }
 

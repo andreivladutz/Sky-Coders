@@ -1,39 +1,62 @@
+import ClientSocketIo from "socket.io-client";
+
 import { Redirect, Connection } from "../../../common/MessageTypes";
-import MessageReceiver from "./MessageReceiver";
+import BufferMessenger from "../../../common/MessageHandlers/BufferMessenger";
+import Manager from "../managers/Manager";
 import CST from "../CST";
 
 import EventEmitter = Phaser.Events.EventEmitter;
 
-export default class SocketManager extends MessageReceiver {
+export default class SocketManager extends Manager {
+  /** Copy the behaviour by delegating the methods from @property messenger BufferMessenger instance */
+  public on: BufferMessenger["on"];
+  public once: BufferMessenger["once"];
+  public emit: BufferMessenger["emit"];
+
   // Uids used to identify the client on the server-side
   private userUid: string;
   private socketUid: string;
-
+  // Abstraction over the socket connection that buffers messages
+  // Until they get confirmed as received
+  private messenger: BufferMessenger;
   // the eventEmitter of this class! not the underlying socket.io
   public events: EventEmitter = new EventEmitter();
 
   private constructor() {
     super();
 
+    this.messenger = new BufferMessenger(ClientSocketIo());
+    this.delegateMethods();
+
     // WARNING: THE CONNECT EVENT FIRES MULTIPLE TIME FOR THE CLIENT
     // ALONG THE LIFETIME OF THE GAME INSTANCE. DUE TO INTERNET CONNECTION
     // SOCKET CONNECTION TO THE SERVER CAN BE TEMPORARILY LOST. ON RECONNECT, ANOTHER SOCKET
     // ON THE SERVER-SIDE IS ALLOCATED AND THIS EVENT FIRES AGAIN
-    this.once("connect", () => {
+    this.messenger.socket.once("connect", () => {
       this.events.emit(CST.IO.EVENTS.CONNECT);
 
       // Let the server know this was the first connection
-      this.emit(Connection.CONNECT_EVENT);
+      this.messenger.socket.emit(Connection.CONNECT_EVENT);
+    });
+
+    this.messenger.socket.on("disconnect", () => {
+      console.log("We have disconnected from the server");
     });
 
     // This socket reconnected to the server
-    this.on("reconnect", () => {
+    // As this event is listened to on a socket directly, don't use the messenger
+    this.messenger.socket.on("reconnect", () => {
       let uids: Connection.Uids = {
         userUid: this.userUid,
         socketUid: this.socketUid
       };
 
-      this.emit(Connection.RECONNECT_EVENT, uids);
+      this.messenger.socket.emit(Connection.RECONNECT_EVENT, uids, () => {
+        console.log("Reconnection acknowledged by the server");
+
+        // Resend all lost messages
+        this.messenger.resendMessages();
+      });
     });
 
     this.listenToSystemEvents();
@@ -51,6 +74,13 @@ export default class SocketManager extends MessageReceiver {
       this.userUid = uids.userUid;
       this.socketUid = uids.socketUid;
     });
+  }
+
+  // Delegate io's methods to this
+  private delegateMethods() {
+    this.emit = this.messenger.emit.bind(this.messenger);
+    this.on = this.messenger.on.bind(this.messenger);
+    this.once = this.messenger.once.bind(this.messenger);
   }
 
   public static getInstance(): SocketManager {

@@ -50,7 +50,7 @@ function logoutMw(req: express.Request, res: express.Response) {
   req.logout();
 
   let logoutMessage = "You have been logged out!",
-    reason: string;
+    reason;
 
   if ((reason = req.query[CST.ROUTES.LOGOUT_PARAM.REASON])) {
     logoutMessage += ` Reason: ${reason}`;

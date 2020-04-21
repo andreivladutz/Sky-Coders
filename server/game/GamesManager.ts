@@ -6,7 +6,7 @@ import { Redirect, Connection } from "../../public/common/MessageTypes";
 import CST from "../SERVER_CST";
 
 import { NamespaceDebugger } from "../utils/debug";
-import MessageSender from "../utils/MessageSender";
+import MessageSender from "../../public/common/MessageHandlers/MessageSender";
 const debug = new NamespaceDebugger("GamesManager");
 
 // Singleton manager of the game instances
@@ -29,8 +29,15 @@ export default class GamesManager {
   public initSocket(socket: SocketIO.Socket) {
     socket.on(Connection.CONNECT_EVENT, () => this.initGameInstance(socket));
 
-    socket.on(Connection.RECONNECT_EVENT, (uids: Connection.Uids) =>
-      this.reconnectClient(socket, uids)
+    socket.on(
+      Connection.RECONNECT_EVENT,
+      async (uids: Connection.Uids, ack: () => void) => {
+        let reconnectionSuccess = await this.reconnectClient(socket, uids);
+
+        if (reconnectionSuccess) {
+          ack();
+        }
+      }
     );
   }
 
@@ -39,19 +46,20 @@ export default class GamesManager {
    * @param socket The socket emitting the reconnect event
    * @param uids socket and user ids used to identify the gameInstance
    */
-  public async reconnectClient(socket: SocketIO.Socket, uids: Connection.Uids) {
+  public async reconnectClient(
+    socket: SocketIO.Socket,
+    uids: Connection.Uids
+  ): Promise<boolean> {
     // Reconnection due to server restart
     if (
       !this.connectedGames[uids.userUid] ||
       !this.connectedGames[uids.userUid][uids.socketUid]
     ) {
-      await this.reconnectOnServerRestart(socket, uids);
-
-      return;
+      return await this.reconnectOnServerRestart(socket, uids);
     }
 
     // This user already has a game instance associated
-    this.replaceSocketOnReconnect(socket, uids);
+    return this.replaceSocketOnReconnect(socket, uids);
   }
 
   public async initGameInstance(socket: SocketIO.Socket) {
@@ -71,13 +79,6 @@ export default class GamesManager {
 
     let newGameInstance = new GameInstance(socket, user);
     this.connectedGames[user.id][socket.id] = newGameInstance;
-
-    // Send the uids used to identify the client
-    let uids: Connection.Uids = {
-      socketUid: socket.id,
-      userUid: user.id
-    };
-    socket.emit(Connection.INIT_UIDS_EVENT, uids);
 
     // Check if the user is already connected from another device / page
     // When the new game completely loads, disconnect the other devices
@@ -119,6 +120,10 @@ export default class GamesManager {
   // Called from the authentication router /users/logout
   // Remove the game instance when the user logged out
   public onUserLoggedOut(userId: string): this {
+    if (!userId || !this.connectedGames[userId]) {
+      return;
+    }
+
     debug.debug(`User logout cleanup for userid: ${userId}`);
 
     // Discard the logged out users
@@ -142,7 +147,7 @@ export default class GamesManager {
   private async reconnectOnServerRestart(
     socket: SocketIO.Socket,
     uids: Connection.Uids
-  ) {
+  ): Promise<boolean> {
     // If we have to logout the user
     let logoutReason = "Your session expired. Please login again!";
 
@@ -154,10 +159,10 @@ export default class GamesManager {
     let user = await this.getUserFromCookie(socket);
 
     // If somehow the user id got altered (possibly manually by the user), logout the user
-    if (user.id !== uids.userUid) {
+    if (!user || user.id !== uids.userUid) {
       this.logoutUser(socket, logoutReason);
 
-      return;
+      return false;
     }
 
     // Basically a new game instance with a new socket is created
@@ -166,13 +171,16 @@ export default class GamesManager {
 
     this.connectedGames[uids.userUid][uids.socketUid] = new GameInstance(
       socket,
-      user
+      user,
+      true
     );
 
     debug.userHas(
       user,
       `reconnected with socket ${socket.id} due to server restart`
     );
+
+    return true;
   }
 
   // Called in the reconnectClient() method
@@ -181,7 +189,7 @@ export default class GamesManager {
   private replaceSocketOnReconnect(
     socket: SocketIO.Socket,
     uids: Connection.Uids
-  ) {
+  ): boolean {
     let user: UserType;
     // If we have to logout the user
     let logoutReason = "Your session expired. Please login again!";
@@ -194,12 +202,15 @@ export default class GamesManager {
     if (user.id !== uids.userUid) {
       gameInstance.logout(logoutReason);
 
-      return;
+      return false;
     }
 
     gameInstance.replaceSocket(socket);
 
+    this.addDisconnectListener(user, socket);
     debug.userHas(user, `reconnected with socket ${socket.id}`);
+
+    return true;
   }
 
   private async getUserFromCookie(socket: SocketIO.Socket): Promise<UserType> {

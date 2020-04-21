@@ -28,5 +28,9 @@ export default {
   },
   GAME_CONFIG: {
     INITIAL_COINS: 100
+  },
+  GAME_INSTANCE: {
+    // Update the game instance and save to db every 20s
+    UPDATE_INTERVAL: 20000
   }
 };

@@ -1,4 +1,5 @@
-import specialToken from "../../public/common/specialToken";
+import { providedAckToken, customAckToken } from "./messengersTokens";
+import SocketInterface from "./CommonSocket";
 
 interface Message {
   eventName: string;
@@ -10,24 +11,27 @@ type AcknowledgeFunction = (...args: any[]) => void;
 // Abstraction over the socket class in socket.io
 // Which buffers unsent messages and guarantees message
 // delivery as long as the client will reconnect (and the old socket is replaced with a new one)
-export default class MessageSender {
+export default abstract class MessageSender {
   // Socket associated with a user, will be replaced as user looses connection and reconnects
-  private socket: SocketIO.Socket;
+  public socket: SocketInterface;
   // All unconfirmed messages are buffered by an uid until they get acknowledged
-  private messagesUnconfirmed: { [eventUid: string]: Message } = {};
-
-  constructor(socket: SocketIO.Socket) {
-    this.socket = socket;
-  }
+  protected messagesUnconfirmed: { [eventUid: string]: Message };
 
   /**
    * On old socket disconnect and reconnection, replace the underlying socket
    * Also all unconfirmed events (messages sent) are re-emited with the new socket
    * @param newSocket the new socket to replace the old one
    */
-  public replaceSocket(newSocket: SocketIO.Socket): this {
+  public replaceSocket(newSocket: SocketInterface): this {
     this.socket = newSocket;
 
+    return this.resendMessages();
+  }
+
+  /**
+   * Resend all buffered messages
+   */
+  public resendMessages(): this {
     for (let eventUid of Object.keys(this.messagesUnconfirmed)) {
       let message = this.messagesUnconfirmed[eventUid];
 
@@ -89,14 +93,18 @@ export default class MessageSender {
       args = args.filter((val, idx) => idx < args.length - 1);
     }
 
-    let customAck = this.customAck(eventUid, providedAck);
+    let customAck = this.customAck(eventUid, providedAck),
+      specialToken: string;
+
+    if (providedAck) {
+      specialToken = providedAckToken;
+    } else {
+      specialToken = customAckToken;
+    }
 
     // If an ack is provided to emit() then send a special token, so the client knows that
-    if (providedAck) {
-      this.socket.emit(event, ...args, specialToken, customAck);
-    } else {
-      this.socket.emit(event, ...args, customAck);
-    }
+    // Otherwise, the normal token is used
+    this.socket.emit(event, ...args, specialToken, customAck);
   }
 
   /**
@@ -115,27 +123,27 @@ export default class MessageSender {
     };
   }
 
-  public on(event: string, listener: (...args: any[]) => void): this {
-    this.socket.on(event, listener);
+  // public on(event: string, listener: (...args: any[]) => void): this {
+  //   this.socket.on(event, listener);
 
-    return this;
-  }
+  //   return this;
+  // }
 
-  public once(event: string, listener: (...args: any[]) => void): this {
-    this.socket.once(event, listener);
+  // public once(event: string, listener: (...args: any[]) => void): this {
+  //   this.socket.once(event, listener);
 
-    return this;
-  }
+  //   return this;
+  // }
 
-  public off(event: string, listener: (...args: any[]) => void): this {
-    this.socket.off(event, listener);
+  // public off(event: string, listener: (...args: any[]) => void): this {
+  //   this.socket.off(event, listener);
 
-    return this;
-  }
+  //   return this;
+  // }
 
-  public removeAllListeners(event?: string): this {
-    this.socket.removeAllListeners(event);
+  // public removeAllListeners(event?: string): this {
+  //   this.socket.removeAllListeners(event);
 
-    return this;
-  }
+  //   return this;
+  // }
 }
