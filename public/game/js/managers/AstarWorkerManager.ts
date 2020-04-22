@@ -7,7 +7,6 @@ import { TileXY } from "../IsoPlugin/IsoBoard";
 const WK_CST = CST.WORKER;
 
 // TODO: check browser worker compatibility
-const Worker = globalThis.Worker;
 
 interface WorkerMapConfig {
   mapWidth: number;
@@ -28,7 +27,7 @@ export default class AstarWorkerManager extends Manager {
   // TODO: each type of actor will have its own worker
   astarWorkers: {
     // the key is the actor key, the value is the worker handling the astar for this object
-    [key: string]: any;
+    [key: string]: Worker;
   } = {};
 
   // whether the workers have been inited by the actors with their particular details

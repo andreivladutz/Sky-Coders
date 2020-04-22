@@ -1,6 +1,7 @@
 import { BuildingPlacement } from "../../../common/MessageTypes";
 import SocketManager from "./SocketManager";
 import BuildingsManager from "../managers/BuildingsManager";
+import IsoScene from "../IsoPlugin/IsoScene";
 
 /**
  * When placing a building, the server takes the final decisions
@@ -9,9 +10,30 @@ import BuildingsManager from "../managers/BuildingsManager";
  */
 export default class BuildingsMessenger {
   private socketManager: SocketManager;
+  private buildsManager: BuildingsManager;
+
+  // Keep the buildings until they get fetched by the mapManager
+  private _initialBuildings: BuildingPlacement.DbBuilding[];
+  public set initialBuildings(buildings: BuildingPlacement.DbBuilding[]) {
+    // Initial building can be set only once (by the gameManager)
+    if (this._initialBuildings === null) {
+      return;
+    }
+
+    this._initialBuildings = buildings;
+  }
+  public get initialBuildings() {
+    let buildings = this._initialBuildings;
+
+    delete this._initialBuildings;
+    this._initialBuildings = null;
+
+    return buildings;
+  }
 
   constructor(socketManager: SocketManager) {
     this.socketManager = socketManager;
+    this.buildsManager = BuildingsManager.getInstance();
 
     this.registerEventListening();
   }
@@ -36,18 +58,12 @@ export default class BuildingsMessenger {
     responseEvent: string,
     resourcesStatus: BuildingPlacement.ResourcesAfterPlacement
   ) {
-    console.log(
-      `Server sent a ${responseEvent} event. Resource status ${resourcesStatus}`
-    );
-
-    let buildsManager = BuildingsManager.getInstance();
-
     switch (responseEvent) {
       case BuildingPlacement.APPROVE_EVENT:
-        buildsManager.onPlacementAllowed(resourcesStatus);
+        this.buildsManager.onPlacementAllowed(resourcesStatus);
         break;
       case BuildingPlacement.DENY_EVENT:
-        buildsManager.onPlacementDenied(resourcesStatus);
+        this.buildsManager.onPlacementDenied(resourcesStatus);
         break;
     }
   }

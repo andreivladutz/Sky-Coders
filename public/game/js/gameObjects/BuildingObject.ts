@@ -32,12 +32,15 @@ export default class BuildingObject extends IsoSpriteObject {
     textureKey: string,
     buildingFrame: string | number,
     localTileX: number,
-    localTileY: number
+    localTileY: number,
+    // Optionally, specify the tile coords of this building
+    tileX?: number,
+    tileY?: number
   ) {
     super(
       scene,
-      0,
-      0,
+      tileX ?? 0,
+      tileY ?? 0,
       0,
       CST.LAYERS.OBJ_ID.BUILDING,
       textureKey,
@@ -51,7 +54,9 @@ export default class BuildingObject extends IsoSpriteObject {
 
     this.buildingType = buildingType;
 
-    this.positionToCenter();
+    if (typeof tileX === "undefined") {
+      this.positionToCenter();
+    }
 
     // this.layersManager.debugLayers(scene);
   }
@@ -100,10 +105,14 @@ export default class BuildingObject extends IsoSpriteObject {
     return this.moveBuilding(deltaX, deltaY);
   }
 
-  // returns whether the building can be placed or not
-  // if it cannot be placed, it will be REMOVED permanently
-  // and if it can be, then it also places it in the spot it is in
-  placeBuilding(): boolean {
+  /**
+   * returns whether the building can be placed or not
+   * if it cannot be placed, it will be REMOVED permanently
+   * and if it can be, then it also places it in the spot it is in
+   *
+   * @param emitPlacingToServer whether the building placement should be emited to the server @default true
+   */
+  placeBuilding(emitPlacingToServer = true): boolean {
     if (!this.canBePlacedHere) {
       this.removeBuilding();
 
@@ -121,8 +130,10 @@ export default class BuildingObject extends IsoSpriteObject {
     // The building can now start producing resources
     this.lastProdTime = Date.now();
 
-    // Let the buildings manager know a building has been placed
-    BuildingsManager.getInstance().onBuildingPlaced(this);
+    if (emitPlacingToServer) {
+      // Let the buildings manager know a building has been placed
+      BuildingsManager.getInstance().onBuildingPlaced(this);
+    }
 
     // the building could be placed
     return true;

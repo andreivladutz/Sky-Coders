@@ -1,3 +1,5 @@
+import COMMON_CST from "../public/common/CommonCST";
+
 export default {
   PUBLIC_FOLDER: "./public",
   NO_AUTH_FOLDER: "./public/no_auth",
@@ -23,14 +25,19 @@ export default {
   },
   ROUTES: {
     LOGOUT_PARAM: {
-      REASON: "reason"
+      REASON: "reason",
+      // User gets kicked if he tries to connect on
+      // multiple pages / devices
+      KICK: "kick"
     }
   },
   GAME_CONFIG: {
-    INITIAL_COINS: 100
+    INITIAL_COINS: 90000000
   },
   GAME_INSTANCE: {
     // Update the game instance and save to db every 20s
     UPDATE_INTERVAL: 20000
-  }
+  },
+  // Common constants between the client and the server
+  COMMON_CST
 };

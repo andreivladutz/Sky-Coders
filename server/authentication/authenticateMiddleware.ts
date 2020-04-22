@@ -6,7 +6,9 @@ export function redirectToLogin(
   req: express.Request,
   res: express.Response,
   flashMsg?: string,
-  succesMessage: boolean = true
+  succesMessage: boolean = true,
+  // User is being kicked, i.e. not logged out for real
+  userIsKicked: boolean = false
 ) {
   if (flashMsg) {
     if (succesMessage) {
@@ -16,7 +18,13 @@ export function redirectToLogin(
     }
   }
 
-  res.redirect("/users/login");
+  let loginRoute = "/users/login";
+
+  if (userIsKicked) {
+    loginRoute += `?${CST.ROUTES.LOGOUT_PARAM.KICK}=true`;
+  }
+
+  res.redirect(loginRoute);
 }
 
 export default function authenticate(

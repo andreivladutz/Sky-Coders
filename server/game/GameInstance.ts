@@ -1,7 +1,6 @@
 import {
   GameInit,
   GameLoaded,
-  BuildingPlacement,
   Connection
 } from "../../public/common/MessageTypes";
 import randomstring from "randomstring";
@@ -9,8 +8,9 @@ import { EventEmitter } from "events";
 import CST from "../SERVER_CST";
 import GamesManager from "./GamesManager";
 import { UserType } from "../models/User";
-import Island, { IslandType, BuildingType } from "../models/Island";
+import Island, { IslandType } from "../models/Island";
 import BufferMessenger from "../../public/common/MessageHandlers/BufferMessenger";
+import BuildingsManager from "./BuildingsManager";
 
 import * as mongoose from "mongoose";
 import Document = mongoose.Document;
@@ -32,8 +32,12 @@ export default class GameInstance extends EventEmitter {
 
   // The messages with buffering abstraction over the connection socket to this user
   public sender: BufferMessenger;
-
+  // The manager handling building related logic
+  private buildingsManger: BuildingsManager;
   private updateInterval: any;
+  // After a timeout time of being disconnected,
+  // Declare the user logged out and clear the memory
+  private logoutTimeout: any;
 
   // The gamesManager has to know when this instance has logged out
   public isLoggedOut = false;
@@ -54,6 +58,8 @@ export default class GameInstance extends EventEmitter {
   ) {
     super();
 
+    this.buildingsManger = new BuildingsManager(this);
+
     this.sender = new BufferMessenger(socket);
     this.userDocument = userDocument;
 
@@ -72,13 +78,17 @@ export default class GameInstance extends EventEmitter {
   }
 
   /** Logout this current user instance
-   * A @param reason message can be provided for logging out
+   * @param reason message can be provided for logging out
+   * @param isKicked the user is being kicked for connecting on other devices / pages
+   * @default false
    */
-  public logout(reason?: string) {
+  public logout(reason?: string, isKicked = false) {
     this.isLoggedOut = true;
+    // Remove all listeners to avoid memory leaks
+    this.removeListeners();
 
     GamesManager.getInstance()
-      .logoutUser(this.sender, reason)
+      .logoutUser(this.sender, reason, isKicked)
       .onUserLoggedOut(this.userDocument.id);
 
     // Stop the update interval
@@ -87,10 +97,22 @@ export default class GameInstance extends EventEmitter {
 
   // Replace the socket used for comunicating to this particular user (on socket reconnect)
   public replaceSocket(newSocket: SocketIO.Socket) {
+    // Remove old listeners before replacing the socket
+    this.removeListeners();
+
     this.sender.replaceSocket(newSocket);
 
     // Add listeners on the new socket
     this.initListeners();
+
+    // If the user reconnected in time, cancel the logout timeout
+    clearTimeout(this.logoutTimeout);
+    this.logoutTimeout = null;
+  }
+
+  // Remove listeners from socket to make sure there aren't memory leaks
+  private removeListeners() {
+    this.sender.socket.removeAllListeners();
   }
 
   private initListeners() {
@@ -105,32 +127,22 @@ export default class GameInstance extends EventEmitter {
     });
 
     this.sender.socket.on("disconnect", () => {
+      // Save everything to the db, in case the user
+      // never connects again and has to be logged out
       this.saveDocumentsToDb();
+
+      if (this.logoutTimeout) {
+        return;
+      }
+
+      // After disconnecting start a logout timeout
+      this.logoutTimeout = setTimeout(
+        () => this.logout(),
+        CST.COMMON_CST.CONNECTION.LOGOUT_TIMEOUT
+      );
     });
 
-    // Client player placed a building on the map
-    this.sender.on(
-      BuildingPlacement.REQUEST_EVENT,
-      async (buildingInfo: BuildingType) => {
-        debug.userHas(
-          this.userDocument,
-          `placed a ${buildingInfo.buildingType} building at (${buildingInfo.position.x}, ${buildingInfo.position.y})`
-        );
-
-        this.currIslandDocument.buildings.push(buildingInfo);
-
-        let resourcesAfterPlacement: BuildingPlacement.ResourcesAfterPlacement = {
-          coins: this.userDocument.game.resources.coins,
-          // Pass the building position so it can be identified on the client-side
-          buildingPosition: buildingInfo.position
-        };
-
-        this.sender.emit(
-          BuildingPlacement.APPROVE_EVENT,
-          resourcesAfterPlacement
-        );
-      }
-    );
+    this.buildingsManger.initListeners();
   }
 
   // Fire the initialisation event
@@ -151,11 +163,19 @@ export default class GameInstance extends EventEmitter {
       return;
     }
 
+    // Internal errors loss of island object
+    if (!this.currIslandDocument) {
+      this.userDocument.game = null;
+
+      this.initClient();
+    }
+
     this.seed = this.currIslandDocument.seed;
 
     // Init the game on the client side by sending the intial cfg
     let gameConfig: GameInit.Config = {
-      seed: this.seed
+      seed: this.seed,
+      buildings: this.currIslandDocument.buildings
     };
 
     this.sender.emit(GameInit.EVENT, gameConfig);
@@ -216,7 +236,7 @@ export default class GameInstance extends EventEmitter {
     // Save the user document
     await this.saveUserDoc();
 
-    debug.userHas(this.userDocument, "saved progress to db");
+    // debug.userHas(this.userDocument, "saved progress to db");
   }
 
   // Retrieve all islands from the db for this user using mongoose(it executes a join)

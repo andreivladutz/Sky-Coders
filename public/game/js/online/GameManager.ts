@@ -5,6 +5,7 @@ import { GameInit, GameLoaded } from "../../../common/MessageTypes";
 
 import CST from "../CST";
 import BuildingsMessenger from "./BuildingsMessenger";
+import { IsoScene } from "../IsoPlugin/IsoPlugin";
 
 export default class GameManager extends Manager {
   private gameInstance: Phaser.Game;
@@ -47,15 +48,17 @@ export default class GameManager extends Manager {
 
       ({ seed: this.seed } = initConfig);
 
+      this.messengers.buildings.initialBuildings = initConfig.buildings;
       this.gameInstance = new Phaser.Game(gameConfig);
+
       this.waitForGameLoad();
     });
   }
 
   // Wait for Game Load to send the gameloaded event to the server
-  private waitForGameLoad() {
+  private waitForGameLoad(): Promise<IsoScene> {
     // Start a coroutine
-    (async () => {
+    return (async () => {
       // Wait until the game starts running
       while (!this.gameInstance.isRunning) {
         await new Promise(resolve => {
@@ -63,14 +66,18 @@ export default class GameManager extends Manager {
         });
       }
 
-      // Subscribe to the loadcomplete event on the Loading Scene
-      // Once the game loaded successfully, emit an event to the server
-      this.gameInstance.scene.keys[CST.SCENES.LOAD].events.once(
-        CST.EVENTS.LOAD_SCENE.LOAD_COMPLETE,
-        () => {
-          this.socketManager.emit(GameLoaded.EVENT);
-        }
-      );
+      return new Promise((resolve: (value: IsoScene) => void) => {
+        // Subscribe to the loadcomplete event on the Loading Scene
+        // Once the game loaded successfully, emit an event to the server
+        this.gameInstance.scene.keys[CST.SCENES.LOAD].events.once(
+          CST.EVENTS.LOAD_SCENE.LOAD_COMPLETE,
+          (gameScene: IsoScene) => {
+            this.socketManager.emit(GameLoaded.EVENT);
+
+            resolve(gameScene);
+          }
+        );
+      });
     })();
   }
 

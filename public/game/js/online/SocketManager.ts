@@ -22,6 +22,9 @@ export default class SocketManager extends Manager {
   // the eventEmitter of this class! not the underlying socket.io
   public events: EventEmitter = new EventEmitter();
 
+  // After a timeout period of being disconnected, log out completely
+  private logoutTimeout: any;
+
   private constructor() {
     super();
 
@@ -39,10 +42,6 @@ export default class SocketManager extends Manager {
       this.messenger.socket.emit(Connection.CONNECT_EVENT);
     });
 
-    this.messenger.socket.on("disconnect", () => {
-      console.log("We have disconnected from the server");
-    });
-
     // This socket reconnected to the server
     // As this event is listened to on a socket directly, don't use the messenger
     this.messenger.socket.on("reconnect", () => {
@@ -50,6 +49,9 @@ export default class SocketManager extends Manager {
         userUid: this.userUid,
         socketUid: this.socketUid
       };
+
+      // On reconnecting in time, cancel the logout timeout
+      clearTimeout(this.logoutTimeout);
 
       this.messenger.socket.emit(Connection.RECONNECT_EVENT, uids, () => {
         console.log("Reconnection acknowledged by the server");
@@ -66,7 +68,7 @@ export default class SocketManager extends Manager {
   private listenToSystemEvents() {
     // Redirect the client to the given path
     this.on(Redirect.EVENT, (newPath: Redirect.Path) => {
-      globalThis.location.href = newPath;
+      this.redirectClient(newPath);
     });
 
     // Init the uids of the socket and the user
@@ -74,6 +76,26 @@ export default class SocketManager extends Manager {
       this.userUid = uids.userUid;
       this.socketUid = uids.socketUid;
     });
+
+    this.messenger.socket.on("disconnect", () => {
+      console.log("We have disconnected from the server");
+
+      this.logoutTimeout = setTimeout(
+        () => this.logout(),
+        CST.COMMON_CST.CONNECTION.LOGOUT_TIMEOUT
+      );
+    });
+  }
+
+  private logout() {
+    console.log("CONNECTION TIMED OUT! LOGGING OUT");
+
+    this.redirectClient(CST.COMMON_CST.CONNECTION.LOGOUT_PATH);
+  }
+
+  // Redirect this client to another route
+  private redirectClient(route: string) {
+    globalThis.location.href = route;
   }
 
   // Delegate io's methods to this

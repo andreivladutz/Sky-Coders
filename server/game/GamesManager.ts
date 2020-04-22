@@ -88,10 +88,14 @@ export default class GamesManager {
       }
 
       let otherGames = Object.values(this.connectedGames[user.id]);
-      console.log("Other games length = " + otherGames.length);
+
       for (let otherDeviceGame of otherGames) {
         if (otherDeviceGame !== newGameInstance) {
-          otherDeviceGame.logout("This account connected on another device");
+          // Just a kick
+          otherDeviceGame.logout(
+            "This account connected on another device",
+            true
+          );
         }
       }
     });
@@ -103,13 +107,18 @@ export default class GamesManager {
    */
   public logoutUser(
     socket: SocketIO.Socket | MessageSender,
-    reason?: string
+    reason?: string,
+    // If a user is being kicked, don't log him out for good
+    beingKicked = false
   ): this {
-    console.log("LOGOUT HANDLER");
     let logoutRoute = "/users/logout";
 
     if (reason) {
       logoutRoute += `?${CST.ROUTES.LOGOUT_PARAM.REASON}=${reason}`;
+
+      if (beingKicked) {
+        logoutRoute += `&${CST.ROUTES.LOGOUT_PARAM.KICK}=true`;
+      }
     }
 
     socket.emit(Redirect.EVENT, logoutRoute);

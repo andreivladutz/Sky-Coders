@@ -19,6 +19,8 @@ export namespace Connection {
 export namespace GameInit {
   export interface Config {
     seed: string;
+    // The buildings already placed by the user on the map
+    buildings: BuildingTypes.DbBuildingInfo[];
   }
 
   export const EVENT = "game_init";

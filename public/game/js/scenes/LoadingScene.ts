@@ -1,4 +1,4 @@
-import CONSTANTS from "../CST";
+import CST from "../CST";
 
 import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js";
 
@@ -21,16 +21,19 @@ export default class LoadingScene extends Phaser.Scene {
 
   constructor() {
     super({
-      key: CONSTANTS.SCENES.LOAD
+      key: CST.SCENES.LOAD
     });
   }
 
   init() {
     this.load.on("progress", this.onLoaderProgress, this);
     this.load.on("complete", () => {
-      this.scene.start(CONSTANTS.SCENES.GAME);
+      this.scene.start(CST.SCENES.GAME);
 
-      this.events.emit(CONSTANTS.EVENTS.LOAD_SCENE.LOAD_COMPLETE);
+      this.events.emit(
+        CST.EVENTS.LOAD_SCENE.LOAD_COMPLETE,
+        this.scene.get(CST.SCENES.GAME)
+      );
     });
 
     this.game.scale.setGameSize(this.game.scale.width, this.game.scale.height);

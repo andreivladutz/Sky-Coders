@@ -9,6 +9,7 @@ import gameRouter from "./routes/gameRouter";
 import CST from "./SERVER_CST";
 import ConfigManager from "./utils/configure";
 import GamesManager from "./game/GamesManager";
+import BuildingsManager from "./game/BuildingsManager";
 
 // Load the environment config from .env file
 dotenv.config({

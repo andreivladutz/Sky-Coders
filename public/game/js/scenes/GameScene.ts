@@ -7,6 +7,7 @@ import MapManager from "../managers/MapManager";
 import Actor from "../gameObjects/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
 import TileMap from "../IsoPlugin/TileMap";
+import BuildingsManager from "../managers/BuildingsManager";
 
 // TODO: remove global variables
 let actor: Actor;
@@ -53,6 +54,7 @@ export default class GameScene extends IsoScene {
 
     // fire the map init
     this.tileMap = MapManager.getInstance().initMap(this);
+
     // init the camera controller
     CameraManager.getInstance({
       camera: this.cameras.main,
@@ -60,6 +62,8 @@ export default class GameScene extends IsoScene {
       enablePan: true,
       enableZoom: true
     });
+
+    BuildingsManager.getInstance().initBuildings(this);
 
     actor = new Actor({
       actorKey: ACTOR_NAMES.MALLACK,

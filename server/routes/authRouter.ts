@@ -7,7 +7,6 @@ import User, { UserType } from "../models/User";
 import { redirectToLogin } from "../authentication/authenticateMiddleware";
 import { default as validation } from "../validation/UserValidation";
 import CST from "../SERVER_CST";
-import GamesManager from "../game/GamesManager";
 
 // If debugging is active this will write logs to the console
 const debug = Debug("authRouter");
@@ -30,24 +29,38 @@ function redirectAuthenticatedMw(
   res: express.Response,
   next: express.NextFunction
 ) {
-  if (req.isAuthenticated()) {
-    res.redirect("/");
-    return;
+  let userKicked = req.query[CST.ROUTES.LOGOUT_PARAM.KICK];
+
+  // If the user is kicked, stay on the login page
+  // Do not redirect
+  if (userKicked || !req.isAuthenticated()) {
+    return next();
   }
 
-  next();
+  res.redirect("/");
 }
 
 function logoutMw(req: express.Request, res: express.Response) {
   let user = req.user as UserType;
+  // If the user gets kicked we mimic logout without actually deleting the session
+  let userKicked = req.query[CST.ROUTES.LOGOUT_PARAM.KICK];
 
   if (user) {
-    debug(`User ${user.name} logged out.`);
+    if (userKicked) {
+      debug(
+        `User ${user.name} was logged out for connecting on another device/page.`
+      );
+    } else {
+      debug(`User ${user.name} logged out.`);
+    }
   }
 
-  // Clear the seesion cookie before logging out
-  res.clearCookie(CST.SESSION_COOKIE.ID);
-  req.logout();
+  // Being logged out for good
+  if (!userKicked) {
+    // Clear the seesion cookie before logging out
+    res.clearCookie(CST.SESSION_COOKIE.ID);
+    req.logout();
+  }
 
   let logoutMessage = "You have been logged out!",
     reason;
@@ -56,7 +69,8 @@ function logoutMw(req: express.Request, res: express.Response) {
     logoutMessage += ` Reason: ${reason}`;
   }
 
-  redirectToLogin(req, res, logoutMessage);
+  // Tell the redirection function the user is being kicked if there's a query param
+  redirectToLogin(req, res, logoutMessage, true, !!userKicked);
 }
 
 async function registrationMw(req: express.Request, res: express.Response) {

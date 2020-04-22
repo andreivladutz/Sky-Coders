@@ -79,4 +79,24 @@ const BuildingTypes = {
   )
 };
 
+// Compute the gcd of two numbers
+function computeGcd(a: number, b: number) {
+  let r: number;
+  while (b != 0) {
+    r = a % b;
+    a = b;
+    b = r;
+  }
+
+  return a;
+}
+
+// The greatest common divisor of all production times
+// Used as an interval for updating the buildings
+export const gcdProdTime = Object.values(BuildingTypes)
+  .map((building): number => building.productionTime)
+  .reduce((prevProdGcd: number, currProdTime: number) => {
+    return computeGcd(prevProdGcd, currProdTime);
+  });
+
 export default BuildingTypes;

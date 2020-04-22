@@ -7,9 +7,13 @@ import LoaderInjector, {
 import BuildingObject from "../gameObjects/BuildingObject";
 import IsoScene from "../IsoPlugin/IsoScene";
 
-import BuildingTypes, { BuildNames } from "../../../common/BuildingTypes";
+import BuildingTypes, {
+  BuildNames,
+  DbBuildingInfo
+} from "../../../common/BuildingTypes";
 import { BuildingPlacement } from "../../../common/MessageTypes";
 import GameManager from "../online/GameManager";
+import BuildingsMessenger from "../online/BuildingsMessenger";
 
 export default class BuildingsManager extends Manager
   implements LoadingInjectedManager {
@@ -30,7 +34,12 @@ export default class BuildingsManager extends Manager
    *
    * Create a building of @param buildingType provided type
    */
-  public create(gameScene: IsoScene, buildingType: BuildNames): BuildingObject {
+  public create(
+    gameScene: IsoScene,
+    buildingType: BuildNames,
+    tileX?: number,
+    tileY?: number
+  ): BuildingObject {
     // get the details of this specific building => frame, texture and localTiles of the grid
     let buildingFrame = this.buildingFrames[buildingType];
     let textureKey = this.getTextureKey();
@@ -43,8 +52,28 @@ export default class BuildingsManager extends Manager
       textureKey,
       buildingFrame,
       localTileX,
-      localTileY
+      localTileY,
+      tileX,
+      tileY
     );
+  }
+
+  /**
+   * Place buildings at the begining of the game
+   * @param buildings array of DbBuildingInfo from the server
+   */
+  public initBuildings(gameScene: IsoScene) {
+    let buildsMessenger = GameManager.getInstance().messengers.buildings;
+    let buildings = buildsMessenger.initialBuildings;
+
+    for (let building of buildings) {
+      let { x, y } = building.position;
+      // TODO: lastProdTime
+
+      this.create(gameScene, building.buildingType, x, y)
+        .enableBuildPlacing()
+        .placeBuilding(false);
+    }
   }
 
   /**
@@ -59,7 +88,9 @@ export default class BuildingsManager extends Manager
     // Map the building awaiting confirmation from the server until it comes
     this.buildsAwaitingSv[building.tileY][building.tileX] = building;
 
-    GameManager.getInstance().messengers.buildings.buildingPlacementMessage({
+    let buildsMessenger = GameManager.getInstance().messengers.buildings;
+
+    buildsMessenger.buildingPlacementMessage({
       // The name of the building used to identify it in the building types
       buildingType: building.buildingType,
       // The tile position of this building
@@ -82,7 +113,6 @@ export default class BuildingsManager extends Manager
     buildingInfo: BuildingPlacement.ResourcesAfterPlacement
   ) {
     console.log("BUILDING ALLOWED");
-    console.log(buildingInfo);
 
     this.onBuildingAcknowledged(buildingInfo);
   }
@@ -97,7 +127,10 @@ export default class BuildingsManager extends Manager
     buildingInfo: BuildingPlacement.ResourcesAfterPlacement
   ) {
     console.log("BUILDING DENIED");
-    console.log(buildingInfo);
+
+    let { x, y } = buildingInfo.buildingPosition;
+
+    this.buildsAwaitingSv[y][x].removeBuilding();
 
     this.onBuildingAcknowledged(buildingInfo);
   }

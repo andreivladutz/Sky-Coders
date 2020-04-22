@@ -1,4 +1,5 @@
 import WORKER_CST from "./utils/astar/WORKER_CST";
+import COMMON_CST from "../../common/CommonCST";
 
 //TODO: Change variant
 const VARIANT = "-hd";
@@ -342,5 +343,7 @@ export default {
     }
   },
   // constants imported from the worker cst
-  WORKER: WORKER_CST
+  WORKER: WORKER_CST,
+  // COMMON CSTS between the client and the sv
+  COMMON_CST
 };
