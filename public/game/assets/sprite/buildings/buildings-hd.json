@@ -4,7 +4,7 @@
 			"image": "buildings-hd-0.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 1443,
+				"w": 1411,
 				"h": 1202
 			},
 			"scale": 0.5,
@@ -20,18 +20,18 @@
 					"spriteSourceSize": {
 						"x": 38,
 						"y": 68,
-						"w": 1441,
+						"w": 1409,
 						"h": 1200
 					},
 					"frame": {
 						"x": 1,
 						"y": 1,
-						"w": 1441,
+						"w": 1409,
 						"h": 1200
 					},
 					"anchor": {
-						"x": 0.5300127713920817,
-						"y": 0.7119970193740686
+						"x": 0.530013,
+						"y": 0.711997
 					}
 				}
 			]
@@ -40,6 +40,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:d0574e50257db5152bdce863ca632319:2c8b61bf8dd3715bc01b12dc36bd28f3:12fb24c2ec3f0ef0ad613977aa4dcf5e$"
+		"smartupdate": "$TexturePacker:SmartUpdate:154f905204c71c26a087fe441df82772:318e8d6658ee31a3edfe5c5e7a356087:12fb24c2ec3f0ef0ad613977aa4dcf5e$"
 	}
 }

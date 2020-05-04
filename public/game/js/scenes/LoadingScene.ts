@@ -57,11 +57,12 @@ export default class LoadingScene extends Phaser.Scene {
   }
 
   onLoaderProgress(progress: number) {
-    const MARGIN_OFFSET = 20,
-      BAR_HEIGHT = 40,
-      LINE_WIDTH = 2;
     let width: number = Number(this.game.scale.width),
       height: number = Number(this.game.scale.height);
+
+    const MARGIN_OFFSET = width * 0.1,
+      BAR_HEIGHT = 0.06 * height,
+      LINE_WIDTH = 2;
 
     if (!this.graphics) {
       this.graphics = this.add.graphics({
@@ -77,15 +78,23 @@ export default class LoadingScene extends Phaser.Scene {
 
     this.graphics
       .clear()
+      .fillStyle(0x000000)
+      .fillRect(
+        MARGIN_OFFSET,
+        height - BAR_HEIGHT * 2,
+        width - MARGIN_OFFSET * 2 + LINE_WIDTH,
+        BAR_HEIGHT
+      )
       .strokeRect(
         MARGIN_OFFSET - LINE_WIDTH / 2,
-        height / 2 - LINE_WIDTH / 2,
+        height - BAR_HEIGHT * 2 - LINE_WIDTH / 2,
         width - MARGIN_OFFSET * 2 + LINE_WIDTH,
         BAR_HEIGHT + LINE_WIDTH
       )
+      .fillStyle(0x2ecc71)
       .fillRect(
         MARGIN_OFFSET,
-        height / 2,
+        height - BAR_HEIGHT * 2,
         (width - MARGIN_OFFSET * 2) * progress,
         BAR_HEIGHT
       );

@@ -9,7 +9,6 @@ import gameRouter from "./routes/gameRouter";
 import CST from "./SERVER_CST";
 import ConfigManager from "./utils/configure";
 import GamesManager from "./game/GamesManager";
-import BuildingsManager from "./game/BuildingsManager";
 
 // Load the environment config from .env file
 dotenv.config({
@@ -33,9 +32,10 @@ const PORT = Number(process.env.PORT) || 8080;
   });
 
   app
-    .get(CST.WEB_MANIFEST, (req, res) => {
+    .use(CST.WEB_MANIFEST, (req, res) => {
       res.sendFile(path.join(__dirname, CST.MANIFEST_FILE));
     })
+    .use("/no_auth", express.static(CST.NO_AUTH_FOLDER))
     // the login / register path
     .use("/users", authRouter)
     // authenticated game route

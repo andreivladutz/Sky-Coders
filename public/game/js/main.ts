@@ -4,4 +4,5 @@ import GameManager from "./online/GameManager";
 
 // fire sw registering and such
 PwaHandler.init();
+
 GameManager.getInstance();

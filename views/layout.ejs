@@ -2,8 +2,31 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="description" content="2.5D building, survival browser game" />
+    <meta
+      name="keywords"
+      content="scripting,game,browser-game,web-game,isometric,2.5D,survival,building"
+    />
+    <meta name="author" content="Dinca Vlad-Andrei" />
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#716981" />
+    <!--iOS specific-->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Sky Dwellers" />
+
     <title>Sky Dwellers</title>
+
+    <link rel="apple-touch-icon" href="/no_auth/image/icon/icon512.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="192x192"
+      href="/no_auth/image/icon/icon192.png"
+    />
+
+    <link rel="icon" type="image/png" href="/no_auth/image/icon/icon192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
 
     <!-- bootswatch -->
     <link
@@ -17,6 +40,13 @@
     ></script>
   </head>
   <body>
+    <!-- Bodymovin animations container -->
+    <div id="bm"></div>
+    <script
+      type="module"
+      src="/no_auth/screen_anim/js/LoginAnimation.js"
+    ></script>
+
     <div class="container">
       <%- body %>
     </div>

@@ -52,9 +52,10 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   // prevent right mouse click default behaviour
   disableContextMenu: true,
   scale: scaleConfig,
-  // render: {
-  //   pixelArt: true
-  // },
+  render: {
+    // pixelArt: true
+    transparent: true
+  },
   physics: {
     default: "arcade"
   },

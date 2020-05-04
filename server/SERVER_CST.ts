@@ -1,8 +1,8 @@
 import COMMON_CST from "../public/common/CommonCST";
 
 export default {
-  PUBLIC_FOLDER: "./public",
-  NO_AUTH_FOLDER: "./public/no_auth",
+  PUBLIC_FOLDER: "public",
+  NO_AUTH_FOLDER: "public/no_auth",
   WEB_MANIFEST: "/manifest.webmanifest",
   MANIFEST_FILE: "../../public/manifest.webmanifest",
   USERS: {

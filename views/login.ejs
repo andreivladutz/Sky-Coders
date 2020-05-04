@@ -4,7 +4,7 @@
       <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i>  Login</h1>
       <!-- Display temporary messages -->
       <%- include('./partials/messages.ejs') %>
-      <form action="/users/login" method="POST">
+      <form id="login-form" action="/users/login" method="POST">
         <div class="form-group">
           <label for="email">Email</label>
           <input
@@ -25,7 +25,7 @@
             placeholder="Enter Password"
           />
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Login</button>
+        <button type="submit" id="login-btn" class="btn btn-primary btn-block">Login</button>
       </form>
       <p class="lead mt-4">
         No Account? <a href="/users/register">Register</a>

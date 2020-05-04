@@ -2,6 +2,7 @@ import Manager from "../managers/Manager";
 import gameConfig from "../system/gameConfig";
 import SocketManager from "./SocketManager";
 import { GameInit, GameLoaded } from "../../../common/MessageTypes";
+import AnimationHandler from "../../../no_auth/screen_anim/js/AnimationHandler";
 
 import CST from "../CST";
 import BuildingsMessenger from "./BuildingsMessenger";
@@ -10,6 +11,7 @@ import { IsoScene } from "../IsoPlugin/IsoPlugin";
 export default class GameManager extends Manager {
   private gameInstance: Phaser.Game;
   private socketManager: SocketManager;
+  private animation: AnimationHandler;
 
   // The messengers used to send events to the server
   public messengers: {
@@ -21,6 +23,10 @@ export default class GameManager extends Manager {
 
   private constructor() {
     super();
+
+    // Create the same page animation as on the login page
+    this.animation = new AnimationHandler();
+    console.log(this.animation);
 
     // Init the socket manager
     this.socketManager = SocketManager.getInstance();
@@ -36,23 +42,28 @@ export default class GameManager extends Manager {
   // Listen for the init event and expect the initial game config
   // This event will fire MULTIPLE times if connection is lost and another socket is allocated server-side
   private listenForInitEvent() {
-    this.socketManager.on(GameInit.EVENT, (initConfig: GameInit.Config) => {
-      // If for some reason, this event fires multiple times
-      // and the game is already running, just ignore it
-      if (this.gameInstance) {
-        // But fire the load event because the game is already loaded
-        this.socketManager.emit(GameLoaded.EVENT);
+    this.socketManager.on(
+      GameInit.EVENT,
+      async (initConfig: GameInit.Config) => {
+        // If for some reason, this event fires multiple times
+        // and the game is already running, just ignore it
+        if (this.gameInstance) {
+          // But fire the load event because the game is already loaded
+          this.socketManager.emit(GameLoaded.EVENT);
 
-        return;
+          return;
+        }
+
+        ({ seed: this.seed } = initConfig);
+
+        this.messengers.buildings.initialBuildings = initConfig.buildings;
+        this.gameInstance = new Phaser.Game(gameConfig);
+
+        await this.waitForGameLoad();
+
+        this.animation.leaveOnlySkyLayers();
       }
-
-      ({ seed: this.seed } = initConfig);
-
-      this.messengers.buildings.initialBuildings = initConfig.buildings;
-      this.gameInstance = new Phaser.Game(gameConfig);
-
-      this.waitForGameLoad();
-    });
+    );
   }
 
   // Wait for Game Load to send the gameloaded event to the server

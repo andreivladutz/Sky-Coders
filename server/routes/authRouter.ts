@@ -21,7 +21,11 @@ function setSessionUserId(req: express.Request, res: express.Response) {
   let encryptedId = cryptr.encrypt(user._id);
 
   res.cookie(CST.SESSION_COOKIE.ID, encryptedId);
-  res.redirect("/");
+
+  // The login page animation script overrides the normal submit and waits for a json response
+  res.send({
+    success: true
+  });
 }
 
 function redirectAuthenticatedMw(
