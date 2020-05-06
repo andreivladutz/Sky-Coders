@@ -1,8 +1,17 @@
 import WORKER_CST from "./utils/astar/WORKER_CST";
 import COMMON_CST from "../../common/CommonCST";
 
-//TODO: Change variant
-const VARIANT = "-hd";
+import SYSTEM from "./system/system";
+
+const VARIANT = SYSTEM.VARIANT;
+
+let BUTTONS_VARIANT: string;
+
+if (VARIANT === "-hd" || VARIANT === "-md") {
+  BUTTONS_VARIANT = "-hd";
+} else {
+  BUTTONS_VARIANT = "-md";
+}
 
 const BUTTON_TYPES = {
   BUILD: "Build",
@@ -162,7 +171,7 @@ export default {
     ATLAS_KEY: "BUTTONS.ATLAS_KEY",
     // path to multiatlas
     MULTIATLAS_PATH: "sprite/ui/",
-    MULTIATLAS: `main_buttons${VARIANT}.json`,
+    MULTIATLAS: `main_buttons${BUTTONS_VARIANT}.json`,
     // the prefix of all buttons' frames
     PREFIX: "Buttons/",
     // the types of the buttons
@@ -265,6 +274,20 @@ export default {
     Z_EFFECT: 40
   },
   UI: {
+    MODAL: {
+      ID: "modal-window",
+      TITLE: "modal-window-title",
+      CLOSE_BUTTON: "x-button",
+      BUTTONS: {
+        CLASS: "modal__btn",
+        PRIMARY_CLASS: "modal__btn-primary",
+        CLOSE_ATTRIB: "data-micromodal-close",
+        CLOSE_ARIA_LABEL: "Close this dialog window"
+      },
+      HEADER: "modal-window-header",
+      FOOTER: "modal-window-footer",
+      CONTENT: "modal-window-content"
+    },
     BUTTONS: {
       TINT_COLOR: 0xffe4b5
     },
@@ -340,7 +363,9 @@ export default {
     EVENTS: {
       CONNECT: "connect",
       RECONNECT: "reconnect"
-    }
+    },
+    // If the game doesn't connect in 3 seconds, consider it offline
+    OFFLINE_TIMEOUT: 2 * 1000
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST,

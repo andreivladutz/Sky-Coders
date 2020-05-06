@@ -1,6 +1,6 @@
-// TODO:  change variant
-// just hardcoded for now
-const VARIANT = "-hd";
+import SYSTEM from "./system/system";
+
+const VARIANT = SYSTEM.VARIANT;
 
 export enum ACTOR_NAMES {
   MALLACK = "Mallack"

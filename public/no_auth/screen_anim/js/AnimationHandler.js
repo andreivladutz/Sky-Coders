@@ -27,13 +27,25 @@ export default class AnimationHandler {
   }
 
   destroyAnim() {
-    this.animation.stop();
+    this.stopAnim();
+
     this.animation.destroy();
 
     if (this.loginSuccessAninm) {
-      this.loginSuccessAnim.stop();
       this.loginSuccessAnim.destroy();
     }
+
+    return this;
+  }
+
+  stopAnim() {
+    this.animation.stop();
+
+    if (this.loginSuccessAnim) {
+      this.loginSuccessAnim.stop();
+    }
+
+    return this;
   }
 
   // Remove Mallack and the island
@@ -59,6 +71,8 @@ export default class AnimationHandler {
     }
 
     this.animation.animationData.layers = layersCopy;
+
+    return this;
   }
 
   // Optional method to load and play the login success anim
@@ -70,6 +84,8 @@ export default class AnimationHandler {
       autoplay: false,
       path: `${PATH}${ANIMATIONS.LOGIN_SUCCESS}`
     });
+
+    return this;
   }
 
   playLoginSuccess() {
@@ -83,6 +99,8 @@ export default class AnimationHandler {
     this.animation.stop();
     this.animation.destroy();
     this.loginSuccessAnim.play();
+
+    return this;
   }
 
   // Set some styles so the animation look good in the page
@@ -92,7 +110,10 @@ export default class AnimationHandler {
     style.position = "absolute";
     style.top = style.left = 0;
     style.width = style.height = "100%";
+    style.zIndex = -1;
 
     document.body.style.backgroundColor = BG_COLOR;
+
+    return this;
   }
 }

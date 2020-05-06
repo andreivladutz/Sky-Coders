@@ -56,6 +56,7 @@ export default class SocketManager extends Manager {
       this.messenger.socket.emit(Connection.RECONNECT_EVENT, uids, () => {
         console.log("Reconnection acknowledged by the server");
 
+        this.events.emit(CST.IO.EVENTS.RECONNECT);
         // Resend all lost messages
         this.messenger.resendMessages();
       });
@@ -88,9 +89,8 @@ export default class SocketManager extends Manager {
   }
 
   private logout() {
-    console.log("CONNECTION TIMED OUT! LOGGING OUT");
-
-    this.redirectClient(CST.COMMON_CST.CONNECTION.LOGOUT_PATH);
+    // this.redirectClient(CST.COMMON_CST.CONNECTION.LOGOUT_PATH);
+    this.redirectClient("/");
   }
 
   // Redirect this client to another route

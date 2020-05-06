@@ -53,7 +53,8 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   disableContextMenu: true,
   scale: scaleConfig,
   render: {
-    // pixelArt: true
+    //pixelArt: true,
+    roundPixels: true,
     transparent: true
   },
   physics: {

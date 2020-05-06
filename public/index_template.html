@@ -28,14 +28,68 @@
     <link rel="icon" type="image/png" href="/no_auth/image/icon/icon192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="stylesheet" href="/game/css/game.css" />
+    <link rel="stylesheet" href="/game/css/modal.css" />
+    <link rel="stylesheet" href="/game/css/spin.css" />
     <!-- using Html Plugin for webpack inserts the scripts automatically
       <script src="./build/vendors~app.app.bundle.js"></script>
       <script src="./build/app.bundle.js"></script>
     -->
+
+    <style>
+      body {
+        overflow: hidden;
+      }
+    </style>
   </head>
   <body>
     <div id="canvas-container"></div>
     <!-- Bodymovin animations container -->
     <div id="bm"></div>
+
+    <!-- Dummy tag -->
+    <a href="#" data-micromodal-trigger="modal-window"></a>
+
+    <!-- micromodal html -->
+    <div
+      class="modal micromodal-slide"
+      id="modal-window"
+      aria-hidden="true"
+      style="display:none"
+    >
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div
+          class="modal__container"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-1-title"
+        >
+          <header class="modal__header" id="modal-window-header">
+            <h2 class="modal__title" id="modal-window-title">
+              Micromodal
+            </h2>
+            <button
+              class="modal__close"
+              aria-label="Close modal"
+              data-micromodal-close
+              id="x-button"
+            ></button>
+          </header>
+          <main class="modal__content" id="modal-window-content"></main>
+          <footer class="modal__footer" id="modal-window-footer">
+            <!--
+            <button class="modal__btn modal__btn-primary">Continue</button>
+
+            <button
+              class="modal__btn"
+              data-micromodal-close
+              aria-label="Close this dialog window"
+            >
+              Close
+            </button>
+            -->
+          </footer>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

@@ -1,5 +1,5 @@
 import CST from "../CST";
-
+import SYSTEM from "../system/system";
 import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js";
 
 // kick the load subscribing of these Managers
@@ -37,6 +37,10 @@ export default class LoadingScene extends Phaser.Scene {
     });
 
     this.game.scale.setGameSize(this.game.scale.width, this.game.scale.height);
+    // Lock the game in landscape mode
+    this.scale.lockOrientation("landscape");
+
+    this.populateSystemValues();
   }
 
   preload() {
@@ -56,7 +60,12 @@ export default class LoadingScene extends Phaser.Scene {
     });
   }
 
-  onLoaderProgress(progress: number) {
+  private populateSystemValues() {
+    SYSTEM.TOUCH_ENABLED = this.sys.game.device.input.touch;
+    SYSTEM.WORKER_SUPPORT = this.sys.game.device.features.worker;
+  }
+
+  private onLoaderProgress(progress: number) {
     let width: number = Number(this.game.scale.width),
       height: number = Number(this.game.scale.height);
 
