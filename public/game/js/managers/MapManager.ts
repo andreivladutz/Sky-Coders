@@ -7,7 +7,7 @@ import CST from "../CST";
 import EnvironmentManager from "./EnvironmentManager";
 import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 import { IsoDebugger } from "../utils/debug";
-import IsoBoard, { TileXY } from "../IsoPlugin/IsoBoard";
+import IsoBoard, { TileXY, ViewExtremes } from "../IsoPlugin/IsoBoard";
 import CameraManager from "./CameraManager";
 import LayersManager from "./LayersManager";
 
@@ -92,12 +92,7 @@ export default class MapManager extends Manager {
 
   // Get the exteme tile coordinates x, y for the current view
   // Get the extreme coordinates of the current view
-  public getExtremesTileCoords(): {
-    rightmostX: number;
-    leftmostX: number;
-    topmostY: number;
-    lowermostY: number;
-  } {
+  public getExtremesTileCoords(): ViewExtremes {
     // use the real viewport not the internal view rect to get accurate tile extremes
     return this.getIsoBoard().getExtremesTileCoords(true);
   }

@@ -3,7 +3,7 @@ import { Board } from "phaser3-rex-plugins/plugins/board-components";
 import { IsoScene, Point3 } from "./IsoPlugin";
 
 import CST from "../CST";
-import KDBush from "kdbush";
+// import KDBush from "kdbush";
 import CameraManager from "../managers/CameraManager";
 
 const QUAD_GRID = "quadGrid",
@@ -14,6 +14,13 @@ const BOTTOM = 1,
   RIGHT = 0,
   LEFT = 2,
   TOP = 3;
+
+export interface ViewExtremes {
+  leftmostX: number;
+  rightmostX: number;
+  topmostY: number;
+  lowermostY: number;
+}
 
 export interface TileXY {
   x: number;
@@ -52,14 +59,15 @@ export default class IsoBoard {
   private viewRectangle: Phaser.Geom.Rectangle;
   // a KD-tree which hold the mid points of all the tiles,
   // this way we can easily get the viewable tiles for drawing
-  tilesIndex: KDBush;
+  // tilesIndex: KDBush;
+
   // array of tiles with their corresponding midPoints
-  tilesWithMidPoints: Array<{
-    x: number;
-    y: number;
-    tileX: number;
-    tileY: number;
-  }>;
+  // tilesWithMidPoints: Array<{
+  //   x: number;
+  //   y: number;
+  //   tileX: number;
+  //   tileY: number;
+  // }>;
 
   // if the view rectangle changed we should redraw the tiles on the screen
   public viewRectangleDirty: boolean = true;
@@ -132,25 +140,12 @@ export default class IsoBoard {
     this.initListeners();
 
     this.updateViewRectangle();
-    this.initKDBush(config.mapMatrix);
+    //this.initKDBush(config.mapMatrix);
 
     this.initGridLines(config.mapMatrix);
   }
 
   private initListeners() {
-    CameraManager.EVENTS.on(CST.CAMERA.MOVE_EVENT, () => {
-      //this.viewRectangleDirty = true;
-      //this.updateViewRectangle();
-    }).on(CST.CAMERA.ZOOM_EVENT, (actualZoomFactor: number) => {
-      //this.updateViewRectangle();
-      //this.viewRectangleDirty = true;
-
-      // if the game is zoomed out too much, the grid will hide
-      if (CameraManager.getInstance().camera.zoom <= CST.GRID.ZOOM_DEACTIVATE) {
-        //this.hideGrid();
-      }
-    });
-
     // when the game screen resizes, the board has to be repositioned according to the projector
     this.board.scene.scale.on(
       "resize",
@@ -224,14 +219,7 @@ export default class IsoBoard {
   }
 
   // Get the extreme coordinates of the current view
-  public getExtremesTileCoords(
-    useRealViewport: boolean = false
-  ): {
-    rightmostX: number;
-    leftmostX: number;
-    topmostY: number;
-    lowermostY: number;
-  } {
+  public getExtremesTileCoords(useRealViewport: boolean = false): ViewExtremes {
     const mapWith = this.mapSize.w / this.mapSize.tileW - 1,
       mapHeight = this.mapSize.h / this.mapSize.tileH - 1;
 
@@ -520,37 +508,37 @@ export default class IsoBoard {
     return this;
   }
 
-  public initKDBush(mapMatrix: number[][]) {
-    this.tilesWithMidPoints = [];
+  // public initKDBush(mapMatrix: number[][]) {
+  //   this.tilesWithMidPoints = [];
 
-    // take the mid point of each tile
-    this.board.forEachTileXY((tileXY: TileXY) => {
-      // if there's no tile here no point in drawing grid stroke
-      if (!mapMatrix[tileXY.y] || !mapMatrix[tileXY.y][tileXY.x]) {
-        return;
-      }
+  //   // take the mid point of each tile
+  //   this.board.forEachTileXY((tileXY: TileXY) => {
+  //     // if there's no tile here no point in drawing grid stroke
+  //     if (!mapMatrix[tileXY.y] || !mapMatrix[tileXY.y][tileXY.x]) {
+  //       return;
+  //     }
 
-      // get the midPoint of this tile
-      let tilePoints = this.board.getGridPoints(tileXY.x, tileXY.y, true);
+  //     // get the midPoint of this tile
+  //     let tilePoints = this.board.getGridPoints(tileXY.x, tileXY.y, true);
 
-      let midX = tilePoints[BOTTOM].x,
-        midY = tilePoints[RIGHT].y;
+  //     let midX = tilePoints[BOTTOM].x,
+  //       midY = tilePoints[RIGHT].y;
 
-      this.tilesWithMidPoints.push({
-        x: midX,
-        y: midY,
-        tileX: tileXY.x,
-        tileY: tileXY.y
-      });
-    });
+  //     this.tilesWithMidPoints.push({
+  //       x: midX,
+  //       y: midY,
+  //       tileX: tileXY.x,
+  //       tileY: tileXY.y
+  //     });
+  //   });
 
-    // index the midPoints of each tile so they are easily found within the viewRect
-    this.tilesIndex = new KDBush(
-      this.tilesWithMidPoints,
-      (p: TileXY) => p.x,
-      (p: TileXY) => p.y
-    );
-  }
+  //   // index the midPoints of each tile so they are easily found within the viewRect
+  //   this.tilesIndex = new KDBush(
+  //     this.tilesWithMidPoints,
+  //     (p: TileXY) => p.x,
+  //     (p: TileXY) => p.y
+  //   );
+  // }
 
   public isTileInView(tileXY: TileXY): boolean {
     // get the corners of this tile
@@ -562,16 +550,16 @@ export default class IsoBoard {
   }
 
   // returns an array of (x, y) pairs that are the tile coordinates of the viewable tiles
-  public getTilesInView(): TileXY[] {
-    // search in the KD-Tree what midPoints are within the view area
-    const rect = this.viewRectangle,
-      results = this.tilesIndex
-        .range(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height)
-        .map((id: number) => this.tilesWithMidPoints[id])
-        .map(({ tileX, tileY }) => ({ x: tileX, y: tileY }));
+  // public getTilesInView(): TileXY[] {
+  //   // search in the KD-Tree what midPoints are within the view area
+  //   const rect = this.viewRectangle,
+  //     results = this.tilesIndex
+  //       .range(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height)
+  //       .map((id: number) => this.tilesWithMidPoints[id])
+  //       .map(({ tileX, tileY }) => ({ x: tileX, y: tileY }));
 
-    return results;
-  }
+  //   return results;
+  // }
 
   public worldXYToTileXYFloat(worldX: number, worldY: number): TileXY {
     return GetTileXY.call(this.board.grid, worldX, worldY);

@@ -91,7 +91,7 @@ export default {
     MOVE_EVENT: "camera.moved",
     ZOOM_EVENT: "camera.zoomed",
     // how many tiles around the view area to add when computing which tiles are visible
-    VIEWRECT_TILE_PAD: 10,
+    VIEWRECT_TILE_PAD: 4,
     // don t let the user scroll outside of the map
     PANLIMIT_RATIO: 4
   },

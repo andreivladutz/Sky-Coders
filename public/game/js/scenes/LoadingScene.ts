@@ -37,9 +37,6 @@ export default class LoadingScene extends Phaser.Scene {
     });
 
     this.game.scale.setGameSize(this.game.scale.width, this.game.scale.height);
-    // Lock the game in landscape mode
-    this.scale.lockOrientation("landscape");
-
     this.populateSystemValues();
   }
 

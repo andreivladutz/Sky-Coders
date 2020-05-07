@@ -43,8 +43,6 @@ export default class GameScene extends IsoScene {
 
     // start the UI scene and move it above
     this.scene.launch(CST.SCENES.UI);
-    // Lock the game in landscape mode
-    this.scale.lockOrientation("landscape");
   }
 
   create() {
