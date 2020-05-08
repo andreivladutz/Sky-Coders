@@ -1,5 +1,5 @@
 import Phaser from "phaser";
-import { Projector, IsoScene, Point3 } from "./IsoPlugin";
+import { Projector, IsoScene, Point3 } from "../IsoPlugin/IsoPlugin";
 import IsoBoard from "./IsoBoard";
 import EnvironmentManager from "../managers/EnvironmentManager";
 

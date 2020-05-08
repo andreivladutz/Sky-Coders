@@ -91,7 +91,7 @@ export default {
     MOVE_EVENT: "camera.moved",
     ZOOM_EVENT: "camera.zoomed",
     // how many tiles around the view area to add when computing which tiles are visible
-    VIEWRECT_TILE_PAD: 4,
+    VIEWRECT_TILE_PAD: 6,
     // don t let the user scroll outside of the map
     PANLIMIT_RATIO: 4
   },
@@ -107,8 +107,9 @@ export default {
     FILL_ALPHA: 0.3
   },
   TILEMAP: {
-    OFFSCR_BUFF_KEY: "tileMapOffscreenCanvas",
-    OFFSCR_BUFF_ID: "offscren-buffer"
+    // How many drawn but not visible tiles have to be to consider
+    // The view rectangle as being dirty (3 times the actual visible tiles)
+    INVISIBLE_DIRTY_RATIO: 3
   },
   // service-worker related csts
   SW: {
@@ -224,7 +225,9 @@ export default {
       TAP: "tiletap",
       MOVE: "tilemove",
       PRESS: "tilepressstart",
-      PREVENTING: "startedpreventingevents"
+      PREVENTING: "startedpreventingevents",
+      // The view rectangle of the isoboard becomes dirty
+      IS_DIRTY: "mapisdirty"
     },
     OBJECT: {
       SELECT: "object.select",

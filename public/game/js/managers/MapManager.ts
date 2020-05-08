@@ -1,5 +1,5 @@
 import TerrainGenerator from "../terrain/terrainGenerator";
-import TileMap from "../IsoPlugin/TileMap";
+import TileMap from "../map/TileMap";
 import { IsoScene } from "../IsoPlugin/IsoPlugin";
 
 import Manager from "./Manager";
@@ -7,7 +7,7 @@ import CST from "../CST";
 import EnvironmentManager from "./EnvironmentManager";
 import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 import { IsoDebugger } from "../utils/debug";
-import IsoBoard, { TileXY, ViewExtremes } from "../IsoPlugin/IsoBoard";
+import IsoBoard, { TileXY, ViewExtremes } from "../map/IsoBoard";
 import CameraManager from "./CameraManager";
 import LayersManager from "./LayersManager";
 
@@ -81,6 +81,11 @@ export default class MapManager extends Manager {
     this.events.on(CST.EVENTS.MAP.PREVENTING, () => {
       this.tileMap.clearTintedTile();
     });
+  }
+
+  // Called by the underlying isoBoard
+  public emitDirtyViewRectEvent(viewRect: Phaser.Geom.Rectangle) {
+    this.events.emit(CST.EVENTS.MAP.IS_DIRTY, viewRect);
   }
 
   public getMapTilesize(): MapTileSize {

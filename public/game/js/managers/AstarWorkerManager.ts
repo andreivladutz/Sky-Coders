@@ -1,8 +1,7 @@
 import Manager from "./Manager";
-import MapManager from "./MapManager";
 
 import CST from "../CST";
-import { TileXY } from "../IsoPlugin/IsoBoard";
+import { TileXY } from "../map/IsoBoard";
 
 const WK_CST = CST.WORKER;
 

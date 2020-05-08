@@ -1,13 +1,10 @@
-// TODO: NEEDS REFACTORING!!!
-import { Board } from "phaser3-rex-plugins/plugins/board-components";
-import { IsoScene, Point3 } from "./IsoPlugin";
-
+import { TileXY, IsoBoardConfig, ViewExtremes } from "./IsoBoard";
 import CST from "../CST";
-// import KDBush from "kdbush";
-import CameraManager from "../managers/CameraManager";
+import BoardViewer from "./BoardViewer";
 
-const QUAD_GRID = "quadGrid",
-  ISO_GRID_TYPE = "isometric";
+type IndexedTileSegments = { [key: number]: Array<[TileXY, TileXY]> };
+// A segment determined by the tile ends
+type TileLine = [TileXY, TileXY];
 
 // the corners of a tile received from the underlying board
 const BOTTOM = 1,
@@ -15,114 +12,19 @@ const BOTTOM = 1,
   LEFT = 2,
   TOP = 3;
 
-export interface ViewExtremes {
-  leftmostX: number;
-  rightmostX: number;
-  topmostY: number;
-  lowermostY: number;
-}
-
-export interface TileXY {
-  x: number;
-  y: number;
-}
-
-type IndexedTileSegments = { [key: number]: Array<[TileXY, TileXY]> };
-
-// A segment determined by the tile ends
-type TileLine = [TileXY, TileXY];
-
-interface IsoBoardConfig {
-  scene: IsoScene;
-  x: number;
-  y: number;
-  tileWidth: number;
-  tileHeight: number;
-  mapWidth: number;
-  mapHeight: number;
-  // the map matrix is needed for initing the RTree
-  // and drawing the grid
-  mapMatrix: number[][];
-}
-
-/*
- * Singleton class that handles tile and grid logic
- */
-export default class IsoBoard {
-  public static instance: IsoBoard = null;
+// All logic related to grid drawing used by the isoboard
+export default class BoardGrid extends BoardViewer {
+  // the lines that compose this grid
+  // split all the tiles into lines so it requires less resources to draw the grid
+  private horizontalGridLines: IndexedTileSegments;
+  private verticalGridLines: IndexedTileSegments;
 
   // the graphics object used to draw the board grid
   private graphics: Phaser.GameObjects.Graphics;
   private visibleGrid: boolean = false;
 
-  // the rectangle that contains the tiles currently in view
-  private viewRectangle: Phaser.Geom.Rectangle;
-  // a KD-tree which hold the mid points of all the tiles,
-  // this way we can easily get the viewable tiles for drawing
-  // tilesIndex: KDBush;
-
-  // array of tiles with their corresponding midPoints
-  // tilesWithMidPoints: Array<{
-  //   x: number;
-  //   y: number;
-  //   tileX: number;
-  //   tileY: number;
-  // }>;
-
-  // if the view rectangle changed we should redraw the tiles on the screen
-  public viewRectangleDirty: boolean = true;
-
-  board: Board;
-  // the gameSize
-  gameSize: { width: number; height: number };
-  // the map position and size in world space
-  mapSize: {
-    w: number;
-    h: number;
-    tileW: number;
-    tileH: number;
-  };
-
-  // game main camera (the one used by the cameraManager)
-  camera: Phaser.Cameras.Scene2D.Camera;
-
-  // the lines that compose this grid
-  // split all the tiles into lines so it requires less resources to draw the grid
-  horizontalGridLines: IndexedTileSegments;
-  verticalGridLines: IndexedTileSegments;
-
-  private constructor(config: IsoBoardConfig) {
-    const boardConfig = {
-      grid: {
-        gridType: QUAD_GRID,
-        x: config.x,
-        y: config.y,
-        cellWidth: config.tileWidth,
-        cellHeight: config.tileHeight,
-        type: ISO_GRID_TYPE,
-        dir: 8
-      },
-      width: config.mapWidth,
-      height: config.mapHeight
-    };
-
-    // the used board texture
-    this.board = new Board(config.scene, boardConfig);
-
-    // adding this to fix a typo in Rex's Plugin AStar PathFinding
-    this.board.tileXYToWroldX = this.board.tileXYToWorldX;
-    this.board.tileXYToWroldY = this.board.tileXYToWorldY;
-
-    // the real gameSize
-    this.gameSize = config.scene.game.scale.gameSize;
-
-    // the width and height of the board in px
-    this.mapSize = {
-      w: config.tileWidth * config.mapWidth,
-      h: config.tileHeight * config.mapHeight,
-      tileW: config.tileWidth,
-      tileH: config.tileHeight
-    };
+  public constructor(config: IsoBoardConfig) {
+    super(config);
 
     // the graphics used to draw the grid on the buffer texture
     this.graphics = config.scene.add
@@ -135,123 +37,7 @@ export default class IsoBoard {
       })
       .setDepth(CST.LAYER_DEPTH.WORLD_GRID);
 
-    this.camera = config.scene.cameras.main;
-
-    this.initListeners();
-
-    this.updateViewRectangle();
-    //this.initKDBush(config.mapMatrix);
-
     this.initGridLines(config.mapMatrix);
-  }
-
-  private initListeners() {
-    // when the game screen resizes, the board has to be repositioned according to the projector
-    this.board.scene.scale.on(
-      "resize",
-      () => {
-        // determine the position of the map corner
-        let { x: mapX, y: mapY } = this.board.scene.iso.projector.project(
-          new Point3(0, 0, 0)
-        );
-
-        this.board.grid.x = mapX;
-        this.board.grid.y = mapY;
-
-        // redraw everything
-        this.viewRectangleDirty = true;
-      },
-      this
-    );
-  }
-
-  // update the view rect every update cycle
-  // called by the map manager
-  public onUpdate() {
-    this.updateViewRectangle();
-    this.drawGrid();
-  }
-
-  private updateViewRectangle() {
-    // pad the view rectangle with 10 tiles all around
-    let view = this.camera.worldView,
-      padX = CST.CAMERA.VIEWRECT_TILE_PAD * this.mapSize.tileW,
-      padY = CST.CAMERA.VIEWRECT_TILE_PAD * this.mapSize.tileH;
-
-    let newRect = new Phaser.Geom.Rectangle(
-      view.x - padX / 2,
-      view.y - padY / 2,
-      view.width + padX,
-      view.height + padY
-    );
-
-    if (
-      this.viewRectangle &&
-      Phaser.Geom.Rectangle.ContainsRect(this.viewRectangle, newRect)
-    ) {
-      return;
-    }
-
-    this.viewRectangle = newRect;
-
-    newRect.x -= padX / 2;
-    newRect.y -= padY / 2;
-    (newRect.width += padX), (newRect.height += padY);
-
-    this.viewRectangleDirty = true;
-
-    // if (
-    //   !oldRect ||
-    //   oldRect.x !== this.viewRectangle.x ||
-    //   oldRect.y !== this.viewRectangle.y ||
-    //   oldRect.width !== this.viewRectangle.width ||
-    //   oldRect.height !== this.viewRectangle.height
-    // ) {
-    //   this.viewRectangleDirty = true;
-    // }
-
-    // DEBUG_GRAPHICS.clear().strokeRect(
-    //   this.viewRectangle.x,
-    //   this.viewRectangle.y,
-    //   this.viewRectangle.width,
-    //   this.viewRectangle.height
-    // );
-  }
-
-  // Get the extreme coordinates of the current view
-  public getExtremesTileCoords(useRealViewport: boolean = false): ViewExtremes {
-    const mapWith = this.mapSize.w / this.mapSize.tileW - 1,
-      mapHeight = this.mapSize.h / this.mapSize.tileH - 1;
-
-    let viewRect = useRealViewport
-      ? CameraManager.getInstance().getViewRect()
-      : this.viewRectangle;
-
-    let leftmostTile = this.board.worldXYToTileXY(viewRect.x, viewRect.y),
-      rightmostTile = this.board.worldXYToTileXY(
-        viewRect.x + viewRect.width,
-        viewRect.y + viewRect.height
-      ),
-      topmostTile = this.board.worldXYToTileXY(
-        viewRect.x + viewRect.width,
-        viewRect.y
-      ),
-      lowermostTile = this.board.worldXYToTileXY(
-        viewRect.x,
-        viewRect.y + viewRect.height
-      );
-
-    let topmostY = Math.max(topmostTile.y, 0),
-      lowermostY = Math.min(lowermostTile.y, mapHeight),
-      leftmostX = Math.max(leftmostTile.x, 0),
-      rightmostX = Math.min(rightmostTile.x, mapWith);
-
-    return {
-      rightmostX,
-      leftmostX,
-      topmostY,
-      lowermostY
-    };
   }
 
   // init the vertical and horizontal lines of this grid internally
@@ -337,7 +123,7 @@ export default class IsoBoard {
 
   // draw the grid once on the gridBufferTexture
   // view rectangle becomes "not dirty" once all the tiles have been redrawn
-  private drawGrid() {
+  protected drawGrid() {
     // grid not visible, return
     if (!this.visibleGrid) {
       this.graphics.setVisible(false);
@@ -459,6 +245,7 @@ export default class IsoBoard {
     return lineEnds;
   }
 
+  // Grid filling -> useful for drawing the grid fill when placing a building (green / red)
   private fillRectGrid(
     verticalLineEnds: Array<TileLine>,
     graphics: Phaser.GameObjects.Graphics,
@@ -507,95 +294,7 @@ export default class IsoBoard {
 
     return this;
   }
-
-  // public initKDBush(mapMatrix: number[][]) {
-  //   this.tilesWithMidPoints = [];
-
-  //   // take the mid point of each tile
-  //   this.board.forEachTileXY((tileXY: TileXY) => {
-  //     // if there's no tile here no point in drawing grid stroke
-  //     if (!mapMatrix[tileXY.y] || !mapMatrix[tileXY.y][tileXY.x]) {
-  //       return;
-  //     }
-
-  //     // get the midPoint of this tile
-  //     let tilePoints = this.board.getGridPoints(tileXY.x, tileXY.y, true);
-
-  //     let midX = tilePoints[BOTTOM].x,
-  //       midY = tilePoints[RIGHT].y;
-
-  //     this.tilesWithMidPoints.push({
-  //       x: midX,
-  //       y: midY,
-  //       tileX: tileXY.x,
-  //       tileY: tileXY.y
-  //     });
-  //   });
-
-  //   // index the midPoints of each tile so they are easily found within the viewRect
-  //   this.tilesIndex = new KDBush(
-  //     this.tilesWithMidPoints,
-  //     (p: TileXY) => p.x,
-  //     (p: TileXY) => p.y
-  //   );
-  // }
-
-  public isTileInView(tileXY: TileXY): boolean {
-    // get the corners of this tile
-    let tilePoints = this.board.getGridPoints(tileXY.x, tileXY.y, true);
-
-    let midX = tilePoints[1].x,
-      midY = tilePoints[0].y;
-    return this.viewRectangle.contains(midX, midY);
-  }
-
-  // returns an array of (x, y) pairs that are the tile coordinates of the viewable tiles
-  // public getTilesInView(): TileXY[] {
-  //   // search in the KD-Tree what midPoints are within the view area
-  //   const rect = this.viewRectangle,
-  //     results = this.tilesIndex
-  //       .range(rect.x, rect.y, rect.x + rect.width, rect.y + rect.height)
-  //       .map((id: number) => this.tilesWithMidPoints[id])
-  //       .map(({ tileX, tileY }) => ({ x: tileX, y: tileY }));
-
-  //   return results;
-  // }
-
-  public worldXYToTileXYFloat(worldX: number, worldY: number): TileXY {
-    return GetTileXY.call(this.board.grid, worldX, worldY);
-  }
-
-  public static getInstance(config?: IsoBoardConfig) {
-    if (IsoBoard.instance === null) {
-      if (!config) {
-        throw new Error(
-          "A config object should be provided to the first call to getInstance(config?)"
-        );
-      }
-
-      IsoBoard.instance = new IsoBoard(config);
-    }
-
-    return IsoBoard.instance;
-  }
 }
-
-// get tileXY not rounded
-// source code from rex's plugin
-let GetTileXY = function(worldX: number, worldY: number): TileXY {
-  let out: TileXY = { x: 0, y: 0 };
-
-  worldX -= this.x;
-  worldY -= this.y;
-
-  var tmpx = worldX / this.width;
-  var tmpy = worldY / this.height;
-
-  out.x = +tmpx + tmpy;
-  out.y = -tmpx + tmpy;
-
-  return out;
-};
 
 // projections for TileXYs
 const projX = ({ x }: TileXY) => x,

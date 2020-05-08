@@ -2,7 +2,7 @@ import { IsoScene, Point3 } from "../IsoPlugin/IsoPlugin";
 import IsoBoard, { TileXY, ViewExtremes } from "./IsoBoard";
 import IsoTile from "./IsoTile";
 
-import List, { Node } from "../utils/List";
+import List from "../utils/dataTypes/List";
 import CST from "../CST";
 import EnvironmentManager from "../managers/EnvironmentManager";
 import LayersManager from "../managers/LayersManager";
@@ -203,7 +203,9 @@ export default class TileMap {
         x,
         y,
         texture
-      ).setDepth(CST.LAYER_DEPTH.TILES);
+      )
+        .setDepth(CST.LAYER_DEPTH.TILES)
+        .setActive(false);
     }
     // an unused tile already exists, reuse this one
     else {
@@ -267,32 +269,6 @@ export default class TileMap {
    * add new ones
    */
   redrawTiles(): this {
-    // only redraw the visible tiles
-    // let visibleTiles = this.isoBoard.getTilesInView();
-
-    // check each tile in the usedPool if it is still visible
-    // this.usedPool.each((tileNode: Node<IsoTile>) => {
-    //   let tile = tileNode.value;
-
-    //   // this tile isn't in view anymore
-    //   if (!tile.inView(this.isoBoard)) {
-    //     // push the tile in the unused pool
-    //     this.usedPool.remove(tileNode);
-    //     this.unusedPool.push(tile);
-
-    //     tile.setVisible(false);
-
-    //     let y = tile.tileY,
-    //       x = tile.tileX;
-
-    //     this.tilesInPlace[y][x] = null;
-
-    //     if (this.cliffsSparseMatrix[y] && this.cliffsSparseMatrix[y][x]) {
-    //       this.cliffsSparseMatrix[y][x].setVisible(false);
-    //     }
-    //   }
-    // });
-
     let extremes = this.isoBoard.getExtremesTileCoords();
 
     // Keep the intersection between oldView and the newView worth of tiles, discard the difference
@@ -316,6 +292,7 @@ export default class TileMap {
             this.unusedPool.push(tile);
 
             tile.setVisible(false);
+
             if (this.cliffsSparseMatrix[y] && this.cliffsSparseMatrix[y][x]) {
               this.cliffsSparseMatrix[y][x].setVisible(false);
             }
@@ -351,12 +328,6 @@ export default class TileMap {
         if (this.cliffsSparseMatrix[y] && this.cliffsSparseMatrix[y][x]) {
           this.cliffsSparseMatrix[y][x].setVisible(true);
         }
-        //   let cliffTile = this.getUnusedTile(x, y, this.cliffsSparseMatrix[y][x]);
-
-        //   cliffTile.setDepth(-1);
-
-        //   this.usedPool.push(cliffTile);
-        // }
 
         // get an unused tile at x, y tile coords
         let tile = this.getUnusedTile(x, y);
@@ -403,7 +374,8 @@ export default class TileMap {
               Phaser.Math.RND.pick(this.envManager.cliffFrames)
             )
               .setDepth(CST.LAYER_DEPTH.CLIFFS)
-              .setVisible(false);
+              .setVisible(false)
+              .setActive(false);
           }
         }
       }

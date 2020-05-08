@@ -2,7 +2,7 @@ import IsoSprite from "../IsoPlugin/IsoSprite";
 import EnvironmentManager from "../managers/EnvironmentManager";
 import MapManager from "../managers/MapManager";
 import CST from "../CST";
-import { TileXY } from "../IsoPlugin/IsoBoard";
+import { TileXY } from "../map/IsoBoard";
 import LayersManager from "../managers/LayersManager";
 
 export enum GridColor {

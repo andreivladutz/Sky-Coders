@@ -5,6 +5,9 @@ import CST from "../CST";
 
 import PlacementManager from "./PlacementManager";
 import IsoScene from "../IsoPlugin/IsoScene";
+import BboxKDStorage from "../utils/dataTypes/BboxKDStorage";
+import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
+import MapManager from "./MapManager";
 
 type Frame = Phaser.Types.Animations.AnimationFrame;
 type FrameGen = Phaser.Types.Animations.GenerateFrameNames;
@@ -37,11 +40,25 @@ export default class EnvironmentManager extends Manager {
   public TILE_WIDTH: number;
   public TILE_HEIGHT: number;
 
-  placementManager: PlacementManager;
+  // Trees and ores indexed efficiently in a kd-tree so they can be
+  // Retrieved fast when they are in view range
+  environmentObjStorage: BboxKDStorage<IsoSpriteObject>;
+  // Index the objects currently in view by their tile coordinates
+  // No objects are overlayed so this is safe
+  environmentObjInView: Map<number, Map<number, IsoSpriteObject>> = new Map();
+  // {
+  //   [yCoord: number]: {
+  //     [xCoord: number]: IsoSpriteObject;
+  //   };
+  // } = {};
+
+  // Keep this flag so listeners do not get registered multiple times
+  initedListeners: boolean = false;
+
+  // placementManager: PlacementManager;
 
   protected constructor() {
     super();
-    this.placementManager = PlacementManager.getInstance();
   }
 
   getTextureKey() {
@@ -78,13 +95,81 @@ export default class EnvironmentManager extends Manager {
     mapH: number,
     seed: string
   ) {
-    this.placementManager.placeRandomResources(
+    let placementManager = PlacementManager.getInstance().placeRandomResources(
       scene,
       mapGrid,
       mapW,
       mapH,
       seed
     );
+
+    let environmentObjects = placementManager.oreObjects.concat(
+      placementManager.treesObjects
+    );
+
+    // Index trees and ores
+    this.environmentObjStorage = new BboxKDStorage(environmentObjects);
+
+    for (let object of environmentObjects) {
+      object.setActive(false).setVisible(false);
+    }
+
+    // Start listening for map events
+    this.initListeners();
+
+    PlacementManager.destroyInstance();
+  }
+
+  // Listen to the map view rectangle getting dirty
+  // That means we have to redraw the objects in view
+  private initListeners() {
+    if (this.initedListeners) {
+      return;
+    }
+
+    this.initedListeners = true;
+
+    MapManager.getInstance().events.on(
+      CST.EVENTS.MAP.IS_DIRTY,
+      this.enableObjectsInView.bind(this)
+    );
+  }
+
+  // Set the objects that are currently visible as active and visible
+  // And also remove the ones that are not being visible anymore
+  private enableObjectsInView(viewRect: Phaser.Geom.Rectangle) {
+    if (!this.environmentObjStorage) {
+      return;
+    }
+
+    let objectBounds = new Phaser.Geom.Rectangle();
+
+    // First, deactivate the object that are no longer visible to the player
+    for (let sameYObjects of this.environmentObjInView.values()) {
+      for (let [tileX, object] of sameYObjects.entries()) {
+        object.getBounds(objectBounds);
+
+        if (!Phaser.Geom.Rectangle.Overlaps(viewRect, objectBounds)) {
+          object.setVisible(false).setActive(false);
+
+          sameYObjects.delete(tileX);
+        }
+      }
+    }
+
+    let objectsInView = this.environmentObjStorage.getObjectsInView(viewRect);
+
+    for (let object of objectsInView) {
+      object.setActive(true).setVisible(true);
+
+      // Index the object so we can deactivate it once it is no longer visible
+      let { tileX, tileY } = object;
+      if (!this.environmentObjInView.get(tileY)) {
+        this.environmentObjInView.set(tileY, new Map());
+      }
+
+      this.environmentObjInView.get(tileY).set(tileX, object);
+    }
   }
 
   async preload(load: Phaser.Loader.LoaderPlugin) {

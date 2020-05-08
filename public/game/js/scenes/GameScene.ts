@@ -6,7 +6,7 @@ import CameraManager from "../managers/CameraManager";
 import MapManager from "../managers/MapManager";
 import Actor from "../gameObjects/Actor";
 import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
-import TileMap from "../IsoPlugin/TileMap";
+import TileMap from "../map/TileMap";
 import BuildingsManager from "../managers/BuildingsManager";
 
 // TODO: remove global variables

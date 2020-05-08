@@ -324,6 +324,11 @@ export default class PlacementManager extends Manager {
   public static getInstance() {
     return super.getInstance() as PlacementManager;
   }
+
+  // Destroy the instance and free up memory once this manager is not used anymore
+  public static destroyInstance() {
+    this._instance = null;
+  }
 }
 
 // module private functions

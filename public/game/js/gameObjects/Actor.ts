@@ -11,7 +11,7 @@ import { IsoScene } from "../IsoPlugin/IsoPlugin";
 import NavSpriteObject from "./NavSpriteObject";
 
 import ActorsManager from "../managers/ActorsManager";
-import { TileXY } from "../IsoPlugin/IsoBoard";
+import { TileXY } from "../map/IsoBoard";
 
 // mapping event to directions
 const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
