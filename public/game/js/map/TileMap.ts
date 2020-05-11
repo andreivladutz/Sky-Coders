@@ -345,6 +345,18 @@ export default class TileMap {
   }
 
   private generateCliffs() {
+    // If the cliff at x, y is hidden by the neigbouring cliffs, don't waste memory
+    let hiddenByNeighbours = (x: number, y: number) => {
+      let empty = CST.ENVIRONMENT.EMPTY_TILE;
+      return (
+        this.mapMatrix[y] &&
+        this.mapMatrix[y + 1] &&
+        this.mapMatrix[y][x + 1] !== empty &&
+        this.mapMatrix[y + 1][x] !== empty &&
+        this.mapMatrix[y + 1][x + 1] !== empty
+      );
+    };
+
     for (let y = 0; y < this.mapHeight; y++) {
       for (let x = 0; x < this.mapWidth; x++) {
         if (
@@ -352,7 +364,7 @@ export default class TileMap {
           this.mapMatrix[y][x] !== CST.ENVIRONMENT.EMPTY_TILE
         ) {
           if (
-            isMargin(x, y, this.mapMatrix) ||
+            (isMargin(x, y, this.mapMatrix) && !hiddenByNeighbours(x, y)) ||
             x === this.mapWidth - 1 ||
             y === this.mapHeight - 1
           ) {

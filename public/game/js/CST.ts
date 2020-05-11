@@ -185,7 +185,7 @@ export default {
     // how wide a region should be in tiles
     MAXSIZE: 30,
     // how many trees should be inside a region
-    MAXTREES: 30,
+    MAXTREES: 10,
     MINTREES: 8,
     // how many tiles should be around the trees
     TREE_RADIUS: 1,

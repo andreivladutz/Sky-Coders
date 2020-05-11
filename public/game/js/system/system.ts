@@ -18,8 +18,8 @@ function getVariant() {
   if (screenHeight < 720) {
     return "sd";
   }
-  // Somewhere between 720p and 1080p
-  else if (screenHeight >= 720 && screenHeight <= 1200) {
+  // Somewhere between 720p and 1440p
+  else if (screenHeight >= 720 && screenHeight < 1440) {
     return "md";
   }
   // Anything above 1080p
