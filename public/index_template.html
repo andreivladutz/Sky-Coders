@@ -28,6 +28,7 @@
     <link rel="icon" type="image/png" href="/no_auth/image/icon/icon192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
     <link rel="stylesheet" href="/game/css/game.css" />
+    <link rel="stylesheet" href="/game/css/blockly.css" />
     <link rel="stylesheet" href="/game/css/modal.css" />
     <link rel="stylesheet" href="/game/css/spin.css" />
     <!-- using Html Plugin for webpack inserts the scripts automatically
@@ -45,6 +46,38 @@
     <div id="canvas-container"></div>
     <!-- Bodymovin animations container -->
     <div id="bm"></div>
+
+    <!-- BLOCKLY CONTAINER :) -->
+    <div id="blocklyContainer">
+      <div>
+        <div id="blocklyArea"></div>
+      </div>
+    </div>
+
+    <!-- Blockly's toolbox -->
+    <xml id="blocklyToolbox" style="display: none">
+      <category name="upper">
+        <category name="math" categorystyle="math_category">
+          <block type="controls_if"></block>
+          <block type="controls_repeat_ext"></block>
+          <block type="logic_compare"></block>
+          <block type="math_number"></block>
+          <block type="math_arithmetic"></block>
+          <block type="text"></block>
+          <block type="text_print"></block>
+          <block type="controls_whileUntil"></block>
+        </category>
+      </category>
+      <category name="lower">
+        <category name="Variables" custom="VARIABLE"></category>
+        <category name="Functions" custom="PROCEDURE"></category>
+      </category>
+    </xml>
+
+    <!-- Dark Mode Button -->
+    <button class="nightModeButton">
+      <img class="button-image" src="/game/assets/image/moon.png" />
+    </button>
 
     <!-- Dummy tag -->
     <a href="#" data-micromodal-trigger="modal-window"></a>

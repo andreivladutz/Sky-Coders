@@ -1,0 +1,127 @@
+#blocklyContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: rgba(224, 224, 224, 0.5);
+
+  -webkit-user-select: none; /* Chrome all / Safari all */
+  -moz-user-select: none; /* Firefox all */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Likely future */
+}
+
+#blocklyContainer > div {
+  border-radius: 0.5rem;
+  width: 92%;
+  height: 80%;
+  background-color: tan;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+#blocklyArea {
+  width: 99%;
+  height: 98%;
+}
+
+.injectionDiv {
+  border-radius: 0.5rem;
+}
+
+/* Dark mode button*/
+button.nightModeButton {
+  position: absolute;
+  top: 2%;
+  right: 5%;
+  padding: 15px 15px 10px 15px;
+  border: none;
+  border-radius: 10%;
+  text-align: center;
+  background: #333333;
+  font-size: 18px;
+  text-decoration: none;
+  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  outline: 0;
+  cursor: pointer;
+}
+
+button.nightModeButton:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+.button-image {
+  height: 20px;
+  margin-right: 5px;
+  margin-bottom: 5px;
+  vertical-align: middle;
+}
+
+button.night-mode {
+  color: #333333;
+  background-color: white;
+}
+
+/**************************\
+  Demo Animation Style
+\**************************/
+@keyframes mmfadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes mmfadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes mmslideIn {
+  from {
+    transform: translateY(15%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes mmslideOut {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-10%);
+  }
+}
+
+.blocklyTransition[aria-hidden="false"]#blocklyContainer {
+  animation: mmfadeIn 0.3s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.blocklyTransition[aria-hidden="false"]#blocklyContainer > div {
+  animation: mmslideIn 0.3s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.blocklyTransition[aria-hidden="true"]#blocklyContainer {
+  animation: mmfadeOut 0.3s cubic-bezier(0, 0, 0.2, 1);
+}
+
+.blocklyTransition[aria-hidden="true"]#blocklyContainer > div {
+  animation: mmslideOut 0.3s cubic-bezier(0, 0, 0.2, 1);
+}

@@ -6,6 +6,7 @@ import UIComponentsFact from "./UIComponentsFactory";
 import { MoveUIUtility, MoveUIDirection } from "./UIMovement";
 import UIComponents from "./UIComponentsFactory";
 import UIStateMachine from "./UIStateMachine";
+import BlocklyManager from "../Blockly/BlocklyManager";
 
 type Image = Phaser.GameObjects.Image;
 const Image = Phaser.GameObjects.Image;
@@ -54,6 +55,10 @@ class MainUIButon extends ButtonImage<MainUI> {
     switch (this.btnName) {
       case BUTTON_TYPES.BUILD:
         this.parentUI.handleBuildButton();
+        break;
+
+      case BUTTON_TYPES.SCRIPT:
+        BlocklyManager.getInstance().toggleWorkspace();
         break;
     }
   };

@@ -370,6 +370,15 @@ export default {
     // If the game doesn't connect in 3 seconds, consider it offline
     OFFLINE_TIMEOUT: 2 * 1000
   },
+  BLOCKLY: {
+    AREA_ID: "blocklyArea",
+    TOOLBOX_ID: "blocklyToolbox",
+    CONTAINER_ID: "blocklyContainer",
+    ANIMATION: {
+      ATTRIB: "aria-hidden",
+      CLASS: "blocklyTransition"
+    }
+  },
   // constants imported from the worker cst
   WORKER: WORKER_CST,
   // COMMON CSTS between the client and the sv
