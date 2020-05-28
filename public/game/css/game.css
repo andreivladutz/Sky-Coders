@@ -9,3 +9,71 @@ body,
   width: 100%;
   height: 100%;
 }
+
+div:focus {
+  outline: none;
+}
+
+#characterContainer {
+  position: fixed;
+  top: 2%;
+  right: 2%;
+
+  width: 10%;
+}
+
+#selectedCharacter {
+  width: 100%;
+  padding-bottom: 100%;
+
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain;
+
+  background-color: #905c2f;
+
+  border-color: #5a2316;
+  border-radius: 5%;
+  border-style: outset;
+  border-width: 5%;
+
+  background-image: url("/game/assets/image/Heads/mallack_head.png");
+}
+
+/* Terminal button*/
+button#terminalButton {
+  width: 50%;
+  padding-bottom: 40%;
+
+  border: none;
+  border-radius: 10%;
+
+  background: #34495e;
+  font-size: 18px;
+  text-decoration: none;
+  color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  outline: 0;
+  cursor: pointer;
+
+  background-image: url("/game/assets/image/UI/terminal.png");
+  background-position: center; /* Center the image */
+  background-repeat: no-repeat; /* Do not repeat the image */
+  background-size: contain;
+}
+
+button#terminalButton:hover {
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+}
+
+#termDiv {
+  width: 99%;
+  height: 98%;
+}
+
+.xterm.terminal {
+  position: fixed;
+  top: 0;
+  left: 0;
+}

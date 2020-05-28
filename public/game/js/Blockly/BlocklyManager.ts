@@ -3,6 +3,7 @@ import Blockly from "blockly";
 import * as JavaScript from "blockly/javascript";
 import CST from "../CST";
 import CodeBridge from "./CodeBridge";
+import GameWindow from "../ui/GameWindow";
 
 export default class BlocklyManager extends Manager {
   private readonly darkTheme: Blockly.Theme = (Blockly as any).Themes.Dark;
@@ -12,7 +13,7 @@ export default class BlocklyManager extends Manager {
   public workspace: Blockly.WorkspaceSvg;
 
   private darkModeToggleButton: HTMLButtonElement;
-  private blocklyContainer: HTMLDivElement;
+  private window: GameWindow;
 
   protected constructor() {
     super();
@@ -52,19 +53,15 @@ export default class BlocklyManager extends Manager {
     }
   }
 
-  // Add the animation class so a transition is animated via css
-  // After the css animation end, hide the workspace completely
   public closeWorkspace() {
-    // Add the class and attribute used by the css animation
-    this.blocklyContainer.classList.add(CST.BLOCKLY.ANIMATION.CLASS);
-    this.blocklyContainer.setAttribute(CST.BLOCKLY.ANIMATION.ATTRIB, "true");
-
     // Hide the button instantly
     this.darkModeToggleButton.style.display = "none";
 
-    this.callbackOnAnimationEnd(() => {
+    this.window.once(CST.WINDOW.CLOSE_ANIM_EVENT, () => {
       this.hideWorkspace();
     });
+
+    this.window.closeWindow();
 
     let code = this.getCode();
     console.log(code);
@@ -77,34 +74,15 @@ export default class BlocklyManager extends Manager {
     }
   }
 
-  // Call cb back when the css animation ends
-  private callbackOnAnimationEnd(cb) {
-    let computedStyle = getComputedStyle(this.blocklyContainer);
-
-    let interval = setInterval(() => {
-      if (computedStyle.animationPlayState === "running") {
-        clearInterval(interval);
-
-        cb();
-
-        this.blocklyContainer.classList.remove(CST.BLOCKLY.ANIMATION.CLASS);
-        this.blocklyContainer.removeAttribute(CST.BLOCKLY.ANIMATION.ATTRIB);
-      }
-    }, 250);
-  }
-
   // Show all workspace-related element with an animated transition
   public showWorkspace() {
-    this.blocklyContainer.classList.add(CST.BLOCKLY.ANIMATION.CLASS);
-    this.blocklyContainer.setAttribute(CST.BLOCKLY.ANIMATION.ATTRIB, "false");
-
-    this.callbackOnAnimationEnd(() => {
+    this.window.once(CST.WINDOW.OPEN_ANIM_EVENT, () => {
       this.darkModeToggleButton.style.display = "";
     });
 
-    this.workspace.setVisible(true);
-    this.blocklyContainer.style.display = "";
+    this.window.openWindow();
 
+    this.workspace.setVisible(true);
     Blockly.svgResize(this.workspace);
   }
 
@@ -113,27 +91,17 @@ export default class BlocklyManager extends Manager {
     this.workspace.setVisible(false);
 
     this.darkModeToggleButton.style.display = "none";
-    this.blocklyContainer.style.display = "none";
   }
 
   private init() {
     this.initWorkspace();
     this.initDarkToggleButton();
-    this.initContainerElement();
-  }
 
-  private initContainerElement() {
-    this.blocklyContainer = document.getElementById(
-      CST.BLOCKLY.CONTAINER_ID
-    ) as HTMLDivElement;
+    this.window = new GameWindow(
+      document.getElementById(CST.BLOCKLY.CONTAINER_ID) as HTMLDivElement
+    );
 
-    this.blocklyContainer.onclick = e => {
-      e.stopPropagation();
-
-      if (e.target === this.blocklyContainer) {
-        this.closeWorkspace();
-      }
-    };
+    this.window.on(CST.WINDOW.CLOSE_EVENT, this.closeWorkspace.bind(this));
   }
 
   private initDarkToggleButton() {

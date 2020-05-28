@@ -379,6 +379,26 @@ export default {
       CLASS: "blocklyTransition"
     }
   },
+  WINDOW: {
+    CLOSE_EVENT: "window-close",
+    OPEN_EVENT: "window-open",
+    CLOSE_ANIM_EVENT: "window-close-anim",
+    OPEN_ANIM_EVENT: "window-open-anim",
+
+    CLASSES: {
+      CONTAINER: "windowOverlay",
+      WINDOW: "windowContainer"
+    }
+  },
+  CHARA_SELECTION: {
+    CONTAINER_ID: "characterContainer",
+    TERMINAL_BTN_ID: "terminalButton"
+  },
+  TERMINAL: {
+    ID: "termDiv",
+    WINDOW_ID: "terminalContainer",
+    DEBOUNCE_TIME: 250
+  },
   // constants imported from the worker cst
   WORKER: WORKER_CST,
   // COMMON CSTS between the client and the sv

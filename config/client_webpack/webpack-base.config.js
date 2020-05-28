@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 const CST = require("./WP_CST");
 
 const webpack = require("webpack"),
@@ -33,6 +34,10 @@ module.exports = {
         test: /\.tsx?$/,
         use: "ts-loader",
         exclude: /node_modules/
+      },
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"]
       }
     ]
   },

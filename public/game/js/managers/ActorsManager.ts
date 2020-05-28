@@ -1,7 +1,7 @@
 import ACTORS_CST, { ACTOR_NAMES_ARR } from "../ACTORS_CST";
 import Actor, { ActorConfig } from "../gameObjects/Actor";
-
 import Manager from "./Manager";
+import CharacterUI from "../ui/CharacterUI";
 
 // Singleton class handling the loading of the actor resources
 export default class ActorsManager extends Manager {
@@ -9,6 +9,7 @@ export default class ActorsManager extends Manager {
   sceneActors: Actor[] = [];
   // currently selected Actor
   selectedActor: Actor = null;
+  charaUI: CharacterUI;
 
   // when an actor gets selected, the actorsManager should be informed
   public onActorSelected(actor: Actor) {
@@ -18,11 +19,13 @@ export default class ActorsManager extends Manager {
     }
 
     this.selectedActor = actor;
+    this.toggleCharaSelectionUI();
   }
 
   public onActorDeselected(actor: Actor) {
     if (this.selectedActor === actor) {
       this.selectedActor = null;
+      this.toggleCharaSelectionUI();
     }
   }
 
@@ -41,6 +44,26 @@ export default class ActorsManager extends Manager {
   // loads all the resources needed for the actors
   async preload(load: Phaser.Loader.LoaderPlugin) {
     this.loadResources(load);
+  }
+
+  private async toggleCharaSelectionUI() {
+    if (!this.charaUI) {
+      let UIComponents = (await import("../ui/UIComponentsFactory")).default;
+      let CharacterUI = (await import("../ui/CharacterUI")).default;
+
+      // Ignore the ui scene and game scene
+      this.charaUI = UIComponents.getUIComponents(
+        CharacterUI,
+        null,
+        null
+      )[0] as CharacterUI;
+    }
+
+    if (this.charaUI.isEnabled) {
+      this.charaUI.turnOff();
+    } else {
+      this.charaUI.enable();
+    }
   }
 
   private loadResources(load: Phaser.Loader.LoaderPlugin) {

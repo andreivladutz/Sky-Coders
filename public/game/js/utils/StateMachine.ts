@@ -1,3 +1,4 @@
+import Phaser from "phaser";
 import EventEmitter = Phaser.Events.EventEmitter;
 
 // config of a state

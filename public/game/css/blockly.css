@@ -1,4 +1,4 @@
-#blocklyContainer {
+.windowOverlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -16,7 +16,7 @@
   user-select: none; /* Likely future */
 }
 
-#blocklyContainer > div {
+.windowOverlay > .windowContainer {
   border-radius: 0.5rem;
   width: 92%;
   height: 80%;
@@ -25,6 +25,11 @@
   display: flex;
   justify-content: center;
   align-items: center;
+
+  -webkit-user-select: none; /* Chrome all / Safari all */
+  -moz-user-select: none; /* Firefox all */
+  -ms-user-select: none; /* IE 10+ */
+  user-select: none; /* Likely future */
 }
 
 #blocklyArea {
@@ -110,18 +115,18 @@ button.night-mode {
   }
 }
 
-.blocklyTransition[aria-hidden="false"]#blocklyContainer {
+.blocklyTransition[aria-hidden="false"].windowOverlay {
   animation: mmfadeIn 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.blocklyTransition[aria-hidden="false"]#blocklyContainer > div {
+.blocklyTransition[aria-hidden="false"].windowOverlay > .windowContainer {
   animation: mmslideIn 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.blocklyTransition[aria-hidden="true"]#blocklyContainer {
+.blocklyTransition[aria-hidden="true"].windowOverlay {
   animation: mmfadeOut 0.3s cubic-bezier(0, 0, 0.2, 1);
 }
 
-.blocklyTransition[aria-hidden="true"]#blocklyContainer > div {
+.blocklyTransition[aria-hidden="true"].windowOverlay > .windowContainer {
   animation: mmslideOut 0.3s cubic-bezier(0, 0, 0.2, 1);
 }

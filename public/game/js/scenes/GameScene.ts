@@ -5,9 +5,10 @@ import IsoScene from "../IsoPlugin/IsoScene";
 import CameraManager from "../managers/CameraManager";
 import MapManager from "../managers/MapManager";
 import Actor from "../gameObjects/Actor";
-import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
+import { ACTOR_NAMES } from "../ACTORS_CST";
 import TileMap from "../map/TileMap";
 import BuildingsManager from "../managers/BuildingsManager";
+import CharacterTerminal from "../Blockly/CharacterTerminal";
 
 // TODO: remove global variables
 let actor: Actor;
@@ -78,6 +79,8 @@ export default class GameScene extends IsoScene {
     MapManager.getInstance().setScrollOverTiles(actor.tileX, actor.tileY);
     //   .enableDebugging()
     // actor.enableDebugging();
+
+    new CharacterTerminal().open();
   }
 
   update() {

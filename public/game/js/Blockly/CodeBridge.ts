@@ -30,6 +30,5 @@ export default class CodeBridge {
       "alert",
       interpreter.createNativeFunction(alertWrapper)
     );
-    console.log(globalObject);
   };
 }
