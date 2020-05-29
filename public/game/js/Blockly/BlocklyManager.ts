@@ -2,8 +2,9 @@ import Manager from "../managers/Manager";
 import Blockly from "blockly";
 import * as JavaScript from "blockly/javascript";
 import CST from "../CST";
-import CodeBridge from "./CodeBridge";
+import CodeInterpreter from "./CodeInterpreter";
 import GameWindow from "../ui/GameWindow";
+import Actor from "../gameObjects/Actor";
 
 export default class BlocklyManager extends Manager {
   private readonly darkTheme: Blockly.Theme = (Blockly as any).Themes.Dark;
@@ -11,6 +12,8 @@ export default class BlocklyManager extends Manager {
     .Classic;
 
   public workspace: Blockly.WorkspaceSvg;
+
+  private currentActor: Actor;
 
   private darkModeToggleButton: HTMLButtonElement;
   private window: GameWindow;
@@ -45,14 +48,6 @@ export default class BlocklyManager extends Manager {
     return JavaScript.workspaceToCode(this.workspace);
   }
 
-  public toggleWorkspace() {
-    if (this.workspace.isVisible()) {
-      this.closeWorkspace();
-    } else {
-      this.showWorkspace();
-    }
-  }
-
   public closeWorkspace() {
     // Hide the button instantly
     this.darkModeToggleButton.style.display = "none";
@@ -62,20 +57,34 @@ export default class BlocklyManager extends Manager {
     });
 
     this.window.closeWindow();
+    this.currentActor.blocklyCode = this.getWorkspaceTextState();
 
     let code = this.getCode();
-    console.log(code);
-    let codeBridge = new CodeBridge(code);
+    this.currentActor.terminal.commandsHandler.outputRunningCode(
+      code.split("\n")
+    );
+
+    let interpreter = this.currentActor.interpreter;
+    interpreter.appendCode(code);
 
     try {
-      while (codeBridge.stepThroughCode());
+      while (interpreter.stepThroughCode());
     } catch (e) {
       console.warn("Error caught " + e.message);
     }
   }
 
   // Show all workspace-related element with an animated transition
-  public showWorkspace() {
+  // Opening the workspace for a specific actor
+  public showWorkspace(actor: Actor) {
+    this.currentActor = actor;
+
+    try {
+      this.setWorkspaceStateFromText(actor.blocklyCode);
+    } catch {
+      this.workspace.clear();
+    }
+
     this.window.once(CST.WINDOW.OPEN_ANIM_EVENT, () => {
       this.darkModeToggleButton.style.display = "";
     });

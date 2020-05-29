@@ -12,6 +12,8 @@ import NavSpriteObject from "./NavSpriteObject";
 
 import ActorsManager from "../managers/ActorsManager";
 import { TileXY } from "../map/IsoBoard";
+import CharacterTerminal from "../Blockly/CharacterTerminal";
+import CodeInterpreter from "../Blockly/CodeInterpreter";
 
 // mapping event to directions
 const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
@@ -56,10 +58,17 @@ export interface ActorConfig {
 }
 
 export default class Actor extends NavSpriteObject {
-  actorsManager: ActorsManager = ActorsManager.getInstance();
+  private actorsManager: ActorsManager = ActorsManager.getInstance();
 
-  walking: boolean = false;
-  direction: ACTOR_DIRECTIONS = ACTOR_DIRECTIONS.SE;
+  private walking: boolean = false;
+  private direction: ACTOR_DIRECTIONS = ACTOR_DIRECTIONS.SE;
+
+  // Each character has its terminal
+  public terminal: CharacterTerminal;
+  // Each character has its interpreter
+  public interpreter: CodeInterpreter;
+  // Each character has its blockly code
+  public blocklyCode: string = "";
 
   constructor(config: ActorConfig) {
     super(
@@ -81,6 +90,9 @@ export default class Actor extends NavSpriteObject {
 
     // subscribes itself to the Actors Manager
     this.actorsManager.sceneActors.push(this);
+
+    this.terminal = new CharacterTerminal(this.actorKey);
+    this.interpreter = new CodeInterpreter(this);
   }
 
   // Keep it as a separate function so we can then remove the listener

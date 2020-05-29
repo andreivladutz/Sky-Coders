@@ -79,8 +79,6 @@ export default class GameScene extends IsoScene {
     MapManager.getInstance().setScrollOverTiles(actor.tileX, actor.tileY);
     //   .enableDebugging()
     // actor.enableDebugging();
-
-    new CharacterTerminal().open();
   }
 
   update() {

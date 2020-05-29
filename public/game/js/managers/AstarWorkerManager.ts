@@ -115,6 +115,13 @@ export default class AstarWorkerManager extends Manager {
     }
   }
 
+  // all workers should apply this layer
+  removeLayer(layer: TileXY[]) {
+    for (let actorKey in this.astarWorkers) {
+      this.sendMessage(actorKey, WK_CST.MSG.REMOVE_LAYER, layer);
+    }
+  }
+
   resolveFoundPath(path: TileXY[], requestId: number) {
     // Resolve the promise returned from the findPath method with the path returned from the worker
     this.pathFindingPromiseResolvers[requestId](path);

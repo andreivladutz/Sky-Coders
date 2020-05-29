@@ -94,7 +94,7 @@ export default class SocketManager extends Manager {
   }
 
   // Redirect this client to another route
-  private redirectClient(route: string) {
+  public redirectClient(route: string) {
     globalThis.location.href = route;
   }
 

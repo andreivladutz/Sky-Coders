@@ -24,8 +24,8 @@ export default class ActorsManager extends Manager {
 
   public onActorDeselected(actor: Actor) {
     if (this.selectedActor === actor) {
-      this.selectedActor = null;
       this.toggleCharaSelectionUI();
+      this.selectedActor = null;
     }
   }
 
@@ -62,7 +62,7 @@ export default class ActorsManager extends Manager {
     if (this.charaUI.isEnabled) {
       this.charaUI.turnOff();
     } else {
-      this.charaUI.enable();
+      this.charaUI.enable(this.selectedActor);
     }
   }
 

@@ -61,6 +61,22 @@ export default class BuildingObject extends IsoSpriteObject {
     // this.layersManager.debugLayers(scene);
   }
 
+  public makeInteractive(): this {
+    this.makeSelectable().setSelectedTintColor(CST.ACTOR.SELECTION_TINT);
+
+    // when this actor gets SELECTED
+    this.on(CST.EVENTS.OBJECT.SELECT, () => {
+      console.log("BUILDING SELECTED");
+    });
+
+    // when this actor gets DESELECTED
+    this.on(CST.EVENTS.OBJECT.DESELECT, () => {
+      console.log("BUILDING DESELECTED");
+    });
+
+    return this;
+  }
+
   private positionToCenter() {
     // Try to position this building at the center of the screen
     let { x, y } = CameraManager.getInstance().getWorldPointAtCenter();
@@ -90,6 +106,8 @@ export default class BuildingObject extends IsoSpriteObject {
       this.layersManager.removeObjectFromLayer(this);
     }
 
+    this.disableInteractive();
+
     this.mapManager.removeSpriteObjectFromBoard(this);
     this.destroy();
     // also destroy the grid graphics
@@ -118,6 +136,8 @@ export default class BuildingObject extends IsoSpriteObject {
 
       return false;
     }
+
+    this.makeInteractive();
 
     // hide the grid
     this.disableGridDrawing();

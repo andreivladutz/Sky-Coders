@@ -7,6 +7,8 @@ import { MoveUIUtility, MoveUIDirection } from "./UIMovement";
 import UIComponents from "./UIComponentsFactory";
 import UIStateMachine from "./UIStateMachine";
 import BlocklyManager from "../Blockly/BlocklyManager";
+import ActorsManager from "../managers/ActorsManager";
+import SocketManager from "../online/SocketManager";
 
 type Image = Phaser.GameObjects.Image;
 const Image = Phaser.GameObjects.Image;
@@ -57,8 +59,21 @@ class MainUIButon extends ButtonImage<MainUI> {
         this.parentUI.handleBuildButton();
         break;
 
+      case BUTTON_TYPES.LOGOUT:
+        SocketManager.getInstance().redirectClient(
+          CST.COMMON_CST.CONNECTION.LOGOUT_PATH
+        );
+        break;
+
       case BUTTON_TYPES.SCRIPT:
-        BlocklyManager.getInstance().toggleWorkspace();
+        let selectedActor = ActorsManager.getInstance().selectedActor;
+
+        if (!selectedActor) {
+          // TODO: TOAST "NO ACTOR IS SELECTED"
+          return;
+        }
+
+        BlocklyManager.getInstance().showWorkspace(selectedActor);
         break;
     }
   };

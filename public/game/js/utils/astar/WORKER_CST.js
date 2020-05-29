@@ -4,7 +4,8 @@ globalThis.WORKER_CST = {
     INIT_MAP: 1,
     INIT_ACTOR: 2,
     FIND_PATH: 3,
-    APPLY_LAYER: 4
+    APPLY_LAYER: 4,
+    REMOVE_LAYER: 5
   },
   // Format of a message
   MESSAGE_TYPE: "messageType",

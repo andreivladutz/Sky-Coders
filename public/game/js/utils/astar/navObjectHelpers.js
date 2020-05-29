@@ -68,6 +68,21 @@ globalThis.NavObjectHelpers = class {
     }
   }
 
+  /*
+   *  gets an array of tiles {x, y} coords and remove them from the object layer
+   */
+  removeLayer(layer) {
+    for (let tile of layer) {
+      let { x, y } = tile;
+
+      if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
+        continue;
+      }
+
+      this.objectLayer[y][x] = EMPTY_OBJECT_TILE;
+    }
+  }
+
   // smoothen the path walked by this game object
   // * do not want to walk in zig zags if succesive tiles are on a diagonal
   // * if succesive tiles are on a line, we can keep the extremes of the lines only

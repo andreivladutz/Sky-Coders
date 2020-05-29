@@ -50,7 +50,6 @@ export default class IsoSpriteObject extends IsoSprite {
   // the graphics used to draw this object's grid
   protected gridGraphics: Phaser.GameObjects.Graphics;
   // should we draw the grid? if so this property is a valid number
-  // TODO: should default to DO_NOT_DRAW
   protected drawingGridColor: GridColor = GridColor.DO_NOT_DRAW;
 
   // the tint color of this object when a pointer is over it or it is selected

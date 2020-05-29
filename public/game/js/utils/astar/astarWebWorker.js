@@ -36,6 +36,9 @@ let Worker = new (class AstarWorker {
       case WORKER_CST.MSG.APPLY_LAYER:
         this.applyLayer(messageData);
         break;
+      case WORKER_CST.MSG.REMOVE_LAYER:
+        this.removeLayer(messageData);
+        break;
       default:
         throw new Error("MESSAGE TYPE NOT RECOGNISED BY THIS WEB WORKER.");
     }
@@ -65,6 +68,11 @@ let Worker = new (class AstarWorker {
   // just apply the layer to the nav object's object grid
   applyLayer(tiles) {
     this.navObject.applyLayer(tiles);
+  }
+
+  // remove the layer from the nav object's object grid
+  removeLayer(tiles) {
+    this.navObject.removeLayer(tiles);
   }
 
   // each path finding instance has a request id where it came from

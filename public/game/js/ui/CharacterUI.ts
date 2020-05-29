@@ -1,5 +1,6 @@
 import UIComponent from "./UIComponent";
 import CST from "../CST";
+import Actor from "../gameObjects/Actor";
 
 export default class CharacterUI extends UIComponent {
   private characterContainer: HTMLDivElement;
@@ -17,12 +18,14 @@ export default class CharacterUI extends UIComponent {
     this.terminalButton = document.getElementById(
       CST.CHARA_SELECTION.TERMINAL_BTN_ID
     ) as HTMLButtonElement;
-
-    this.terminalButton.onclick;
   }
 
-  public enable() {
+  public enable(selectedActor: Actor) {
     this.characterContainer.style.display = "";
+
+    this.terminalButton.onclick = () => {
+      selectedActor.terminal.open();
+    };
 
     this.isEnabled = true;
   }

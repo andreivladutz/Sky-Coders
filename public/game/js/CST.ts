@@ -397,7 +397,23 @@ export default {
   TERMINAL: {
     ID: "termDiv",
     WINDOW_ID: "terminalContainer",
-    DEBOUNCE_TIME: 250
+    DEBOUNCE_TIME: 250,
+    // color codes to use in the terminal
+    COLORS: {
+      RED: "31m",
+      GREEN: "92m",
+      YELLOW: "93m",
+      MAGENTA: "35m",
+      CYAN: "96m"
+    },
+    BACKGROUND: {
+      GRAY: "100m"
+    },
+    // Ansi escape
+    ESCAPE: {
+      START: "\x1B[1;3;",
+      END: "\x1B[0m"
+    }
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST,

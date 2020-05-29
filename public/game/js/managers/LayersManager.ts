@@ -70,8 +70,12 @@ export default class LayersManager extends Manager {
   /*
    * Notify the astar worker to also apply this layer
    */
-  public notifyAstarWorker(layer: Tile[]) {
-    AstarWorkerManager.getInstance().applyLayer(layer);
+  public notifyAstarWorker(layer: Tile[], removeLayer: boolean = false) {
+    if (removeLayer) {
+      AstarWorkerManager.getInstance().removeLayer(layer);
+    } else {
+      AstarWorkerManager.getInstance().applyLayer(layer);
+    }
   }
 
   // Apply the object's id on the objectLayer ONLY IF there isn't another object there already
@@ -121,8 +125,10 @@ export default class LayersManager extends Manager {
 
     // the uid is unique to each object
     let uid = obj.getObjectUID();
+    let id = obj.objectId;
 
-    for (let tile of obj.getGridTiles()) {
+    let gridTiles = obj.getGridTiles();
+    for (let tile of gridTiles) {
       let { x, y } = tile;
 
       if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
@@ -135,6 +141,11 @@ export default class LayersManager extends Manager {
 
       this.objectLayer[y][x] = CST.ENVIRONMENT.EMPTY_TILE;
       this.objectUidsGrid[y][x] = CST.ENVIRONMENT.EMPTY_TILE;
+    }
+
+    // notify astar worker to remove the layer but remove only buildings
+    if (id === CST.LAYERS.OBJ_ID.BUILDING) {
+      this.notifyAstarWorker(gridTiles, true);
     }
 
     delete this.uidsToObjects[uid];
