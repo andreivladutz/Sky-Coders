@@ -1,0 +1,30 @@
+[
+  {
+    "type": "environment_coordinate_pair",
+    "message0": "(x : %1 %2 , y : %3 )",
+    "args0": [
+      {
+        "type": "field_number",
+        "name": "X_COORD",
+        "value": 0,
+        "min": 0,
+        "max": 127
+      },
+      {
+        "type": "input_dummy"
+      },
+      {
+        "type": "field_number",
+        "name": "Y_COORD",
+        "value": 0,
+        "min": 0,
+        "max": 127
+      }
+    ],
+    "inputsInline": true,
+    "output": "Coordinate",
+    "colour": 65,
+    "tooltip": "Coordinate pair",
+    "helpUrl": ""
+  }
+]

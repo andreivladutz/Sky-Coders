@@ -1,0 +1,115 @@
+<xml xmlns="https://developers.google.com/blockly/xml"><block type="factory_base" id="fj[rCnGE7`aot5BV%C/t" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">environment_coordinate_pair</field>
+    <field name="INLINE">INT</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="egU~O5ewgjF17t`]F!YY">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="nl=[BJ{ogL3}!VfKvf)_">
+            <field name="TEXT">(x :</field>
+            <next>
+              <block type="field_number" id="|90;etP#G~pf=x1.}@bK">
+                <field name="VALUE">0</field>
+                <field name="FIELDNAME">X_COORD</field>
+                <field name="MIN">0</field>
+                <field name="MAX">127</field>
+                <field name="PRECISION">0</field>
+              </block>
+            </next>
+          </block>
+        </statement>
+        <next>
+          <block type="input_dummy" id="{tQ-A6tbrrB+Xkl[7z=y">
+            <field name="ALIGN">LEFT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id=":=5![M`xTPlQ(oJBJR7F">
+                <field name="TEXT">, y :</field>
+                <next>
+                  <block type="field_number" id="0J+/Xj1N;_~LjNjV.}.O">
+                    <field name="VALUE">0</field>
+                    <field name="FIELDNAME">Y_COORD</field>
+                    <field name="MIN">0</field>
+                    <field name="MAX">127</field>
+                    <field name="PRECISION">0</field>
+                    <next>
+                      <block type="field_static" id="rO/$L9epH~knM?M3z7%]">
+                        <field name="TEXT">)</field>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="4~X8yaM2fmgZZ|5JEKO:" deletable="false" movable="false">
+        <field name="TEXT">Coordinate pair</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="#Cnm4EULs7KfTAgW5:E#" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="/v|aQ?8sc:slx6{?Eyyp"></shadow>
+      <block type="type_other" id="QNn-8*8,R}gD}Hbkae.f">
+        <field name="TYPE">Coordinate</field>
+      </block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="ls6*x-F_c9w(4ZKF`L:C">
+        <mutation colour="#9fa55b"></mutation>
+        <field name="HUE">65</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="-1[u.}v-JI/rTltJlQ*J" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="BOTH"></mutation>
+    <field name="NAME">actions_walk</field>
+    <field name="INLINE">EXT</field>
+    <field name="CONNECTIONS">BOTH</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="5t/tG80EtlfwAArn5/)6">
+        <field name="INPUTNAME">COORDINATE</field>
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="{Z=Rub:rlXtaGwk/1GJ;">
+            <field name="TEXT">Walk to grid coordinate</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="9KZSdEjB?4rZ{W8nE#6g"></shadow>
+          <block type="type_other" id="5n;Rt$}A|mL$KLSr;8[D">
+            <field name="TYPE">Coordinate</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="lclrW$f9fVN0e3vJ;4tq" deletable="false" movable="false">
+        <field name="TEXT">Tell the character to walk to a certain coordinate</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="dm:2?Tjv;$)x,H=EV;M0" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="TOPTYPE">
+      <shadow type="type_null" id="z;^hl_:bHE]wWV5Let]r"></shadow>
+    </value>
+    <value name="BOTTOMTYPE">
+      <shadow type="type_null" id="[M,nkI)cwLCY{+AwVBw}"></shadow>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="FzeyahPYGmai::_/Tj{}">
+        <mutation colour="#5ba593"></mutation>
+        <field name="HUE">165</field>
+      </block>
+    </value>
+  </block></xml>

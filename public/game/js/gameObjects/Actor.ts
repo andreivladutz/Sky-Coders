@@ -63,6 +63,9 @@ export default class Actor extends NavSpriteObject {
   private walking: boolean = false;
   private direction: ACTOR_DIRECTIONS = ACTOR_DIRECTIONS.SE;
 
+  // If a walking cycle is initiated from code, don't let the user change the direction
+  private walkingFromCode: boolean = false;
+
   // Each character has its terminal
   public terminal: CharacterTerminal;
   // Each character has its interpreter
@@ -97,10 +100,28 @@ export default class Actor extends NavSpriteObject {
 
   // Keep it as a separate function so we can then remove the listener
   navigationHandler = (tile: TileXY) => {
-    if (!this.tileCoordsOnThisGrid(tile.x, tile.y)) {
+    if (!this.tileCoordsOnThisGrid(tile.x, tile.y) && !this.walkingFromCode) {
       this.navigateTo(tile.x, tile.y);
     }
   };
+
+  // Handle a navigation request from Blockly code.
+  // While walking from code user walk commands are disabled
+  public navigationBlocklyHandler(x: number, y: number): Promise<any> {
+    // Promise that resolves once the character reached its destination
+    let navigationEnded = new Promise(resolve => {
+      this.once(CST.NAV_OBJECT.EVENTS.IDLE, () => {
+        this.walkingFromCode = false;
+
+        resolve();
+      });
+    });
+
+    this.walkingFromCode = true;
+    this.navigateTo(x, y);
+
+    return navigationEnded;
+  }
 
   /* Make the character:
    *  - selectable

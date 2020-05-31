@@ -1,0 +1,19 @@
+[
+  {
+    "type": "actions_walk",
+    "message0": "Walk to grid coordinate %1",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "COORDINATE",
+        "check": "Coordinate"
+      }
+    ],
+    "inputsInline": false,
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 165,
+    "tooltip": "Tell the character to walk to a certain coordinate",
+    "helpUrl": ""
+  }
+]

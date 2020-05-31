@@ -38,5 +38,24 @@ export default class CodeInterpreter {
       "alert",
       interpreter.createNativeFunction(alertWrapper)
     );
+
+    // Walk to command block's handler function -> tile coordinates received
+    // It is an asynchronous action, as walking somewhere takes time
+    let walkToWrapper = async (
+      xCoord: number,
+      yCoord: number,
+      finishedCb: () => void
+    ) => {
+      //this.actor.terminal.commandsHandler.codePrint(xCoord + " and " + yCoord);
+      await this.actor.navigationBlocklyHandler(xCoord, yCoord);
+
+      finishedCb();
+    };
+
+    interpreter.setProperty(
+      globalObject,
+      "walkTo",
+      interpreter.createAsyncFunction(walkToWrapper)
+    );
   };
 }

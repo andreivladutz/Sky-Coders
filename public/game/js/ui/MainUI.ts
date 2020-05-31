@@ -5,25 +5,28 @@ import CST from "../CST";
 import UIComponentsFact from "./UIComponentsFactory";
 import { MoveUIUtility, MoveUIDirection } from "./UIMovement";
 import UIComponents from "./UIComponentsFactory";
-import UIStateMachine from "./UIStateMachine";
-import BlocklyManager from "../Blockly/BlocklyManager";
 import ActorsManager from "../managers/ActorsManager";
 import SocketManager from "../online/SocketManager";
+import BlocklyManager from "../Blockly/BlocklyManager";
 
 type Image = Phaser.GameObjects.Image;
 const Image = Phaser.GameObjects.Image;
 
 export default class MainUI extends UIComponent {
-  mainButtons: MainGameButtons;
+  public mainButtons: MainGameButtons;
+  public blocklyManager: BlocklyManager;
 
   constructor(uiScene: UIScene, gameScene: IsoScene) {
     super(uiScene, gameScene);
 
     this.mainButtons = new MainGameButtons(uiScene, this);
+
+    this.blocklyManager = BlocklyManager.getInstance();
+    this.blocklyManager.init(this.uiScene.cache);
   }
 
   // Enable the UI main buttons
-  enable(): Promise<void> {
+  async enable(): Promise<void> {
     return this.mainButtons.show();
   }
 
@@ -53,7 +56,7 @@ class MainUIButon extends ButtonImage<MainUI> {
   }
 
   // define the logic for button clicking
-  onTap = () => {
+  onTap = async () => {
     switch (this.btnName) {
       case BUTTON_TYPES.BUILD:
         this.parentUI.handleBuildButton();
@@ -73,7 +76,9 @@ class MainUIButon extends ButtonImage<MainUI> {
           return;
         }
 
-        BlocklyManager.getInstance().showWorkspace(selectedActor);
+        let blocklyManager = this.parentUI.blocklyManager;
+        blocklyManager.showWorkspace(selectedActor);
+
         break;
     }
   };

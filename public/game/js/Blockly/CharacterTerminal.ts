@@ -334,7 +334,9 @@ export default class CharacterTerminal {
 
   public open(): this {
     this.terminalWindow.openWindow();
-    this.terminal.element.style.display = "";
+    this.terminalWindow.on(CST.WINDOW.OPEN_ANIM_EVENT, () => {
+      this.terminal.element.style.display = "";
+    });
 
     return this;
   }

@@ -372,11 +372,25 @@ export default {
   },
   BLOCKLY: {
     AREA_ID: "blocklyArea",
-    TOOLBOX_ID: "blocklyToolbox",
+    TOOLBOX_ID: "toolbox",
     CONTAINER_ID: "blocklyContainer",
     ANIMATION: {
       ATTRIB: "aria-hidden",
       CLASS: "blocklyTransition"
+    },
+    // Path to the toolbox for loading
+    RESOURCES: {
+      PATH: "../js/Blockly/Workspace/",
+      TOOLBOX_XML: "toolbox.xml",
+      TOOLBOX_KEY: "toolbox",
+      BLOCKLY_PREFIX: "Blockly.",
+      // The path to json block definitions
+      // To be loaded by phaser
+      BLOCKS: {
+        JSON_PATH: "blockDefs/blocksJson/",
+        FILENAME_SUFFIX: "_blocks.json",
+        CATEGORIES: ["actions", "environment"]
+      }
     }
   },
   WINDOW: {

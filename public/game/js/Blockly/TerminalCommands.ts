@@ -1,6 +1,8 @@
 import CharacterTerminal from "./CharacterTerminal";
 import CST from "../CST";
 
+const COLORS = CST.TERMINAL.COLORS;
+
 export default class TerminalCommands {
   private terminal: CharacterTerminal;
 
@@ -12,7 +14,7 @@ export default class TerminalCommands {
     this.terminal.printLine(
       `${this.terminal.coloredText(
         "Error:",
-        CST.TERMINAL.COLORS.RED
+        COLORS.RED
       )} Unknown command ${cmd}`
     );
   };
@@ -47,7 +49,7 @@ export default class TerminalCommands {
   };
 
   private handleCiciCmd = () => {
-    this.terminal.printLine("Cici is the best!", CST.TERMINAL.COLORS.MAGENTA);
+    this.terminal.printLine("Cici is the best!", COLORS.MAGENTA);
   };
 
   private readonly COMMANDS: {
@@ -69,6 +71,7 @@ export default class TerminalCommands {
     this.handleUnknownCmd(cmd);
   }
 
+  // output the Blockly-generated code
   public outputRunningCode(code: string[]) {
     if (!code || !code[0]) {
       return;
@@ -77,12 +80,12 @@ export default class TerminalCommands {
     this.terminal.printLine(
       `Running the following ${this.terminal.coloredText(
         "code",
-        CST.TERMINAL.COLORS.GREEN
+        COLORS.GREEN
       )}:`
     );
 
     for (let codeLine of code) {
-      this.terminal.printLine(codeLine, CST.TERMINAL.COLORS.GREEN);
+      this.terminal.printLine(codeLine, COLORS.GREEN);
     }
 
     this.terminal.prompt();
@@ -91,10 +94,13 @@ export default class TerminalCommands {
   // Output of print cmd
   public codePrint(text: string) {
     this.terminal.printLine(
-      `${this.terminal.coloredText(
-        "Code output",
-        CST.TERMINAL.COLORS.YELLOW
-      )}: ${text}`
+      `${this.terminal.coloredText("Code output", COLORS.YELLOW)}: ${text}`
     );
+  }
+
+  // Report an error caught inside the code
+  public reportCodeError(e: Error) {
+    this.terminal.printLine("Error caught inside code:", COLORS.RED);
+    this.terminal.printLine(`${e.message}`, COLORS.RED);
   }
 }

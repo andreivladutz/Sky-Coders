@@ -8,7 +8,6 @@ import Actor from "../gameObjects/Actor";
 import { ACTOR_NAMES } from "../ACTORS_CST";
 import TileMap from "../map/TileMap";
 import BuildingsManager from "../managers/BuildingsManager";
-import CharacterTerminal from "../Blockly/CharacterTerminal";
 
 // TODO: remove global variables
 let actor: Actor;
