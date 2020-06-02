@@ -110,6 +110,15 @@ export default class LayersManager extends Manager {
     if (id === CST.LAYERS.OBJ_ID.BUILDING) {
       this.notifyAstarWorker(objLayerTiles);
     }
+    // for trees, add only the origin tile to the grid
+    else if (id === CST.LAYERS.OBJ_ID.TREE) {
+      this.notifyAstarWorker([
+        {
+          x: obj.tileX,
+          y: obj.tileY
+        }
+      ]);
+    }
 
     // also index the object by its uid
     this.uidsToObjects[uid] = obj;
@@ -146,6 +155,18 @@ export default class LayersManager extends Manager {
     // notify astar worker to remove the layer but remove only buildings
     if (id === CST.LAYERS.OBJ_ID.BUILDING) {
       this.notifyAstarWorker(gridTiles, true);
+    }
+    // for trees, remove only the origin tile from the grid
+    else if (id === CST.LAYERS.OBJ_ID.TREE) {
+      this.notifyAstarWorker(
+        [
+          {
+            x: obj.tileX,
+            y: obj.tileY
+          }
+        ],
+        true
+      );
     }
 
     delete this.uidsToObjects[uid];

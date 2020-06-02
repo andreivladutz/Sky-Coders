@@ -221,12 +221,82 @@
   <sep></sep>
   <category name="Environment" colour="#9fa55b">
     <block type="environment_coordinate_pair">
-      <field name="X_COORD">0</field>
-      <field name="Y_COORD">0</field>
+      <value name="X_COORD">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+
+      <value name="Y_COORD">
+        <shadow type="math_number">
+          <field name="NUM">0</field>
+        </shadow>
+      </value>
+    </block>
+    <block type="environment_position"></block>
+
+    <block type="environment_reachable">
+     <value name="COORD">
+        <shadow type="environment_coordinate_pair">
+          <value name="X_COORD">
+            <shadow type="math_number">
+              <field name="NUM">0</field>
+            </shadow>
+          </value>
+
+          <value name="Y_COORD">
+            <shadow type="math_number">
+              <field name="NUM">0</field>
+            </shadow>
+          </value>
+        </shadow>
+      </value>
+    </block>
+
+    <block type="environment_get_x">
+      <value name="COORD">
+        <shadow type="environment_position"></shadow>
+      </value>
+    </block>
+    <block type="environment_get_y">
+      <value name="COORD">
+        <shadow type="environment_position"></shadow>
+      </value>
+    </block>
+    <block type="environment_get_neighbour">
+      <value name="COORD">
+        <shadow type="environment_position"></shadow>
+      </value>
+
+      <field name="DIRECTION">UP</field>
     </block>
   </category>
   <category name="Actions" colour="#5ba58c">
-    <block type="actions_walk"></block>
+    <block type="text_print">
+      <value name="TEXT">
+        <shadow type="text">
+          <field name="TEXT">abc</field>
+        </shadow>
+      </value>
+    </block>
+
+    <block type="actions_walk">
+      <value name="COORDINATE">
+        <shadow type="environment_coordinate_pair">
+          <value name="X_COORD">
+            <shadow type="math_number">
+              <field name="NUM">0</field>
+            </shadow>
+          </value>
+
+          <value name="Y_COORD">
+            <shadow type="math_number">
+              <field name="NUM">0</field>
+            </shadow>
+          </value>
+        </shadow>
+      </value>
+    </block>
   </category>
   <sep></sep>
   <category name="Variables" colour="#a55b80" custom="VARIABLE"></category>

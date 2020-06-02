@@ -1,30 +1,110 @@
 [
   {
     "type": "environment_coordinate_pair",
-    "message0": "(x : %1 %2 , y : %3 )",
+    "message0": "(x : %1 , y : %2 )",
     "args0": [
       {
-        "type": "field_number",
+        "type": "input_value",
         "name": "X_COORD",
-        "value": 0,
-        "min": 0,
-        "max": 127
+        "check": "Number"
       },
       {
-        "type": "input_dummy"
-      },
-      {
-        "type": "field_number",
+        "type": "input_value",
         "name": "Y_COORD",
-        "value": 0,
-        "min": 0,
-        "max": 127
+        "check": "Number"
       }
     ],
     "inputsInline": true,
     "output": "Coordinate",
     "colour": 65,
     "tooltip": "Coordinate pair",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_reachable",
+    "message0": "%1 can be reached?",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "COORD",
+        "check": "Coordinate"
+      }
+    ],
+    "inputsInline": true,
+    "output": "Boolean",
+    "colour": 65,
+    "tooltip": "Check if a coordinate pair is reachable for this character. Returns true / false.",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_position",
+    "message0": "Current position",
+    "inputsInline": true,
+    "output": "Coordinate",
+    "colour": 65,
+    "tooltip": "Get the current position coordinate for this character.",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_get_x",
+    "message0": "Get x coordinate of %1",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "COORD",
+        "check": "Coordinate"
+      }
+    ],
+    "inputsInline": true,
+    "output": "Number",
+    "colour": 65,
+    "tooltip": "Get the x coordinate from an (x, y) coordinate pair.",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_get_y",
+    "message0": "Get y coordinate of %1",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "COORD",
+        "check": "Coordinate"
+      }
+    ],
+    "inputsInline": true,
+    "output": "Number",
+    "colour": 65,
+    "tooltip": "Get the y coordinate from an (x, y) coordinate pair.",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_get_neighbour",
+    "message0": "Get the neighbour of %1 in %2 direction",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "COORD",
+        "check": "Coordinate"
+      },
+      {
+        "type": "field_dropdown",
+        "name": "DIRECTION",
+        "options": [
+          ["up", "UP"],
+          ["down", "DOWN"],
+          ["left", "LEFT"],
+          ["right", "RIGHT"],
+          ["up-left", "UPLEFT"],
+          ["up-right", "UPRIGHT"],
+          ["down-left", "DOWNLEFT"],
+          ["down-right", "DOWNRIGHT"]
+        ]
+      }
+    ],
+    "inputsInline": true,
+    "output": "Coordinate",
+    "colour": 65,
+    "tooltip": "Get the neighbour of a coordinate (x, y) in a chosen direction.",
     "helpUrl": ""
   }
 ]

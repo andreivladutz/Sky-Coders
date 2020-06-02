@@ -4,44 +4,41 @@
     <field name="INLINE">INT</field>
     <field name="CONNECTIONS">LEFT</field>
     <statement name="INPUTS">
-      <block type="input_dummy" id="egU~O5ewgjF17t`]F!YY">
+      <block type="input_value" id="yM:R/#7OB!(5,2amZMq6">
+        <field name="INPUTNAME">X_COORD</field>
         <field name="ALIGN">LEFT</field>
         <statement name="FIELDS">
           <block type="field_static" id="nl=[BJ{ogL3}!VfKvf)_">
             <field name="TEXT">(x :</field>
-            <next>
-              <block type="field_number" id="|90;etP#G~pf=x1.}@bK">
-                <field name="VALUE">0</field>
-                <field name="FIELDNAME">X_COORD</field>
-                <field name="MIN">0</field>
-                <field name="MAX">127</field>
-                <field name="PRECISION">0</field>
-              </block>
-            </next>
           </block>
         </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="jn!g}#[5vzH}J%+4ZTsT"></shadow>
+          <block type="type_number" id="bn.X2K+IpYm[ML+k0tM="></block>
+        </value>
         <next>
-          <block type="input_dummy" id="{tQ-A6tbrrB+Xkl[7z=y">
+          <block type="input_value" id="{^nCS.0nJ^$-e.%UQ9~s">
+            <field name="INPUTNAME">Y_COORD</field>
             <field name="ALIGN">LEFT</field>
             <statement name="FIELDS">
               <block type="field_static" id=":=5![M`xTPlQ(oJBJR7F">
                 <field name="TEXT">, y :</field>
-                <next>
-                  <block type="field_number" id="0J+/Xj1N;_~LjNjV.}.O">
-                    <field name="VALUE">0</field>
-                    <field name="FIELDNAME">Y_COORD</field>
-                    <field name="MIN">0</field>
-                    <field name="MAX">127</field>
-                    <field name="PRECISION">0</field>
-                    <next>
-                      <block type="field_static" id="rO/$L9epH~knM?M3z7%]">
-                        <field name="TEXT">)</field>
-                      </block>
-                    </next>
-                  </block>
-                </next>
               </block>
             </statement>
+            <value name="TYPE">
+              <shadow type="type_null" id="41A%PSk9j`${[D83$V}|"></shadow>
+              <block type="type_number" id=";4bG~v{:{S~QOG+K%97]"></block>
+            </value>
+            <next>
+              <block type="input_dummy" id="RG=~TXTx-[dv`@zX!P!5">
+                <field name="ALIGN">LEFT</field>
+                <statement name="FIELDS">
+                  <block type="field_static" id="rO/$L9epH~knM?M3z7%]">
+                    <field name="TEXT">)</field>
+                  </block>
+                </statement>
+              </block>
+            </next>
           </block>
         </next>
       </block>
@@ -57,7 +54,7 @@
       </block>
     </value>
     <value name="OUTPUTTYPE">
-      <shadow type="type_null" id="/v|aQ?8sc:slx6{?Eyyp"></shadow>
+      <shadow type="type_null" id="/.z7K:dVG142dY1#6$Q%"></shadow>
       <block type="type_other" id="QNn-8*8,R}gD}Hbkae.f">
         <field name="TYPE">Coordinate</field>
       </block>
@@ -110,6 +107,255 @@
       <block type="colour_hue" id="FzeyahPYGmai::_/Tj{}">
         <mutation colour="#5ba593"></mutation>
         <field name="HUE">165</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="4Ay(v3x:2-AtO59o;4qr" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">environment_reachable</field>
+    <field name="INLINE">INT</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="^t0EBy`1+LW(vYtG2AD!">
+        <field name="INPUTNAME">COORD</field>
+        <field name="ALIGN">LEFT</field>
+        <value name="TYPE">
+          <shadow type="type_null" id="oAnge3R1@92|1;Yj-g/S"></shadow>
+          <block type="type_other" id="ML[gwxDyagLIw#RUMpJB">
+            <field name="TYPE">Coordinate</field>
+          </block>
+        </value>
+        <next>
+          <block type="input_dummy" id="6T[Vbe#JH#(~D}=v3D@1">
+            <field name="ALIGN">LEFT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="88%ZRo4,H10!-B^cqv#H">
+                <field name="TEXT">can be reached?</field>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="PL990:X#Ora4lM_K#Vqe" deletable="false" movable="false">
+        <field name="TEXT">Check if a coordinate pair is reachable for this character. Returns true / false.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="TZgLBsXkhb0z_/4yy9]A" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="ZjZOsM.jBx:1Wx$URD#~"></shadow>
+      <block type="type_boolean" id="dr[-0vCZsVFyDm/m;SwF"></block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="1;SQy5$H3YDIdqi:K!;;">
+        <mutation colour="#9fa55b"></mutation>
+        <field name="HUE">65</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="4Ay(v3x:2-AtO59o;4qr" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">environment_position</field>
+    <field name="INLINE">INT</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_dummy" id="6T[Vbe#JH#(~D}=v3D@1">
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="88%ZRo4,H10!-B^cqv#H">
+            <field name="TEXT">Current position</field>
+          </block>
+        </statement>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="PL990:X#Ora4lM_K#Vqe" deletable="false" movable="false">
+        <field name="TEXT">Get the current position coordinate for this character.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="TZgLBsXkhb0z_/4yy9]A" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="ZIvRm/(-y=i9X1ye{%ms"></shadow>
+      <block type="type_other" id="F9Y.Pp7pY~|rMOTFpX3?">
+        <field name="TYPE">Coordinate</field>
+      </block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="1;SQy5$H3YDIdqi:K!;;">
+        <mutation colour="#9fa55b"></mutation>
+        <field name="HUE">65</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="4Ay(v3x:2-AtO59o;4qr" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">environment_get_x</field>
+    <field name="INLINE">INT</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="^t0EBy`1+LW(vYtG2AD!">
+        <field name="INPUTNAME">COORD</field>
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="88%ZRo4,H10!-B^cqv#H">
+            <field name="TEXT">Get x coordinate of</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="oAnge3R1@92|1;Yj-g/S"></shadow>
+          <block type="type_other" id="ML[gwxDyagLIw#RUMpJB">
+            <field name="TYPE">Coordinate</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="PL990:X#Ora4lM_K#Vqe" deletable="false" movable="false">
+        <field name="TEXT">Get the x coordinate from an (x, y) coordinate pair.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="TZgLBsXkhb0z_/4yy9]A" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="!m[.xYRob6VUArOLikky"></shadow>
+      <block type="type_number" id="mD9dM*W9sEd/.PLC9awr"></block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="1;SQy5$H3YDIdqi:K!;;">
+        <mutation colour="#9fa55b"></mutation>
+        <field name="HUE">65</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="4Ay(v3x:2-AtO59o;4qr" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">environment_get_y</field>
+    <field name="INLINE">INT</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="^t0EBy`1+LW(vYtG2AD!">
+        <field name="INPUTNAME">COORD</field>
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="88%ZRo4,H10!-B^cqv#H">
+            <field name="TEXT">Get y coordinate of</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="oAnge3R1@92|1;Yj-g/S"></shadow>
+          <block type="type_other" id="ML[gwxDyagLIw#RUMpJB">
+            <field name="TYPE">Coordinate</field>
+          </block>
+        </value>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="PL990:X#Ora4lM_K#Vqe" deletable="false" movable="false">
+        <field name="TEXT">Get the y coordinate from an (x, y) coordinate pair.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="TZgLBsXkhb0z_/4yy9]A" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="9/*8c!+mR5uBiVj:}T5#"></shadow>
+      <block type="type_number" id="mD9dM*W9sEd/.PLC9awr"></block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="1;SQy5$H3YDIdqi:K!;;">
+        <mutation colour="#9fa55b"></mutation>
+        <field name="HUE">65</field>
+      </block>
+    </value>
+  </block><block type="factory_base" id="4Ay(v3x:2-AtO59o;4qr" deletable="false" movable="false" x="10" y="10">
+    <mutation connections="LEFT"></mutation>
+    <field name="NAME">environment_get_neighbour</field>
+    <field name="INLINE">INT</field>
+    <field name="CONNECTIONS">LEFT</field>
+    <statement name="INPUTS">
+      <block type="input_value" id="^t0EBy`1+LW(vYtG2AD!">
+        <field name="INPUTNAME">COORD</field>
+        <field name="ALIGN">LEFT</field>
+        <statement name="FIELDS">
+          <block type="field_static" id="88%ZRo4,H10!-B^cqv#H">
+            <field name="TEXT">Get the neighbour of</field>
+          </block>
+        </statement>
+        <value name="TYPE">
+          <shadow type="type_null" id="oAnge3R1@92|1;Yj-g/S"></shadow>
+          <block type="type_other" id="ML[gwxDyagLIw#RUMpJB">
+            <field name="TYPE">Coordinate</field>
+          </block>
+        </value>
+        <next>
+          <block type="input_dummy" id="#IIm,S/2ETo/tK!SVcN/">
+            <field name="ALIGN">LEFT</field>
+            <statement name="FIELDS">
+              <block type="field_static" id="TavYGSA8{Z+(Q]A3Z[`#">
+                <field name="TEXT">in</field>
+                <next>
+                  <block type="field_dropdown" id=")7X3]B]D8c$Spf-+=7V(">
+                    <mutation options="[&quot;text&quot;,&quot;text&quot;,&quot;text&quot;,&quot;text&quot;,&quot;text&quot;,&quot;text&quot;,&quot;text&quot;,&quot;text&quot;]"></mutation>
+                    <field name="FIELDNAME">DIRECTION</field>
+                    <field name="USER0">up</field>
+                    <field name="CPU0">UP</field>
+                    <field name="USER1">down</field>
+                    <field name="CPU1">DOWN</field>
+                    <field name="USER2">left</field>
+                    <field name="CPU2">LEFT</field>
+                    <field name="USER3">right</field>
+                    <field name="CPU3">RIGHT</field>
+                    <field name="USER4">up-left</field>
+                    <field name="CPU4">UPLEFT</field>
+                    <field name="USER5">up-right</field>
+                    <field name="CPU5">UPRIGHT</field>
+                    <field name="USER6">down-left</field>
+                    <field name="CPU6">DOWNLEFT</field>
+                    <field name="USER7">down-right</field>
+                    <field name="CPU7">DOWNRIGH</field>
+                    <next>
+                      <block type="field_static" id="9nqyeLhw@V?5KsU#|qiU">
+                        <field name="TEXT">direction</field>
+                      </block>
+                    </next>
+                  </block>
+                </next>
+              </block>
+            </statement>
+          </block>
+        </next>
+      </block>
+    </statement>
+    <value name="TOOLTIP">
+      <block type="text" id="PL990:X#Ora4lM_K#Vqe" deletable="false" movable="false">
+        <field name="TEXT">Get the neighbour of a coordinate (x, y) in a chosen direction.</field>
+      </block>
+    </value>
+    <value name="HELPURL">
+      <block type="text" id="TZgLBsXkhb0z_/4yy9]A" deletable="false" movable="false">
+        <field name="TEXT"></field>
+      </block>
+    </value>
+    <value name="OUTPUTTYPE">
+      <shadow type="type_null" id="?$!01_F,bl3A~`Yj-GN-"></shadow>
+      <block type="type_other" id="et_8fP)t[iu(hZ3MY1tq">
+        <field name="TYPE">Coordinate</field>
+      </block>
+    </value>
+    <value name="COLOUR">
+      <block type="colour_hue" id="1;SQy5$H3YDIdqi:K!;;">
+        <mutation colour="#9fa55b"></mutation>
+        <field name="HUE">65</field>
       </block>
     </value>
   </block></xml>

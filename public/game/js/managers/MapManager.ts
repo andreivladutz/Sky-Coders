@@ -95,6 +95,14 @@ export default class MapManager extends Manager {
     };
   }
 
+  public get mapWidth(): number {
+    return this.getMapTilesize().w;
+  }
+
+  public get mapHeight(): number {
+    return this.getMapTilesize().h;
+  }
+
   // Get the exteme tile coordinates x, y for the current view
   // Get the extreme coordinates of the current view
   public getExtremesTileCoords(): ViewExtremes {

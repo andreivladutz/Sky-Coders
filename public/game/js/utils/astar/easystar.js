@@ -422,7 +422,7 @@ EasyStar.js = function() {
     // Performing helpful checks on the end tile:
 
     // Start and end are the same tile.
-    if (startX === endX && startY === endY) {
+    if ((startX === endX && startY === endY) || !collisionGrid[endY]) {
       callbackWrapper([]);
       return;
     }
