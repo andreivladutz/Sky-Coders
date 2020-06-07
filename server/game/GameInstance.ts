@@ -277,17 +277,28 @@ export default class GameInstance extends EventEmitter {
     try {
       await doc.save();
     } catch (err) {
+      if (err.name === "ParallelSaveError") {
+        // Error that can be temporarily ignored
+        return this.handleDbError(err, errMsg, false);
+      }
+
       this.handleDbError(err, errMsg);
     }
   }
 
-  private handleDbError(err, errorDescription: string) {
+  private handleDbError(
+    err: Error,
+    errorDescription: string,
+    shouldLogout: boolean = true
+  ) {
     console.error(
       `Error for user ${this.userDocument.name}, id: ${this.userDocument.id}`
     );
     console.error(`Error description: ${errorDescription}`);
     console.error(err);
 
-    this.logout("Internal server error. Please try again later!");
+    if (shouldLogout) {
+      this.logout("Internal server error. Please try again later!");
+    }
   }
 }

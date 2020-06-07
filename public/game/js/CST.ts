@@ -109,7 +109,14 @@ export default {
   TILEMAP: {
     // How many drawn but not visible tiles have to be to consider
     // The view rectangle as being dirty (3 times the actual visible tiles)
-    INVISIBLE_DIRTY_RATIO: 3
+    INVISIBLE_DIRTY_RATIO: 3,
+    // How many tiles a piece of a canvas contains
+    TEXTURE_TILESIZE: 32,
+
+    CHUNK: {
+      HEIGHT: 16,
+      WIDTH: 32
+    }
   },
   // service-worker related csts
   SW: {

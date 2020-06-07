@@ -227,6 +227,9 @@ export default class MapManager extends Manager {
     // generate environment frames
     this.envManager.generateFrames(gameScene);
 
+    // init the LayerManager
+    LayersManager.getInstance(this.mapMatrix);
+
     // init the tilemap
     this.tileMap = new TileMap({
       scene: this.gameScene,
@@ -236,9 +239,6 @@ export default class MapManager extends Manager {
       mapHeight: this.mapMatrix.length,
       mapMatrix: this.mapMatrix
     });
-
-    // init the LayerManager
-    LayersManager.getInstance(this.mapMatrix);
 
     let mapSize = this.getMapTilesize();
 

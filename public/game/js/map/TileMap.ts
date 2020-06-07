@@ -2,10 +2,11 @@ import { IsoScene, Point3 } from "../IsoPlugin/IsoPlugin";
 import IsoBoard, { TileXY, ViewExtremes } from "./IsoBoard";
 import IsoTile from "./IsoTile";
 
-import List from "../utils/dataTypes/List";
+// import List from "../utils/dataTypes/List";
 import CST from "../CST";
 import EnvironmentManager from "../managers/EnvironmentManager";
 import LayersManager from "../managers/LayersManager";
+import CameraManager from "../managers/CameraManager";
 
 interface TileMapConfig {
   scene: IsoScene;
@@ -17,6 +18,26 @@ interface TileMapConfig {
   mapHeight: number;
   mapMatrix: number[][];
 }
+
+interface TileChunk {
+  // Pixel coordinates
+  topY?: number;
+  bottomY?: number;
+  leftX?: number;
+  rightX?: number;
+  // the tiles contained (or belong to the rows contained)
+  topDiagonalTile: number;
+  bottomDiagonalTile: number;
+
+  leftmostCoordX: number;
+  leftmostCoordY: number;
+
+  rightmostCoordX: number;
+  rightmostCoordY: number;
+}
+
+type CanvasTileChunk = HTMLCanvasElement & { _chunkPosition?: TileChunk };
+type CliffsMatrix = { [key: number]: { [key: number]: IsoTile } };
 
 export default class TileMap {
   // the game scene this
@@ -36,23 +57,23 @@ export default class TileMap {
   mapMatrix: number[][];
   // for each (y, x) tilesInPlace[y][x] represents if the tile at (x, y) coords
   // is already in place, otherwise a tile should be instanced and placed at those coords
-  tilesInPlace: IsoTile[][] = [];
-
-  // A sparse matrix kept to recognize tiles that are cliffs (i.e. they are margins of the world)
-  // if a tile is a cliff, then this matrix will keep it's IsoTile
-  cliffsSparseMatrix: { [key: number]: { [key: number]: IsoTile } } = {};
+  // tilesInPlace: IsoTile[][] = [];
 
   // tile pools
-  unusedPool: List<IsoTile>;
+  // unusedPool: List<IsoTile>;
   // usedPool: List<IsoTile>;
 
   // Keep the old view rect so we can free unused tiles into the pool
-  oldView: ViewExtremes;
+  // oldView: ViewExtremes;
 
   envManager: EnvironmentManager;
 
   // always remember the last tinted tile so we can clear its tint when we leave the tile
   lastTintedTile: IsoTile;
+
+  // Use multiple canvases to draw pieces of the map
+  // each map canvas is a normal HTML Canvas element with added chunkPosition property
+  mapCanvases: CanvasTileChunk[][] = [];
 
   constructor(config: TileMapConfig) {
     this.scene = config.scene;
@@ -86,17 +107,21 @@ export default class TileMap {
 
     // init the pools of used and unused tiles
     // this.usedPool = new List();
-    this.unusedPool = new List();
+    //this.unusedPool = new List();
 
     // no tile is in place at first
-    this.initTilesInPlace();
+    // this.initTilesInPlace();
 
     // add event listeners
     this.registerToEvents();
 
     // generate the frames for the cliffs (the margins of the world)
-    this.generateCliffs();
+    // A sparse matrix kept to recognize tiles that are cliffs (i.e. they are margins of the world)
+    // if a tile is a cliff, then this matrix will keep its IsoTile
+    let cliffsSparseMatrix: CliffsMatrix = {};
+    this.generateCliffs(cliffsSparseMatrix);
 
+    this.drawMapPieces(cliffsSparseMatrix);
     // window.onkeydown = () => {
     //   let extremes = this.isoBoard.getExtremesTileCoords(true);
 
@@ -126,12 +151,357 @@ export default class TileMap {
     // };
   }
 
+  // Get the world positions of each canvas chunk of tiles
+  private getChunksPositions(): TileChunk[][] {
+    // Create an array of tile chunks positions and return them
+    let chunks: TileChunk[][] = [];
+    // The width and height in tiles of a tile chunk
+    const { HEIGHT } = CST.TILEMAP.CHUNK;
+
+    // rowUp is the top tile row (both y and x coord) on the "diagonal" straight down
+    // rowDown is the bottom tile row contained by the current chunk box
+    let rowUp = 0,
+      rowDown: number;
+
+    // half of the chunks
+    let noChunksHeight = Math.ceil(this.mapHeight / (HEIGHT * 2));
+    let totalChunksHeight = Math.ceil(this.mapHeight / HEIGHT);
+
+    for (let chunkY = 0; chunkY < noChunksHeight; chunkY++) {
+      chunks[chunkY] = [];
+
+      rowDown = rowUp + HEIGHT - 1;
+
+      // The current row
+      chunks[chunkY] = this.getRowOfChunks(rowUp);
+
+      // The symmetric of this row on the screen y axis through the middle of the map
+      let symmetricChunkY = totalChunksHeight - (chunkY + 1);
+
+      chunks[symmetricChunkY] = [];
+      // Get the symmetric chunk for each of the computed chunks on the row
+      for (let chunkX in chunks[chunkY]) {
+        chunks[symmetricChunkY][chunkX] = {
+          topDiagonalTile: HEIGHT * symmetricChunkY,
+          bottomDiagonalTile: HEIGHT * (symmetricChunkY + 1) - 1,
+
+          leftmostCoordX: chunks[chunkY][chunkX].leftmostCoordX,
+          leftmostCoordY: chunks[chunkY][chunkX].leftmostCoordY,
+          rightmostCoordX: chunks[chunkY][chunkX].rightmostCoordX,
+          rightmostCoordY: chunks[chunkY][chunkX].rightmostCoordY
+        };
+      }
+
+      // Get to the next row of boxes
+      rowUp = rowDown + 1;
+    }
+
+    return chunks;
+  }
+
+  // Process a row of box chunks i.e. knowing the top tileY of the diagonal it contains
+  // Get a row full of this chunks positions
+  private getRowOfChunks(rowUp: number): TileChunk[] {
+    // Create an array of tile chunks positions and return them
+    let chunks: TileChunk[] = [];
+    // The width and height in tiles of a tile chunk
+    const { HEIGHT, WIDTH } = CST.TILEMAP.CHUNK;
+
+    let rowDown = rowUp + HEIGHT - 1;
+
+    // how wide (in tiles) is the last row contained by this chunk box (the widest row)
+    let longestRowWidth = (rowDown + 1) * 2 - 1;
+
+    // how many box chunks for this current rows (to contain everything)
+    let noChunksWidth = Math.ceil(longestRowWidth / WIDTH);
+    // This is the sum for the diagonal indices and is the same sum for
+    // all pairs of indices on this current row (the lowermost one)
+    let coordSum = longestRowWidth - 1;
+
+    for (let chunkX = 0; chunkX < noChunksWidth; chunkX++) {
+      // the leftmost and rightmost tiles contained by this box on the last row
+      let tileLeftX = chunkX * WIDTH;
+      let tileRightX = (chunkX + 1) * WIDTH - 1;
+
+      chunks.push({
+        topDiagonalTile: rowUp,
+        bottomDiagonalTile: rowDown,
+
+        leftmostCoordX: tileLeftX,
+        leftmostCoordY: coordSum - tileLeftX,
+        rightmostCoordX: tileRightX,
+        rightmostCoordY: coordSum - tileRightX
+      });
+    }
+
+    return chunks;
+  }
+
+  // Position a chunk by using its tile extremes
+  private positionCanvasChunk(chunk: CanvasTileChunk) {
+    let chunkExtremes = chunk._chunkPosition;
+    let [topY, bottomY] = this.getTopBottomYChunkRow(
+      chunkExtremes.topDiagonalTile,
+      chunkExtremes.bottomDiagonalTile
+    );
+
+    // the leftmost pair of coord contained by this box on the last row (their sum has to be coordSum)
+    let leftX = Math.floor(
+      this.isoBoard.board.tileXYToWorldXY(
+        chunkExtremes.leftmostCoordX,
+        chunkExtremes.leftmostCoordY
+      ).x - this.tileWidth
+    );
+
+    let rightX = Math.ceil(
+      this.isoBoard.board.tileXYToWorldXY(
+        chunkExtremes.rightmostCoordX,
+        chunkExtremes.rightmostCoordY
+      ).x + this.tileWidth
+    );
+
+    chunkExtremes.topY = topY;
+    chunkExtremes.bottomY = bottomY;
+    chunkExtremes.leftX = leftX;
+    chunkExtremes.rightX = rightX;
+  }
+
+  private recomputeChunkPixelPositions() {
+    for (let canvasesRow of this.mapCanvases) {
+      for (let mapCanvas of canvasesRow) {
+        this.positionCanvasChunk(mapCanvas);
+      }
+    }
+  }
+
+  // Get [topY, bottomY] coords for a row of chunks
+  private getTopBottomYChunkRow(
+    rowUp: number,
+    rowDown: number
+  ): [number, number] {
+    // get the topmost Y and lowermost Y of the box chunk
+    let bottomY = Math.ceil(
+      this.isoBoard.board.tileXYToWorldXY(rowDown, rowDown).y + this.tileHeight
+    );
+    let topY = Math.floor(
+      this.isoBoard.board.tileXYToWorldXY(rowUp, rowUp).y - this.tileHeight
+    );
+
+    return [topY, bottomY];
+  }
+
+  // Draw map in chunks on different canvases
+  private drawMapPieces(cliffsSparseMatrix: CliffsMatrix) {
+    let chunksBounds = this.getChunksPositions();
+
+    let tile = new IsoTile(
+      this.scene,
+      0,
+      0,
+      0,
+      0,
+      EnvironmentManager.getInstance().getTextureKey()
+    );
+
+    let chunkViewRect = new Phaser.Geom.Rectangle();
+
+    for (let chunkY = 0; chunkY < chunksBounds.length; chunkY++) {
+      for (let chunkX = 0; chunkX < chunksBounds[chunkY].length; chunkX++) {
+        let mapCanvas: CanvasTileChunk = document.createElement("canvas");
+        let chunk = (mapCanvas._chunkPosition = chunksBounds[chunkY][chunkX]);
+
+        this.positionCanvasChunk(mapCanvas);
+
+        let canvasWidth = chunk.rightX - chunk.leftX;
+        let canvasHeight = chunk.bottomY - chunk.topY;
+
+        mapCanvas.width = canvasWidth;
+        mapCanvas.height = canvasHeight;
+
+        document.body.appendChild(mapCanvas);
+        mapCanvas.style.position = "absolute";
+        mapCanvas.style.zIndex = "-1";
+
+        let leftCanvasPos = chunk.leftX;
+        let topCanvasPos = chunk.topY;
+        mapCanvas.style.left = `${leftCanvasPos}px`;
+        mapCanvas.style.top = `${topCanvasPos}px`;
+
+        let extremes = this.isoBoard.getExtremeTilesInRect(
+          chunkViewRect.setTo(
+            leftCanvasPos,
+            topCanvasPos,
+            canvasWidth,
+            canvasHeight
+          )
+        );
+
+        let ctx = mapCanvas.getContext("2d");
+
+        // First draw the cliffs, then draw the tiles
+        for (let x = extremes.leftmostX; x <= extremes.rightmostX; x++) {
+          for (let y = extremes.topmostY; y <= extremes.lowermostY; y++) {
+            if (
+              !this.mapMatrix[y] ||
+              this.mapMatrix[y][x] === CST.ENVIRONMENT.EMPTY_TILE
+            ) {
+              continue;
+            }
+
+            tile = this.preprocessTile(
+              x,
+              y,
+              tile.set3DPosition(x * this.tileHeight, y * this.tileHeight, 0)
+            );
+
+            //if a cliff should be drawn underneath this tile
+            if (cliffsSparseMatrix[y] && cliffsSparseMatrix[y][x]) {
+              let cliff = cliffsSparseMatrix[y][x];
+
+              ctx.drawImage(
+                cliff.texture.source[0].image,
+                cliff.frame.cutX,
+                cliff.frame.cutY,
+                cliff.frame.cutWidth,
+                cliff.frame.cutHeight,
+                tile.x - this.tileWidth / 2 - leftCanvasPos,
+                tile.y - this.tileHeight / 2 - topCanvasPos,
+                cliff.frame.cutWidth,
+                cliff.frame.cutHeight
+              );
+            }
+          }
+        }
+
+        for (let x = extremes.leftmostX; x <= extremes.rightmostX; x++) {
+          for (let y = extremes.topmostY; y <= extremes.lowermostY; y++) {
+            if (
+              !this.mapMatrix[y] ||
+              this.mapMatrix[y][x] === CST.ENVIRONMENT.EMPTY_TILE
+            ) {
+              continue;
+            }
+
+            tile = this.preprocessTile(
+              x,
+              y,
+              tile.set3DPosition(x * this.tileHeight, y * this.tileHeight, 0)
+            );
+
+            let xPos = tile.x - this.tileWidth * tile.originX - leftCanvasPos,
+              yPos = tile.y - this.tileHeight * tile.originY - topCanvasPos;
+
+            let scaleX = tile.flipX ? -1 : 1,
+              scaleY = tile.flipY ? -1 : 1;
+
+            let xOffset = tile.flipX ? -(xPos + this.tileWidth) : xPos,
+              yOffset = tile.flipY ? -(yPos + this.tileHeight) : yPos;
+
+            ctx.save();
+            ctx.scale(scaleX, scaleY);
+
+            ctx.drawImage(
+              tile.texture.source[0].image,
+              tile.frame.cutX,
+              tile.frame.cutY,
+              tile.frame.cutWidth,
+              tile.frame.cutHeight,
+              xOffset,
+              yOffset,
+              this.tileWidth,
+              this.tileHeight
+            );
+
+            if (scaleX !== 1 || scaleY !== 1) {
+              ctx.restore();
+            }
+          }
+        }
+
+        if (!this.mapCanvases[chunkY]) {
+          this.mapCanvases[chunkY] = [];
+        }
+
+        this.mapCanvases[chunkY][chunkX] = mapCanvas;
+      }
+    }
+
+    tile.destroy();
+
+    CameraManager.EVENTS.on(CST.CAMERA.MOVE_EVENT, () => this.repositionMap());
+    CameraManager.EVENTS.on(CST.CAMERA.ZOOM_EVENT, this.repositionMap);
+  }
+
+  // Reposition the map on zoom and map move (the canvas chunks)
+  private repositionMap = (
+    zoomFactor: number = 1,
+    actualZoom: number = this.isoBoard.camera.zoom
+  ) =>
+    this.scene.events.once("render", () => {
+      for (let i = 0; i < this.mapCanvases.length; i++) {
+        for (let j = 0; j < this.mapCanvases[i].length; j++) {
+          let mapCanvas = this.mapCanvases[i][j];
+
+          let oldWidth =
+            mapCanvas._chunkPosition.rightX - mapCanvas._chunkPosition.leftX;
+          let oldHeight =
+            mapCanvas._chunkPosition.bottomY - mapCanvas._chunkPosition.topY;
+
+          mapCanvas.style.width = `${actualZoom * oldWidth}px`;
+          mapCanvas.style.height = `${actualZoom * oldHeight}px`;
+
+          let leftCanvasPos = mapCanvas._chunkPosition.leftX * actualZoom;
+          let topCanvasPos = mapCanvas._chunkPosition.topY * actualZoom;
+
+          // See how the (0, 0) point "stays in place" so
+          // we can keep the canvases in place also
+          let deltaPoint = this.isoBoard.camera.getWorldPoint(0, 0);
+
+          mapCanvas.style.left = `${leftCanvasPos -
+            deltaPoint.x * actualZoom}px`;
+          mapCanvas.style.top = `${topCanvasPos - deltaPoint.y * actualZoom}px`;
+        }
+      }
+
+      this.checkVisibleChunks();
+    });
+
+  // Determine and show the visible chunks
+  // Hide the invisible tiles
+  private checkVisibleChunks() {
+    let view = this.isoBoard.camera.worldView;
+
+    for (let i = 0; i < this.mapCanvases.length; i++) {
+      for (let j = 0; j < this.mapCanvases[i].length; j++) {
+        let chunk = this.mapCanvases[i][j]._chunkPosition;
+
+        let canvasWidth = chunk.rightX - chunk.leftX;
+        let canvasHeight = chunk.bottomY - chunk.topY;
+        let leftCanvasPos = chunk.leftX;
+        let topCanvasPos = chunk.topY;
+
+        let chunkViewRect = new Phaser.Geom.Rectangle(
+          leftCanvasPos,
+          topCanvasPos,
+          canvasWidth,
+          canvasHeight
+        );
+
+        if (Phaser.Geom.Rectangle.Overlaps(view, chunkViewRect)) {
+          this.mapCanvases[i][j].style.display = "";
+        } else {
+          this.mapCanvases[i][j].style.display = "none";
+        }
+      }
+    }
+  }
+
   public onUpdate() {
     // check every update cycle if the viewport moved
     // if so, redraw all tiles
-    if (this.isoBoard.viewRectangleDirty) {
-      this.redrawTiles();
-    }
+    // if (this.isoBoard.viewRectangleDirty) {
+    //   this.redrawTiles();
+    // }
   }
 
   public onTileOver(tileXY: TileXY) {
@@ -189,34 +559,34 @@ export default class TileMap {
   // this method checks if there is any unused tile in the pool of unused tile
   // otherwise allocates a new one
   // and returns a tile at (x, y) TILE coords
-  getUnusedTile(x: number, y: number): IsoTile {
-    // get this last tile from the unused pool
-    let tile: IsoTile = this.unusedPool.pop(),
-      texture = this.envManager.getTextureKey();
+  // getUnusedTile(x: number, y: number): IsoTile {
+  //   // get this last tile from the unused pool
+  //   let tile: IsoTile = this.unusedPool.pop(),
+  //     texture = this.envManager.getTextureKey();
 
-    // if no tile is found, create a new one
-    if (!tile) {
-      tile = new IsoTile(
-        this.scene,
-        x * this.tileHeight,
-        y * this.tileHeight,
-        x,
-        y,
-        texture
-      )
-        .setDepth(CST.LAYER_DEPTH.TILES)
-        .setActive(false);
-    }
-    // an unused tile already exists, reuse this one
-    else {
-      tile
-        .set3DPosition(x * this.tileHeight, y * this.tileHeight, 0)
-        .setTilePosition(x, y)
-        .setVisible(true);
-    }
+  //   // if no tile is found, create a new one
+  //   if (!tile) {
+  //     tile = new IsoTile(
+  //       this.scene,
+  //       x * this.tileHeight,
+  //       y * this.tileHeight,
+  //       x,
+  //       y,
+  //       texture
+  //     )
+  //       .setDepth(CST.LAYER_DEPTH.TILES)
+  //       .setActive(false);
+  //   }
+  //   // an unused tile already exists, reuse this one
+  //   else {
+  //     tile
+  //       .set3DPosition(x * this.tileHeight, y * this.tileHeight, 0)
+  //       .setTilePosition(x, y)
+  //       .setVisible(true);
+  //   }
 
-    return this.preprocessTile(x, y, tile);
-  }
+  //   return this.preprocessTile(x, y, tile);
+  // }
 
   // set the correct frame to the tile and flip it if it's flipped in the game world
   private preprocessTile(x: number, y: number, tile: IsoTile): IsoTile {
@@ -230,37 +600,41 @@ export default class TileMap {
 
   registerToEvents() {
     // when the game resizes, we should reposition all the tiles
-    this.scene.scale.on(
-      "resize",
-      () => {
-        for (let x = 0; x < this.mapWidth; x++) {
-          for (let y = 0; y < this.mapHeight; y++) {
-            if (!this.tilesInPlace[y]) {
-              continue;
-            }
-
-            let usedTile = this.tilesInPlace[y][x];
-
-            if (!usedTile) {
-              continue;
-            }
-
-            usedTile.setVisible(false);
-
-            this.unusedPool.push(usedTile);
-          }
-        }
-
-        this.initTilesInPlace();
-
-        for (let y in this.cliffsSparseMatrix) {
-          for (let x in this.cliffsSparseMatrix[y]) {
-            this.cliffsSparseMatrix[y][x].reset3DPosition();
-          }
-        }
-      },
-      this
+    this.scene.scale.on("resize", () =>
+      this.scene.events.once("render", () => {
+        this.recomputeChunkPixelPositions();
+        this.repositionMap(1, this.isoBoard.camera.zoom);
+      })
     );
+    //{
+    // for (let x = 0; x < this.mapWidth; x++) {
+    //   for (let y = 0; y < this.mapHeight; y++) {
+    //     if (!this.tilesInPlace[y]) {
+    //       continue;
+    //     }
+
+    //     let usedTile = this.tilesInPlace[y][x];
+
+    //     if (!usedTile) {
+    //       continue;
+    //     }
+
+    //     usedTile.setVisible(false);
+
+    //     this.unusedPool.push(usedTile);
+    //   }
+    //}
+
+    //   this.initTilesInPlace();
+
+    //   for (let y in this.cliffsSparseMatrix) {
+    //     for (let x in this.cliffsSparseMatrix[y]) {
+    //       this.cliffsSparseMatrix[y][x].reset3DPosition();
+    //     }
+    //   }
+    // },
+    // this
+    //);
   }
 
   /**
@@ -268,83 +642,88 @@ export default class TileMap {
    * when there aren't enough tiles in the tileLayerGroup pool of tiles
    * add new ones
    */
-  redrawTiles(): this {
-    let extremes = this.isoBoard.getExtremesTileCoords();
+  // redrawTiles(): this {
+  //   //return;
+  //   if (!this.isoBoard.viewRectangleDirty) {
+  //     return;
+  //   }
 
-    // Keep the intersection between oldView and the newView worth of tiles, discard the difference
-    if (this.oldView) {
-      let unusedRects = rectDifference(this.oldView, extremes);
+  //   let extremes = this.isoBoard.getExtremesTileCoords();
 
-      // Remove old rects of unused tiles
-      for (let rect of unusedRects) {
-        for (let x = rect.leftmostX; x <= rect.rightmostX; x++) {
-          for (let y = rect.topmostY; y <= rect.lowermostY; y++) {
-            if (!this.tilesInPlace[y]) {
-              continue;
-            }
+  //   // Keep the intersection between oldView and the newView worth of tiles, discard the difference
+  //   if (this.oldView) {
+  //     let unusedRects = rectDifference(this.oldView, extremes);
 
-            let tile = this.tilesInPlace[y][x];
+  //     // Remove old rects of unused tiles
+  //     for (let rect of unusedRects) {
+  //       for (let x = rect.leftmostX; x <= rect.rightmostX; x++) {
+  //         for (let y = rect.topmostY; y <= rect.lowermostY; y++) {
+  //           if (!this.tilesInPlace[y]) {
+  //             continue;
+  //           }
 
-            if (!tile) {
-              continue;
-            }
+  //           let tile = this.tilesInPlace[y][x];
 
-            this.unusedPool.push(tile);
+  //           if (!tile) {
+  //             continue;
+  //           }
 
-            tile.setVisible(false);
+  //           this.unusedPool.push(tile);
 
-            if (this.cliffsSparseMatrix[y] && this.cliffsSparseMatrix[y][x]) {
-              this.cliffsSparseMatrix[y][x].setVisible(false);
-            }
+  //           tile.setVisible(false);
 
-            this.tilesInPlace[y][x] = null;
-          }
-        }
-      }
-    }
+  //           if (this.cliffsSparseMatrix[y] && this.cliffsSparseMatrix[y][x]) {
+  //             this.cliffsSparseMatrix[y][x].setVisible(false);
+  //           }
 
-    this.oldView = extremes;
+  //           this.tilesInPlace[y][x] = null;
+  //         }
+  //       }
+  //     }
+  //   }
 
-    // console.log(extremes);
+  //   this.oldView = extremes;
 
-    for (let x = extremes.leftmostX; x <= extremes.rightmostX; x++) {
-      for (let y = extremes.topmostY; y <= extremes.lowermostY; y++) {
-        // visibleTiles.forEach(({ x, y }) => {
-        // there is no tile to be drawn
-        if (
-          !this.mapMatrix[y] ||
-          this.mapMatrix[y][x] === CST.ENVIRONMENT.EMPTY_TILE
-        ) {
-          // return;
-          continue;
-        }
-        // also if this tile is already in place, don't reposition it
-        if (this.tilesInPlace[y][x]) {
-          // return;
-          continue;
-        }
+  //   // console.log(extremes);
 
-        // if a cliff should be drawn underneath this tile
-        if (this.cliffsSparseMatrix[y] && this.cliffsSparseMatrix[y][x]) {
-          this.cliffsSparseMatrix[y][x].setVisible(true);
-        }
+  //   for (let x = extremes.leftmostX; x <= extremes.rightmostX; x++) {
+  //     for (let y = extremes.topmostY; y <= extremes.lowermostY; y++) {
+  //       // visibleTiles.forEach(({ x, y }) => {
+  //       // there is no tile to be drawn
+  //       if (
+  //         !this.mapMatrix[y] ||
+  //         this.mapMatrix[y][x] === CST.ENVIRONMENT.EMPTY_TILE
+  //       ) {
+  //         // return;
+  //         continue;
+  //       }
+  //       // also if this tile is already in place, don't reposition it
+  //       if (this.tilesInPlace[y][x]) {
+  //         // return;
+  //         continue;
+  //       }
 
-        // get an unused tile at x, y tile coords
-        let tile = this.getUnusedTile(x, y);
+  //       // if a cliff should be drawn underneath this tile
+  //       if (this.cliffsSparseMatrix[y] && this.cliffsSparseMatrix[y][x]) {
+  //         this.cliffsSparseMatrix[y][x].setVisible(true);
+  //       }
 
-        // push this tile in the pool of used tiles and mark it as being in place
-        // this.usedPool.push(tile);
-        this.tilesInPlace[y][x] = tile;
-      }
-    }
-    // );
+  //       // get an unused tile at x, y tile coords
+  //       let tile = this.getUnusedTile(x, y);
 
-    // redrew tiles, this viewRectangle is not dirty anymore
-    this.isoBoard.viewRectangleDirty = false;
-    return this;
-  }
+  //       // push this tile in the pool of used tiles and mark it as being in place
+  //       // this.usedPool.push(tile);
+  //       this.tilesInPlace[y][x] = tile;
+  //     }
+  //   }
+  //   // );
 
-  private generateCliffs() {
+  //   // redrew tiles, this viewRectangle is not dirty anymore
+  //   this.isoBoard.viewRectangleDirty = false;
+  //   return this;
+  // }
+
+  private generateCliffs(cliffsSparseMatrix: CliffsMatrix) {
     // If the cliff at x, y is hidden by the neigbouring cliffs, don't waste memory
     let hiddenByNeighbours = (x: number, y: number) => {
       let empty = CST.ENVIRONMENT.EMPTY_TILE;
@@ -368,15 +747,15 @@ export default class TileMap {
             x === this.mapWidth - 1 ||
             y === this.mapHeight - 1
           ) {
-            if (!this.cliffsSparseMatrix[y]) {
-              this.cliffsSparseMatrix[y] = {};
+            if (!cliffsSparseMatrix[y]) {
+              cliffsSparseMatrix[y] = {};
             }
 
             // this.cliffsSparseMatrix[y][x] = Phaser.Math.RND.pick(
             //   this.envManager.cliffFrames
             // );
 
-            this.cliffsSparseMatrix[y][x] = new IsoTile(
+            cliffsSparseMatrix[y][x] = new IsoTile(
               this.scene,
               x * this.tileHeight,
               y * this.tileHeight,
@@ -395,16 +774,16 @@ export default class TileMap {
   }
 
   // no tile is in place at first, so init a matrix of false values
-  private initTilesInPlace() {
-    for (let i = 0; i < this.mapMatrix.length; i++) {
-      // init this row if it is undefined
-      this.tilesInPlace[i] || (this.tilesInPlace[i] = []);
+  // private initTilesInPlace() {
+  //   for (let i = 0; i < this.mapMatrix.length; i++) {
+  //     // init this row if it is undefined
+  //     this.tilesInPlace[i] || (this.tilesInPlace[i] = []);
 
-      for (let j = 0; j < this.mapMatrix[i].length; j++) {
-        this.tilesInPlace[i][j] = null;
-      }
-    }
-  }
+  //     for (let j = 0; j < this.mapMatrix[i].length; j++) {
+  //       this.tilesInPlace[i][j] = null;
+  //     }
+  //   }
+  // }
 }
 
 function* getNeighbours(x: number, y: number): Generator<TileXY> {
@@ -438,77 +817,77 @@ function isMargin(x: number, y: number, mapGrid: number[][]) {
   return false;
 }
 
-function createView(
-  leftmostX: number,
-  rightmostX: number,
-  topmostY: number,
-  lowermostY: number
-): ViewExtremes {
-  return {
-    leftmostX,
-    rightmostX,
-    topmostY,
-    lowermostY
-  };
-}
+// function createView(
+//   leftmostX: number,
+//   rightmostX: number,
+//   topmostY: number,
+//   lowermostY: number
+// ): ViewExtremes {
+//   return {
+//     leftmostX,
+//     rightmostX,
+//     topmostY,
+//     lowermostY
+//   };
+// }
 
 // Return the difference of two view rectangles
 // Code adapted from https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference
-function rectDifference(
-  oldView: ViewExtremes,
-  newView: ViewExtremes
-): ViewExtremes[] {
-  let result: ViewExtremes[] = [];
+// function rectDifference(
+//   oldView: ViewExtremes,
+//   newView: ViewExtremes
+// ): ViewExtremes[] {
+//   let result: ViewExtremes[] = [];
 
-  // compute the top rectangle
-  let raHeight = newView.topmostY - oldView.topmostY;
+//   // compute the top rectangle
+//   let raHeight = newView.topmostY - oldView.topmostY;
 
-  if (raHeight > 0) {
-    result.push(
-      createView(
-        oldView.leftmostX,
-        oldView.rightmostX,
-        oldView.topmostY,
-        newView.topmostY
-      )
-    );
-  }
+//   if (raHeight > 0) {
+//     result.push(
+//       createView(
+//         oldView.leftmostX,
+//         oldView.rightmostX,
+//         oldView.topmostY,
+//         newView.topmostY
+//       )
+//     );
+//   }
 
-  // compute the bottom rectangle
-  let rbHeight = oldView.lowermostY - newView.lowermostY;
+//   // compute the bottom rectangle
+//   let rbHeight = oldView.lowermostY - newView.lowermostY;
 
-  if (rbHeight > 0 && newView.lowermostY < oldView.lowermostY) {
-    result.push(
-      createView(
-        oldView.leftmostX,
-        oldView.rightmostX,
-        newView.lowermostY,
-        oldView.lowermostY
-      )
-    );
-  }
+//   if (rbHeight > 0 && newView.lowermostY < oldView.lowermostY) {
+//     result.push(
+//       createView(
+//         oldView.leftmostX,
+//         oldView.rightmostX,
+//         newView.lowermostY,
+//         oldView.lowermostY
+//       )
+//     );
+//   }
 
-  let y1 =
-    newView.topmostY > oldView.topmostY ? newView.topmostY : oldView.topmostY;
-  let y2 =
-    newView.lowermostY < oldView.lowermostY
-      ? newView.lowermostY
-      : oldView.lowermostY;
-  let rcHeight = y2 - y1;
+//   let y1 =
+//     newView.topmostY > oldView.topmostY ? newView.topmostY : oldView.topmostY;
+//   let y2 =
+//     newView.lowermostY < oldView.lowermostY
+//       ? newView.lowermostY
+//       : oldView.lowermostY;
+//   let rcHeight = y2 - y1;
 
-  // compute the left rectangle
-  let rcWidth = newView.leftmostX - oldView.leftmostX;
+//   // compute the left rectangle
+//   let rcWidth = newView.leftmostX - oldView.leftmostX;
 
-  if (rcWidth > 0 && rcHeight > 0) {
-    result.push(createView(oldView.leftmostX, newView.leftmostX, y1, y2));
-  }
+//   if (rcWidth > 0 && rcHeight > 0) {
+//     result.push(createView(oldView.leftmostX, newView.leftmostX, y1, y2));
+//   }
 
-  // compute the right rectangle
-  let rdWidth = oldView.rightmostX - newView.rightmostX;
+//   // compute the right rectangle
+//   let rdWidth = oldView.rightmostX - newView.rightmostX;
 
-  if (rdWidth > 0) {
-    result.push(createView(newView.rightmostX, oldView.rightmostX, y1, y2));
-  }
+//   if (rdWidth > 0) {
+//     result.push(createView(newView.rightmostX, oldView.rightmostX, y1, y2));
+//   }
 
-  return result;
-}
+//   return result;
+// }

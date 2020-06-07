@@ -16,7 +16,7 @@ export default class BoardViewer {
   public viewRectangleDirty: boolean = true;
 
   // game main camera (the one used by the cameraManager)
-  private camera: Phaser.Cameras.Scene2D.Camera;
+  public camera: Phaser.Cameras.Scene2D.Camera;
 
   // the map position and size in world space
   protected mapSize: {
@@ -65,12 +65,16 @@ export default class BoardViewer {
 
   // Get the extreme coordinates of the current view
   public getExtremesTileCoords(useRealViewport: boolean = false): ViewExtremes {
-    const mapWith = this.mapSize.w / this.mapSize.tileW - 1,
-      mapHeight = this.mapSize.h / this.mapSize.tileH - 1;
-
     let viewRect = useRealViewport
       ? CameraManager.getInstance().getViewRect()
       : this.viewRectangle;
+
+    return this.getExtremeTilesInRect(viewRect);
+  }
+
+  public getExtremeTilesInRect(viewRect: Phaser.Geom.Rectangle): ViewExtremes {
+    const mapWith = this.mapSize.w / this.mapSize.tileW - 1,
+      mapHeight = this.mapSize.h / this.mapSize.tileH - 1;
 
     let leftmostTile = this.board.worldXYToTileXY(viewRect.x, viewRect.y),
       rightmostTile = this.board.worldXYToTileXY(

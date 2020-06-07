@@ -4,8 +4,8 @@
 			"image": "environment-md-0.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 1909,
-				"h": 500
+				"w": 1925,
+				"h": 485
 			},
 			"scale": 0.25,
 			"frames": [
@@ -35,7 +35,7 @@
 					}
 				},
 				{
-					"filename": "Tiles/base00",
+					"filename": "Tiles/backup/base00",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -60,7 +60,32 @@
 					}
 				},
 				{
-					"filename": "Tiles/base01",
+					"filename": "Tiles/backup/base01",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 10,
+						"y": 394,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
+					"filename": "Tiles/backup/base03",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -110,6 +135,31 @@
 					}
 				},
 				{
+					"filename": "Tiles/backup/base02",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 156,
+						"y": 394,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
 					"filename": "Tiles/base02",
 					"rotated": false,
 					"trimmed": false,
@@ -125,6 +175,31 @@
 					},
 					"frame": {
 						"x": 156,
+						"y": 394,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
+					"filename": "Tiles/backup/base02bef",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 302,
 						"y": 394,
 						"w": 128,
 						"h": 74
@@ -185,6 +260,31 @@
 					}
 				},
 				{
+					"filename": "Tiles/backup/base04",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 448,
+						"y": 384,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
 					"filename": "Tiles/base04",
 					"rotated": false,
 					"trimmed": false,
@@ -210,6 +310,31 @@
 					}
 				},
 				{
+					"filename": "Tiles/backup/grass00",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 594,
+						"y": 384,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
 					"filename": "Tiles/grass00",
 					"rotated": false,
 					"trimmed": false,
@@ -225,6 +350,31 @@
 					},
 					"frame": {
 						"x": 594,
+						"y": 384,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
+					"filename": "Tiles/backup/grass01",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 740,
 						"y": 384,
 						"w": 128,
 						"h": 74
@@ -285,6 +435,31 @@
 					}
 				},
 				{
+					"filename": "Tiles/backup/grass02",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 886,
+						"y": 354,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
 					"filename": "Tiles/grass02",
 					"rotated": false,
 					"trimmed": false,
@@ -300,6 +475,31 @@
 					},
 					"frame": {
 						"x": 886,
+						"y": 354,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
+					"filename": "Tiles/backup/grass03",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 1032,
 						"y": 354,
 						"w": 128,
 						"h": 74
@@ -360,6 +560,31 @@
 					}
 				},
 				{
+					"filename": "Tiles/backup/grass04",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 1178,
+						"y": 328,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
 					"filename": "Tiles/grass04",
 					"rotated": false,
 					"trimmed": false,
@@ -375,6 +600,56 @@
 					},
 					"frame": {
 						"x": 1178,
+						"y": 328,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
+					"filename": "Tiles/base00",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 1324,
+						"y": 328,
+						"w": 128,
+						"h": 74
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.5
+					}
+				},
+				{
+					"filename": "Tiles/base01",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 74
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 74
+					},
+					"frame": {
+						"x": 1324,
 						"y": 328,
 						"w": 128,
 						"h": 74
@@ -405,58 +680,33 @@
 						"h": 257
 					},
 					"anchor": {
-						"x": 0.48242188,
-						"y": 0.63615385
+						"x": 0.482422,
+						"y": 0.636154
 					}
 				},
 				{
-					"filename": "Cliffs/cliff3",
+					"filename": "Cliffs/cliff1",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
 						"w": 128,
-						"h": 213
+						"h": 200
 					},
 					"spriteSourceSize": {
 						"x": 0,
-						"y": 8,
-						"w": 127,
-						"h": 205
-					},
-					"frame": {
-						"x": 1384,
-						"y": 285,
-						"w": 127,
-						"h": 205
-					},
-					"anchor": {
-						"x": 0.5,
-						"y": 0.174118
-					}
-				},
-				{
-					"filename": "Cliffs/cliff2",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
+						"y": 4,
 						"w": 128,
-						"h": 213
-					},
-					"spriteSourceSize": {
-						"x": 1,
-						"y": 15,
-						"w": 127,
-						"h": 198
+						"h": 188
 					},
 					"frame": {
-						"x": 1529,
+						"x": 1470,
 						"y": 285,
-						"w": 127,
-						"h": 198
+						"w": 128,
+						"h": 188
 					},
 					"anchor": {
 						"x": 0.5,
-						"y": 0.174118
+						"y": 0.185
 					}
 				},
 				{
@@ -480,33 +730,58 @@
 						"h": 242
 					},
 					"anchor": {
-						"x": 0.47851563,
-						"y": 0.57714844
+						"x": 0.478516,
+						"y": 0.577148
 					}
 				},
 				{
-					"filename": "Cliffs/cliff1",
+					"filename": "Cliffs/cliff3",
 					"rotated": false,
 					"trimmed": true,
 					"sourceSize": {
 						"w": 128,
-						"h": 200
+						"h": 213
 					},
 					"spriteSourceSize": {
 						"x": 0,
-						"y": 4,
-						"w": 128,
-						"h": 188
+						"y": 8,
+						"w": 127,
+						"h": 205
 					},
 					"frame": {
-						"x": 1674,
+						"x": 1643,
 						"y": 270,
-						"w": 128,
-						"h": 188
+						"w": 127,
+						"h": 205
 					},
 					"anchor": {
 						"x": 0.5,
-						"y": 0.185
+						"y": 0.174118
+					}
+				},
+				{
+					"filename": "Cliffs/cliff2",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 213
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 15,
+						"w": 127,
+						"h": 198
+					},
+					"frame": {
+						"x": 1788,
+						"y": 270,
+						"w": 127,
+						"h": 198
+					},
+					"anchor": {
+						"x": 0.5,
+						"y": 0.174118
 					}
 				}
 			]
@@ -515,6 +790,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:65887b5f813308403b3602cfb18b4950:f7b18e38f693a9ad0f52cd33992ba904:1efd645e775df4ac353f239e5fd118d6$"
+		"smartupdate": "$TexturePacker:SmartUpdate:a8a469b8ec40254f1415db626aac3006:a13094aab6cebe6dba540726ec93bf90:1efd645e775df4ac353f239e5fd118d6$"
 	}
 }

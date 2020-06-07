@@ -140,8 +140,14 @@ export default class NavSpriteObject extends IsoSpriteObject {
     let dx = Math.floor(x - this.tileCoords.x),
       dy = Math.floor(y - this.tileCoords.y);
 
-    if (dx > 0) {
-      if (dy > 0) {
+    if (Math.abs(dx) === 1 && dy >= 3) {
+      this.emit(WALK_EV.S);
+    } else if (Math.abs(dx) === 1 && dy <= -3) {
+      this.emit(WALK_EV.N);
+    } else if (dx > 0) {
+      if (Math.abs(dy) === 1 && dx >= 3) {
+        this.emit(WALK_EV.E);
+      } else if (dy > 0) {
         this.emit(WALK_EV.SE);
       } else if (dy < 0) {
         this.emit(WALK_EV.NE);
@@ -149,7 +155,9 @@ export default class NavSpriteObject extends IsoSpriteObject {
         this.emit(WALK_EV.E);
       }
     } else if (dx < 0) {
-      if (dy < 0) {
+      if (Math.abs(dy) === 1 && dx <= -3) {
+        this.emit(WALK_EV.W);
+      } else if (dy < 0) {
         this.emit(WALK_EV.NW);
       } else if (dy > 0) {
         this.emit(WALK_EV.SW);

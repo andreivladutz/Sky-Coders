@@ -58,6 +58,8 @@ export default class CameraManager extends Manager {
       this.camera.setScroll(scrollX - width / 2, scrollY - height / 2);
     }
 
+    setTimeout(() => CameraManager.EVENTS.emit(CST.CAMERA.MOVE_EVENT), 0);
+
     return this;
   }
 
@@ -115,12 +117,21 @@ export default class CameraManager extends Manager {
           pan.dy = 0;
         }
 
+        let dx = pan.dx / this.camera.zoom;
+        let dy = pan.dy / this.camera.zoom;
+
         // using the inverse of the zoom so when the camera is zoomed out
         // the player can pan the camera faster
-        this.window.x -= pan.dx / this.camera.zoom;
-        this.window.y -= pan.dy / this.camera.zoom;
+        this.window.x -= dx;
+        this.window.y -= dy;
 
-        CameraManager.EVENTS.emit(CST.CAMERA.MOVE_EVENT);
+        CameraManager.EVENTS.emit(
+          CST.CAMERA.MOVE_EVENT,
+          dx,
+          dy,
+          pan.dx,
+          pan.dy
+        );
       },
       this
     );
@@ -157,7 +168,11 @@ export default class CameraManager extends Manager {
 
       // emit the camera zoom event with the actual zoom factor the camera scaled
       let actualZoomFactor = this.camera.zoom / oldZoom;
-      CameraManager.EVENTS.emit(CST.CAMERA.ZOOM_EVENT, actualZoomFactor);
+      CameraManager.EVENTS.emit(
+        CST.CAMERA.ZOOM_EVENT,
+        actualZoomFactor,
+        this.camera.zoom
+      );
     };
 
     this.pinch.on(
