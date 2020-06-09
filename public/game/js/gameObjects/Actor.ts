@@ -14,6 +14,7 @@ import ActorsManager from "../managers/ActorsManager";
 import { TileXY } from "../map/IsoBoard";
 import CharacterTerminal from "../Blockly/CharacterTerminal";
 import CodeInterpreter from "../Blockly/CodeInterpreter";
+import { GridColor } from "./IsoSpriteObject";
 
 // mapping event to directions
 const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
@@ -133,6 +134,17 @@ export default class Actor extends NavSpriteObject {
     this.on(CST.EVENTS.OBJECT.SELECT, () => {
       this.mapManager.events.on(CST.EVENTS.MAP.TAP, this.navigationHandler);
 
+      // Pick a random grid color
+      let randomColor = Phaser.Math.RND.pick([
+        GridColor.YELLOW,
+        GridColor.ORANGE,
+        GridColor.BLUE,
+        GridColor.NEUTRAL_GREEN,
+        GridColor.PURPLE,
+        GridColor.PINK
+      ]);
+      this.enableGridDrawing(randomColor);
+
       this.actorsManager.onActorSelected(this);
     });
 
@@ -140,6 +152,9 @@ export default class Actor extends NavSpriteObject {
     this.on(CST.EVENTS.OBJECT.DESELECT, () => {
       // stop listening to tap events
       this.mapManager.events.off(CST.EVENTS.MAP.TAP, this.navigationHandler);
+
+      // Disable the grid
+      this.disableGridDrawing();
 
       this.actorsManager.onActorDeselected(this);
     });

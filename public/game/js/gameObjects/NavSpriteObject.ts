@@ -4,6 +4,7 @@ import CST from "../CST";
 
 import MoveTo from "../plugins/MoveToPlugin/MoveTo";
 import AstarWorkerManager from "../managers/AstarWorkerManager";
+import EnvironmentManager from "../managers/EnvironmentManager";
 
 interface TileXY {
   x: number;
@@ -42,7 +43,11 @@ export default class NavSpriteObject extends IsoSpriteObject {
 
     // RexPlugins behaviour:
     this.moveTo = new MoveTo(this, {
-      speed: CST.NAV_OBJECT.SPEED,
+      // Keep the speed consistent against multiple screen sizes
+      speed:
+        CST.NAV_OBJECT.SPEED *
+        (EnvironmentManager.getInstance().TILE_WIDTH /
+          CST.NAV_OBJECT.IDEAL_TILESIZE),
       rotateToTarget: false,
       //occupiedTest: true
       blockerTest: false
@@ -137,40 +142,72 @@ export default class NavSpriteObject extends IsoSpriteObject {
 
     const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING;
 
-    let dx = Math.floor(x - this.tileCoords.x),
-      dy = Math.floor(y - this.tileCoords.y);
+    // Angle between current tile and next tile
+    let angle =
+      (Phaser.Math.Angle.BetweenPoints({ x, y }, this.tileCoords) * 180) /
+      Math.PI;
 
-    if (Math.abs(dx) === 1 && dy >= 3) {
-      this.emit(WALK_EV.S);
-    } else if (Math.abs(dx) === 1 && dy <= -3) {
-      this.emit(WALK_EV.N);
-    } else if (dx > 0) {
-      if (Math.abs(dy) === 1 && dx >= 3) {
-        this.emit(WALK_EV.E);
-      } else if (dy > 0) {
-        this.emit(WALK_EV.SE);
-      } else if (dy < 0) {
-        this.emit(WALK_EV.NE);
-      } else {
-        this.emit(WALK_EV.E);
-      }
-    } else if (dx < 0) {
-      if (Math.abs(dy) === 1 && dx <= -3) {
-        this.emit(WALK_EV.W);
-      } else if (dy < 0) {
-        this.emit(WALK_EV.NW);
-      } else if (dy > 0) {
-        this.emit(WALK_EV.SW);
-      } else {
-        this.emit(WALK_EV.W);
-      }
-    } else {
-      if (dy < 0) {
-        this.emit(WALK_EV.N);
-      } else if (dy > 0) {
-        this.emit(WALK_EV.S);
-      }
+    // Diagonals first
+    if (angle === 45) {
+      this.emit(WALK_EV.NW);
+    } else if (angle === 135) {
+      this.emit(WALK_EV.NE);
+    } else if (angle === -135) {
+      this.emit(WALK_EV.SE);
+    } else if (angle === -45) {
+      this.emit(WALK_EV.SW);
     }
+    // Walk left
+    else if (Math.abs(angle) < 45) {
+      this.emit(WALK_EV.W);
+    }
+    // Walk right
+    else if (Math.abs(angle) > 135) {
+      this.emit(WALK_EV.E);
+    }
+    // Walk up
+    else if (angle > 45 && angle < 135) {
+      this.emit(WALK_EV.N);
+    }
+    // Walk downwards
+    else if (angle > -135 && angle < -45) {
+      this.emit(WALK_EV.S);
+    }
+
+    // let dx = Math.floor(x - this.tileCoords.x),
+    //   dy = Math.floor(y - this.tileCoords.y);
+
+    // if (Math.abs(dx) === 1 && dy >= 3) {
+    //   this.emit(WALK_EV.S);
+    // } else if (Math.abs(dx) === 1 && dy <= -3) {
+    //   this.emit(WALK_EV.N);
+    // } else if (dx > 0) {
+    //   if (Math.abs(dy) === 1 && dx >= 3) {
+    //     this.emit(WALK_EV.E);
+    //   } else if (dy > 0) {
+    //     this.emit(WALK_EV.SE);
+    //   } else if (dy < 0) {
+    //     this.emit(WALK_EV.NE);
+    //   } else {
+    //     this.emit(WALK_EV.E);
+    //   }
+    // } else if (dx < 0) {
+    //   if (Math.abs(dy) === 1 && dx <= -3) {
+    //     this.emit(WALK_EV.W);
+    //   } else if (dy < 0) {
+    //     this.emit(WALK_EV.NW);
+    //   } else if (dy > 0) {
+    //     this.emit(WALK_EV.SW);
+    //   } else {
+    //     this.emit(WALK_EV.W);
+    //   }
+    // } else {
+    //   if (dy < 0) {
+    //     this.emit(WALK_EV.N);
+    //   } else if (dy > 0) {
+    //     this.emit(WALK_EV.S);
+    //   }
+    // }
 
     this.moveTo.moveTo(x, y);
   }

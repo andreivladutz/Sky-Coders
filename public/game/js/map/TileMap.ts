@@ -36,7 +36,20 @@ interface TileChunk {
   rightmostCoordY: number;
 }
 
-type CanvasTileChunk = HTMLCanvasElement & { _chunkPosition?: TileChunk };
+interface CanvasTileChunk extends HTMLCanvasElement {
+  // The initial positioning of the chunk
+  _chunkPosition?: TileChunk;
+  // The positioning of the chunk in the world
+  currentPosition?: {
+    leftX?: number;
+    topY?: number;
+
+    width?: number;
+    height?: number;
+  };
+  isVisible?: boolean;
+}
+
 type CliffsMatrix = { [key: number]: { [key: number]: IsoTile } };
 
 export default class TileMap {
@@ -74,6 +87,14 @@ export default class TileMap {
   // Use multiple canvases to draw pieces of the map
   // each map canvas is a normal HTML Canvas element with added chunkPosition property
   mapCanvases: CanvasTileChunk[][] = [];
+  // The layer canvas the chunks get drawn to
+  mapCanvasLayer: HTMLCanvasElement;
+
+  // Keep count of the origin point (0, 0) and where it is sitting now in world coordinates
+  // In case the point changes, move the map and redraw
+  originPoint: Phaser.Math.Vector2 = new Phaser.Math.Vector2();
+  // A repositioning is waiting for the next render cycle
+  willReposition: boolean = false;
 
   constructor(config: TileMapConfig) {
     this.scene = config.scene;
@@ -115,13 +136,17 @@ export default class TileMap {
     // add event listeners
     this.registerToEvents();
 
+    this.initMapCanvasLayer();
+
     // generate the frames for the cliffs (the margins of the world)
     // A sparse matrix kept to recognize tiles that are cliffs (i.e. they are margins of the world)
     // if a tile is a cliff, then this matrix will keep its IsoTile
     let cliffsSparseMatrix: CliffsMatrix = {};
     this.generateCliffs(cliffsSparseMatrix);
 
-    this.drawMapPieces(cliffsSparseMatrix);
+    this.bufferMapPieces(cliffsSparseMatrix);
+    this.redrawMap();
+
     // window.onkeydown = () => {
     //   let extremes = this.isoBoard.getExtremesTileCoords(true);
 
@@ -149,6 +174,18 @@ export default class TileMap {
     //     }
     //   }
     // };
+  }
+
+  // Initialize a map canvas and add it to the DOM
+  private initMapCanvasLayer() {
+    this.mapCanvasLayer = document.createElement("canvas");
+
+    this.mapCanvasLayer.style.top = "0";
+    this.mapCanvasLayer.style.left = "0";
+    this.mapCanvasLayer.style.position = "absolute";
+    this.mapCanvasLayer.style.zIndex = "-1";
+
+    document.body.appendChild(this.mapCanvasLayer);
   }
 
   // Get the world positions of each canvas chunk of tiles
@@ -291,7 +328,7 @@ export default class TileMap {
   }
 
   // Draw map in chunks on different canvases
-  private drawMapPieces(cliffsSparseMatrix: CliffsMatrix) {
+  private bufferMapPieces(cliffsSparseMatrix: CliffsMatrix) {
     let chunksBounds = this.getChunksPositions();
 
     let tile = new IsoTile(
@@ -310,6 +347,9 @@ export default class TileMap {
         let mapCanvas: CanvasTileChunk = document.createElement("canvas");
         let chunk = (mapCanvas._chunkPosition = chunksBounds[chunkY][chunkX]);
 
+        mapCanvas.isVisible = false;
+        mapCanvas.currentPosition = {};
+
         this.positionCanvasChunk(mapCanvas);
 
         let canvasWidth = chunk.rightX - chunk.leftX;
@@ -318,14 +358,14 @@ export default class TileMap {
         mapCanvas.width = canvasWidth;
         mapCanvas.height = canvasHeight;
 
-        document.body.appendChild(mapCanvas);
-        mapCanvas.style.position = "absolute";
-        mapCanvas.style.zIndex = "-1";
+        // document.body.appendChild(mapCanvas);
+        // mapCanvas.style.position = "absolute";
+        // mapCanvas.style.zIndex = "-1";
 
         let leftCanvasPos = chunk.leftX;
         let topCanvasPos = chunk.topY;
-        mapCanvas.style.left = `${leftCanvasPos}px`;
-        mapCanvas.style.top = `${topCanvasPos}px`;
+        // mapCanvas.style.left = `${leftCanvasPos}px`;
+        // mapCanvas.style.top = `${topCanvasPos}px`;
 
         let extremes = this.isoBoard.getExtremeTilesInRect(
           chunkViewRect.setTo(
@@ -436,35 +476,46 @@ export default class TileMap {
   private repositionMap = (
     zoomFactor: number = 1,
     actualZoom: number = this.isoBoard.camera.zoom
-  ) =>
-    this.scene.events.once("render", () => {
-      for (let i = 0; i < this.mapCanvases.length; i++) {
-        for (let j = 0; j < this.mapCanvases[i].length; j++) {
-          let mapCanvas = this.mapCanvases[i][j];
+  ) => {
+    this.willReposition = true;
+    this.scene.events.once("render", () =>
+      this.immediateMapReposition(actualZoom)
+    );
+  };
 
-          let oldWidth =
-            mapCanvas._chunkPosition.rightX - mapCanvas._chunkPosition.leftX;
-          let oldHeight =
-            mapCanvas._chunkPosition.bottomY - mapCanvas._chunkPosition.topY;
+  private immediateMapReposition(
+    actualZoom: number = this.isoBoard.camera.zoom
+  ) {
+    for (let i = 0; i < this.mapCanvases.length; i++) {
+      for (let j = 0; j < this.mapCanvases[i].length; j++) {
+        let mapCanvas = this.mapCanvases[i][j];
 
-          mapCanvas.style.width = `${actualZoom * oldWidth}px`;
-          mapCanvas.style.height = `${actualZoom * oldHeight}px`;
+        let oldWidth =
+          mapCanvas._chunkPosition.rightX - mapCanvas._chunkPosition.leftX;
+        let oldHeight =
+          mapCanvas._chunkPosition.bottomY - mapCanvas._chunkPosition.topY;
 
-          let leftCanvasPos = mapCanvas._chunkPosition.leftX * actualZoom;
-          let topCanvasPos = mapCanvas._chunkPosition.topY * actualZoom;
+        mapCanvas.currentPosition.width = actualZoom * oldWidth;
+        mapCanvas.currentPosition.height = actualZoom * oldHeight;
 
-          // See how the (0, 0) point "stays in place" so
-          // we can keep the canvases in place also
-          let deltaPoint = this.isoBoard.camera.getWorldPoint(0, 0);
+        let leftCanvasPos = mapCanvas._chunkPosition.leftX * actualZoom;
+        let topCanvasPos = mapCanvas._chunkPosition.topY * actualZoom;
 
-          mapCanvas.style.left = `${leftCanvasPos -
-            deltaPoint.x * actualZoom}px`;
-          mapCanvas.style.top = `${topCanvasPos - deltaPoint.y * actualZoom}px`;
-        }
+        // See how the (0, 0) point "stays in place" so
+        // we can keep the canvases in place also
+        this.isoBoard.camera.getWorldPoint(0, 0, this.originPoint);
+
+        mapCanvas.currentPosition.leftX =
+          leftCanvasPos - this.originPoint.x * actualZoom;
+        mapCanvas.currentPosition.topY =
+          topCanvasPos - this.originPoint.y * actualZoom;
       }
+    }
 
-      this.checkVisibleChunks();
-    });
+    this.willReposition = false;
+    this.checkVisibleChunks();
+    this.redrawMap();
+  }
 
   // Determine and show the visible chunks
   // Hide the invisible tiles
@@ -488,15 +539,47 @@ export default class TileMap {
         );
 
         if (Phaser.Geom.Rectangle.Overlaps(view, chunkViewRect)) {
-          this.mapCanvases[i][j].style.display = "";
+          this.mapCanvases[i][j].isVisible = true;
         } else {
-          this.mapCanvases[i][j].style.display = "none";
+          this.mapCanvases[i][j].isVisible = false;
         }
       }
     }
   }
 
+  // Redraw the offscreen buffered chunks on the map canvas
+  private redrawMap() {
+    let { width, height } = this.scene.game.scale.canvas;
+    this.mapCanvasLayer.width = width;
+    this.mapCanvasLayer.height = height;
+
+    let ctx = this.mapCanvasLayer.getContext("2d");
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < this.mapCanvases.length; i++) {
+      for (let j = 0; j < this.mapCanvases[i].length; j++) {
+        let bufferedChunk = this.mapCanvases[i][j];
+
+        if (!bufferedChunk.isVisible) {
+          continue;
+        }
+
+        let { leftX, topY, width, height } = bufferedChunk.currentPosition;
+
+        ctx.drawImage(bufferedChunk, leftX, topY, width, height);
+      }
+    }
+  }
+
   public onUpdate() {
+    let newOrigin = this.isoBoard.camera.getWorldPoint(0, 0);
+    if (
+      (this.originPoint.x !== newOrigin.x ||
+        this.originPoint.y !== newOrigin.y) &&
+      !this.willReposition
+    ) {
+      this.repositionMap();
+    }
     // check every update cycle if the viewport moved
     // if so, redraw all tiles
     // if (this.isoBoard.viewRectangleDirty) {

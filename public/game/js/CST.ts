@@ -203,6 +203,8 @@ export default {
   },
   NAV_OBJECT: {
     SPEED: 400,
+    // Make the speed relative to this tilesize
+    IDEAL_TILESIZE: 128,
     EVENTS: {
       WALKING: {
         S: "walking.S",

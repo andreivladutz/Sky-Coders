@@ -8,7 +8,14 @@ import LayersManager from "../managers/LayersManager";
 export enum GridColor {
   DO_NOT_DRAW = -1,
   GREEN = CST.COLORS.GREEN,
-  RED = CST.COLORS.RED
+  RED = CST.COLORS.RED,
+  // Random colors for the actor grid
+  ORANGE = 0xff4f00,
+  YELLOW = 0xfce205,
+  BLUE = 0x51a0d5,
+  NEUTRAL_GREEN = 0x59c878,
+  PURPLE = 0x8d4585,
+  PINK = 0xe51a4c
 }
 
 // check if a tile is out of bounds
@@ -310,6 +317,9 @@ export default class IsoSpriteObject extends IsoSprite {
   // acceptable values for color param are red or green hexa color
   enableGridDrawing(color: GridColor) {
     this.drawingGridColor = color;
+
+    // Force grid redraw
+    this.lastDrewTileCoords.x = -1;
   }
 
   disableGridDrawing() {
