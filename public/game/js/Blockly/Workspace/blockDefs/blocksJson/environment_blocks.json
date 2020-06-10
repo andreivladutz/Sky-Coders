@@ -17,12 +17,12 @@
     "inputsInline": true,
     "output": "Coordinate",
     "colour": 65,
-    "tooltip": "Coordinate pair",
+    "tooltip": "%{BKY_ENV_COORDINATE_PAIR_TOOLTIP}",
     "helpUrl": ""
   },
   {
     "type": "environment_reachable",
-    "message0": "%1 can be reached?",
+    "message0": "%{BKY_ENV_REACHABLE_TITLE}",
     "args0": [
       {
         "type": "input_value",
@@ -33,21 +33,21 @@
     "inputsInline": true,
     "output": "Boolean",
     "colour": 65,
-    "tooltip": "Check if a coordinate pair is reachable for this character. Returns true / false.",
+    "tooltip": "%{BKY_ENV_REACHABLE_TOOLTIP}",
     "helpUrl": ""
   },
   {
     "type": "environment_position",
-    "message0": "Current position",
+    "message0": "%{BKY_ENV_CURRPOS_TITLE}",
     "inputsInline": true,
     "output": "Coordinate",
     "colour": 65,
-    "tooltip": "Get the current position coordinate for this character.",
+    "tooltip": "%{BKY_ENV_CURRPOS_TOOLTIP}",
     "helpUrl": ""
   },
   {
     "type": "environment_get_x",
-    "message0": "Get x coordinate of %1",
+    "message0": "%{BKY_ENV_X_COORD_TITLE}",
     "args0": [
       {
         "type": "input_value",
@@ -58,12 +58,12 @@
     "inputsInline": true,
     "output": "Number",
     "colour": 65,
-    "tooltip": "Get the x coordinate from an (x, y) coordinate pair.",
+    "tooltip": "%{BKY_ENV_X_COORD_TOOLTIP}",
     "helpUrl": ""
   },
   {
     "type": "environment_get_y",
-    "message0": "Get y coordinate of %1",
+    "message0": "%{BKY_ENV_Y_COORD_TITLE}",
     "args0": [
       {
         "type": "input_value",
@@ -74,12 +74,12 @@
     "inputsInline": true,
     "output": "Number",
     "colour": 65,
-    "tooltip": "Get the y coordinate from an (x, y) coordinate pair.",
+    "tooltip": "%{BKY_ENV_Y_COORD_TOOLTIP}",
     "helpUrl": ""
   },
   {
     "type": "environment_get_neighbour",
-    "message0": "Get the neighbour of %1 in %2 direction",
+    "message0": "%{BKY_ENV_NEIGHBOUR_DIR_TITLE}",
     "args0": [
       {
         "type": "input_value",
@@ -90,21 +90,21 @@
         "type": "field_dropdown",
         "name": "DIRECTION",
         "options": [
-          ["up", "UP"],
-          ["down", "DOWN"],
-          ["left", "LEFT"],
-          ["right", "RIGHT"],
-          ["up-left", "UPLEFT"],
-          ["up-right", "UPRIGHT"],
-          ["down-left", "DOWNLEFT"],
-          ["down-right", "DOWNRIGHT"]
+          ["%{BKY_ENV_NEIGHBOUR_UP}", "UP"],
+          ["%{BKY_ENV_NEIGHBOUR_DOWN}", "DOWN"],
+          ["%{BKY_ENV_NEIGHBOUR_LEFT}", "LEFT"],
+          ["%{BKY_ENV_NEIGHBOUR_RIGHT}", "RIGHT"],
+          ["%{BKY_ENV_NEIGHBOUR_UPLEFT}", "UPLEFT"],
+          ["%{BKY_ENV_NEIGHBOUR_UPRIGHT}", "UPRIGHT"],
+          ["%{BKY_ENV_NEIGHBOUR_DOWNLEFT}", "DOWNLEFT"],
+          ["%{BKY_ENV_NEIGHBOUR_DOWNRIGHT}", "DOWNRIGHT"]
         ]
       }
     ],
     "inputsInline": true,
     "output": "Coordinate",
     "colour": 65,
-    "tooltip": "Get the neighbour of a coordinate (x, y) in a chosen direction.",
+    "tooltip": "%{BKY_ENV_NEIGHBOUR_DIR_TOOTLTIP}",
     "helpUrl": ""
   }
 ]

@@ -415,6 +415,7 @@ export default {
   },
   CHARA_SELECTION: {
     CONTAINER_ID: "characterContainer",
+    CHARA_HEAD_ID: "selectedCharacter",
     TERMINAL_BTN_ID: "terminalButton"
   },
   TERMINAL: {

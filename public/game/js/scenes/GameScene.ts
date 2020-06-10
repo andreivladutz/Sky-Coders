@@ -73,9 +73,9 @@ export default class GameScene extends IsoScene {
       scene: this
     });
 
-    actor.idleAnim();
+    actor.idleAnim().focusCamera();
 
-    MapManager.getInstance().setScrollOverTiles(actor.tileX, actor.tileY);
+    // MapManager.getInstance()
     //   .enableDebugging()
     // actor.enableDebugging();
   }

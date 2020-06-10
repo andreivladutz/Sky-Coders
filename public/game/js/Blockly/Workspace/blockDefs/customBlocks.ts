@@ -2,7 +2,13 @@
 import actionsCategory from "./blocksStubs/actions_stubs";
 import environmentCategory from "./blocksStubs/environment_stubs";
 
+import blocksLang from "./blocksLang";
 import Blockly from "blockly";
+
+interface Locales {
+  RO: object;
+  EN: object;
+}
 
 /**
  * Define the custom blocks for blockly using the json definitions and
@@ -10,10 +16,32 @@ import Blockly from "blockly";
  *
  * @param blockDefs array of parsed json objects loaded using Phaser's Loader
  */
-export default function defineCustomBlocks(blockDefs: Object[]) {
+export default function defineCustomBlocks(
+  blockDefs: object[],
+  locales: Locales
+) {
   // Add the JavaScript code generation
   actionsCategory(Blockly);
   environmentCategory(Blockly);
 
   Blockly.defineBlocksWithJsonArray(blockDefs);
+
+  // Add block translations to the locales
+  addLocaleBlockText(locales);
+}
+
+// Add block messages to the locales
+function addLocaleBlockText(locales: Locales) {
+  // Take each of the locales with their langKey i.e. "RO", "EN", etc.
+  for (let [langKey, locale] of Object.entries(locales)) {
+    // Take each category of translations from the lang file
+    for (let categoryTranslations of Object.values(blocksLang)) {
+      // Take each identifier in the Blockly.Msg object and add the translated text
+      for (let [replacementName, blockText] of Object.entries(
+        categoryTranslations[langKey]
+      )) {
+        locale[replacementName] = blockText;
+      }
+    }
+  }
 }

@@ -5,6 +5,7 @@ import Actor from "../gameObjects/Actor";
 export default class CharacterUI extends UIComponent {
   private characterContainer: HTMLDivElement;
   private terminalButton: HTMLButtonElement;
+  private selectedCharaHead: HTMLDivElement;
 
   public isEnabled = false;
 
@@ -18,6 +19,10 @@ export default class CharacterUI extends UIComponent {
     this.terminalButton = document.getElementById(
       CST.CHARA_SELECTION.TERMINAL_BTN_ID
     ) as HTMLButtonElement;
+
+    this.selectedCharaHead = document.getElementById(
+      CST.CHARA_SELECTION.CHARA_HEAD_ID
+    ) as HTMLDivElement;
   }
 
   public enable(selectedActor: Actor) {
@@ -25,6 +30,10 @@ export default class CharacterUI extends UIComponent {
 
     this.terminalButton.onclick = () => {
       selectedActor.terminal.open();
+    };
+
+    this.selectedCharaHead.onclick = () => {
+      selectedActor.focusCamera();
     };
 
     this.isEnabled = true;

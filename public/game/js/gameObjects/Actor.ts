@@ -99,6 +99,12 @@ export default class Actor extends NavSpriteObject {
     this.interpreter = new CodeInterpreter(this);
   }
 
+  public focusCamera(): this {
+    this.mapManager.setScrollOverTiles(this.tileX, this.tileY);
+
+    return this;
+  }
+
   // Keep it as a separate function so we can then remove the listener
   navigationHandler = (tile: TileXY) => {
     if (!this.tileCoordsOnThisGrid(tile.x, tile.y) && !this.walkingFromCode) {

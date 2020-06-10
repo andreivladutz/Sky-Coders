@@ -5,6 +5,8 @@ import GameWindow from "../ui/GameWindow";
 import Actor from "../gameObjects/Actor";
 
 import defineCustomBlocks from "./Workspace/blockDefs/customBlocks";
+import * as roLang from "blockly/msg/ro";
+import * as enLang from "blockly/msg/en";
 
 const { JavaScript } = Blockly as any;
 
@@ -176,7 +178,13 @@ export default class BlocklyManager extends Manager {
       blockDefs = blockDefs.concat(cache.json.get(blockDefKey));
     }
 
-    defineCustomBlocks(blockDefs);
+    defineCustomBlocks(blockDefs, {
+      RO: roLang,
+      EN: enLang
+    });
+
+    Blockly.setLocale(enLang);
+    // Blockly.setLocale(roLang);
   }
 
   // Load the toolbox xml

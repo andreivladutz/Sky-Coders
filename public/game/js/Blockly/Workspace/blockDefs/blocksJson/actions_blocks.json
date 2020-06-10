@@ -1,7 +1,7 @@
 [
   {
     "type": "actions_walk",
-    "message0": "Walk to grid coordinate %1",
+    "message0": "%{BKY_ACTIONS_WALK_TITLE}",
     "args0": [
       {
         "type": "input_value",
@@ -13,7 +13,7 @@
     "previousStatement": null,
     "nextStatement": null,
     "colour": 165,
-    "tooltip": "Tell the character to walk to a certain coordinate",
+    "tooltip": "%{BKY_ACTIONS_WALK_TOOLTIP}",
     "helpUrl": ""
   }
 ]
