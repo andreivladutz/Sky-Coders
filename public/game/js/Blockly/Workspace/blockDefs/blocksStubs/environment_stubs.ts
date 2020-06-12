@@ -1,5 +1,5 @@
 import { Block } from "blockly";
-import { removeIdentation } from "../codeUtils";
+import { BlocklyJS } from "../codeUtils";
 
 // Possible neighbour directions of a tile coordinate
 // in get_neighbour block function
@@ -40,7 +40,7 @@ function getCoordinateNeighbour(direction: NEIGHBOUR_DIR): Coord {
   }
 }
 
-export default function(Blockly: any) {
+export default function(Blockly: BlocklyJS) {
   Blockly.JavaScript["environment_coordinate_pair"] = function(block: Block) {
     let value_x_coord =
       Blockly.JavaScript.valueToCode(
@@ -58,78 +58,63 @@ export default function(Blockly: any) {
 
     let code = `({ x: ${value_x_coord}, y: ${value_y_coord} })`;
 
-    // TODO: Change ORDER_NONE to the correct strength.
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    // The coordinate pair can be used with a member access operator
+    return [code, Blockly.JavaScript.ORDER_MEMBER];
   };
 
   Blockly.JavaScript["environment_reachable"] = function(block: Block) {
     var value_coord = Blockly.JavaScript.valueToCode(
       block,
       "COORD",
-      Blockly.JavaScript.ORDER_ATOMIC
+      Blockly.JavaScript.ORDER_MEMBER
     );
 
-    var code = removeIdentation(`
-    (function __isReachable__() {
-      var coord = ${value_coord};
+    var code = `isCoordReachable(${value_coord}.x, ${value_coord}.y)`;
 
-      return isCoordReachable(coord.x, coord.y);
-    })()
-    `);
-
-    // TODO: Change ORDER_NONE to the correct strength.
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    // This function call can be used safely with a logical not operator
+    return [code, Blockly.JavaScript.ORDER_LOGICAL_NOT];
   };
 
   Blockly.JavaScript["environment_position"] = function() {
-    var code = "{ x: getXCoord(), y: getYCoord() }";
+    var code = "({ x: getXCoord(), y: getYCoord() })";
 
-    // TODO: Change ORDER_NONE to the correct strength.
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    return [code, Blockly.JavaScript.ORDER_MEMBER];
   };
 
   Blockly.JavaScript["environment_get_x"] = function(block: Block) {
     var value_coord = Blockly.JavaScript.valueToCode(
       block,
       "COORD",
-      Blockly.JavaScript.ORDER_ATOMIC
+      Blockly.JavaScript.ORDER_MEMBER
     );
 
-    var code = removeIdentation(`
-    (function __getX__(coord) {
-      return coord.x;
-    })(${value_coord})
-    `);
-    // TODO: Change ORDER_NONE to the correct strength.
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    var code = `${value_coord}.x`;
+
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
   };
 
   Blockly.JavaScript["environment_get_y"] = function(block: Block) {
     var value_coord = Blockly.JavaScript.valueToCode(
       block,
       "COORD",
-      Blockly.JavaScript.ORDER_ATOMIC
+      Blockly.JavaScript.ORDER_MEMBER
     );
 
-    var code = removeIdentation(`
-    (function __getY__(coord) {
-      return coord.y;
-    })(${value_coord})
-    `);
-    // TODO: Change ORDER_NONE to the correct strength.
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    var code = `${value_coord}.y`;
+
+    return [code, Blockly.JavaScript.ORDER_ATOMIC];
   };
 
   Blockly.JavaScript["environment_get_neighbour"] = function(block: Block) {
     var value_coord = Blockly.JavaScript.valueToCode(
       block,
       "COORD",
-      Blockly.JavaScript.ORDER_ATOMIC
+      Blockly.JavaScript.ORDER_MEMBER
     );
-    var dropdown_direction = block.getFieldValue("DIRECTION");
+    var dropdownDir: NEIGHBOUR_DIR = block.getFieldValue("DIRECTION");
 
     // Transfrom the directions in dx and dy values
-    let neighbourCoord = getCoordinateNeighbour(dropdown_direction);
+    let neighbourCoord = getCoordinateNeighbour(dropdownDir);
 
     let dXString = "",
       dYString = "";
@@ -146,13 +131,25 @@ export default function(Blockly: any) {
       dYString = " + 1";
     }
 
-    var code = removeIdentation(`
-    (function __getNeighbour__(coord) {
-      return { x: coord.x${dXString}, y: coord.y${dYString} };
-    })(${value_coord})
-    `);
+    // Transform the upper case direction into a title cased string
+    let titleCaseDirection =
+      dropdownDir.substr(0, 1) + dropdownDir.substr(1).toLowerCase();
 
-    // TODO: Change ORDER_NONE to the correct strength.
-    return [code, Blockly.JavaScript.ORDER_NONE];
+    // Generate a function that sits up-top outside the generated code and can be easily called
+    // The name of the newly created function will be returned
+    let functionName = Blockly.JavaScript.provideFunction_(
+      `getNeighbour${titleCaseDirection}`,
+      [
+        `function ${Blockly.JavaScript.FUNCTION_NAME_PLACEHOLDER_}(coord) {`,
+        ` // Get the neighbour of coord in ${titleCaseDirection} direction`,
+        ` return { x: coord.x${dXString}, y: coord.y${dYString} };`,
+        "}"
+      ]
+    );
+
+    // Call the get neighbour function
+    var code = `${functionName}(${value_coord})`;
+
+    return [code, Blockly.JavaScript.ORDER_MEMBER];
   };
 }

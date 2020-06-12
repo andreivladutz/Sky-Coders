@@ -240,7 +240,11 @@ export default {
     },
     OBJECT: {
       SELECT: "object.select",
-      DESELECT: "object.deselect"
+      DESELECT: "object.deselect",
+      PRESS: "object.press",
+      // Time needed for the pointerdown event
+      // to be considered a press event
+      PRESS_TIME: 300
     },
     ARROWS_UI: {
       TAP: "arrow.tapped"
@@ -391,14 +395,16 @@ export default {
     RESOURCES: {
       PATH: "../js/Blockly/Workspace/",
       TOOLBOX_XML: "toolbox.xml",
+      DEFAULT_WORKSPACE_XML: "workspace.xml",
       TOOLBOX_KEY: "toolbox",
+      WORKSPACE_KEY: "workspace",
       BLOCKLY_PREFIX: "Blockly.",
       // The path to json block definitions
       // To be loaded by phaser
       BLOCKS: {
         JSON_PATH: "blockDefs/blocksJson/",
         FILENAME_SUFFIX: "_blocks.json",
-        CATEGORIES: ["actions", "environment"]
+        CATEGORIES: ["actions", "environment", "events"]
       }
     }
   },
@@ -416,7 +422,15 @@ export default {
   CHARA_SELECTION: {
     CONTAINER_ID: "characterContainer",
     CHARA_HEAD_ID: "selectedCharacter",
-    TERMINAL_BTN_ID: "terminalButton"
+    TERMINAL_BTN_ID: "terminalButton",
+
+    UI: {
+      // The ratio of the menu width
+      CMDS_SPACE_RATIO: 0.01,
+      FONT_RATIO: 0.035,
+      BTN_BG_DEPTH: 7,
+      BTN_TEXT_DEPTH: 8
+    }
   },
   TERMINAL: {
     ID: "termDiv",

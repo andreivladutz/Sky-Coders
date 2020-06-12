@@ -83,7 +83,7 @@ export default class CodeInterpreter {
 
   private getApiWrappers(): ((...args: any[]) => any)[] {
     let alertWrapper = (text = "") => {
-      this.actor.terminal.commandsHandler.codePrint(text);
+      this.actor.codeHandler.terminal.commandsHandler.codePrint(text);
     };
 
     // Walk to command block's handler function -> tile coordinates received

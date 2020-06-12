@@ -1,0 +1,33 @@
+[
+  {
+    "type": "events_selected",
+    "message0": "%{BKY_EVENTS_SELECTED_TITLE}",
+    "nextStatement": null,
+    "colour": 30,
+    "tooltip": "%{BKY_EVENTS_SELECTED_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "events_prod_ready",
+    "message0": "%{BKY_EVENTS_PRODREADY_TITLE}",
+    "nextStatement": null,
+    "colour": 30,
+    "tooltip": "%{BKY_EVENTS_PRODREADY_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "command",
+    "message0": "%{BKY_COMMAND_TITLE}",
+    "args0": [
+      {
+        "type": "field_input",
+        "name": "NAME",
+        "text": "%{BKY_COMMAND_NAME}"
+      }
+    ],
+    "nextStatement": null,
+    "colour": 75,
+    "tooltip": "%{BKY_COMMAND_TOOLTIP}",
+    "helpUrl": ""
+  }
+]

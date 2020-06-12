@@ -1,4 +1,4 @@
-import UIComponent from "./UIComponent";
+import UIComponent from "./uiUtils/UIComponent";
 import IsoScene from "../IsoPlugin/IsoScene";
 import UIScene from "../scenes/UIScene";
 
@@ -10,7 +10,7 @@ import LoaderInjector, {
   FramesMap
 } from "../managers/LoaderInjector";
 
-import UIStateMachine from "./UIStateMachine";
+import UIStateMachine from "./uiUtils/UIStateMachine";
 
 type UIComponentConstructor = new (
   uiScene: UIScene,

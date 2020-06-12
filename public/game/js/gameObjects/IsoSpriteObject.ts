@@ -64,6 +64,12 @@ export default class IsoSpriteObject extends IsoSprite {
   // is this object selected?
   selected: boolean = false;
 
+  // This flag should be set if the press event should cancel the selection / deselection event
+  protected pressCancelsSelection: boolean = false;
+  // Flag to know if the press event has been fired
+  private pressWasFired: boolean = false;
+  private pressTimeout: any;
+
   // tile coords of this object
   // CAN BE FLOATING POINT NUMBERS!!!
   protected tileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
@@ -194,6 +200,32 @@ export default class IsoSpriteObject extends IsoSprite {
         }
       })
       .on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+        // Consider the right mouse button as being a press action
+        if (pointer.rightButtonDown()) {
+          this.pressWasFired = true;
+          this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
+
+          return;
+        }
+
+        // Check for press event
+        this.pressTimeout = setTimeout(() => {
+          if (pointer.isDown) {
+            this.pressWasFired = true;
+            this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
+          }
+        }, CST.EVENTS.OBJECT.PRESS_TIME);
+      })
+      .on("pointerup", (pointer: Phaser.Input.Pointer) => {
+        // If the press event fired and it should cancel selection / deselection
+        if (this.pressWasFired && this.pressCancelsSelection) {
+          this.pressWasFired = false;
+
+          return;
+        }
+
+        clearTimeout(this.pressTimeout);
+        this.pressWasFired = false;
         this.toggleSelected(pointer);
       });
 
@@ -207,7 +239,7 @@ export default class IsoSpriteObject extends IsoSprite {
       this.deselect(pointer);
     } else {
       // this object was just selected, emit the event
-      this.emit(CST.EVENTS.OBJECT.SELECT);
+      this.emit(CST.EVENTS.OBJECT.SELECT, pointer);
 
       this.selected = true;
       this.setTint(this.selectedTintColor);
@@ -217,7 +249,7 @@ export default class IsoSpriteObject extends IsoSprite {
   // Provide it as a different function so deselection logic can be overriden in the subclasses
   deselect(pointer?: Phaser.Input.Pointer) {
     this.clearTint();
-    this.emit(CST.EVENTS.OBJECT.DESELECT);
+    this.emit(CST.EVENTS.OBJECT.DESELECT, pointer);
     this.selected = false;
   }
 

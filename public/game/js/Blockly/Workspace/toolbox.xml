@@ -219,6 +219,10 @@
     </block>
   </category>
   <sep></sep>
+  <category name="Events" colour="#a5745b">
+    <block type="events_selected"></block>
+    <block type="events_prod_ready"></block>
+  </category>
   <category name="Environment" colour="#9fa55b">
     <block type="environment_coordinate_pair">
       <value name="X_COORD">
@@ -226,7 +230,6 @@
           <field name="NUM">0</field>
         </shadow>
       </value>
-
       <value name="Y_COORD">
         <shadow type="math_number">
           <field name="NUM">0</field>
@@ -234,16 +237,14 @@
       </value>
     </block>
     <block type="environment_position"></block>
-
     <block type="environment_reachable">
-     <value name="COORD">
+      <value name="COORD">
         <shadow type="environment_coordinate_pair">
           <value name="X_COORD">
             <shadow type="math_number">
               <field name="NUM">0</field>
             </shadow>
           </value>
-
           <value name="Y_COORD">
             <shadow type="math_number">
               <field name="NUM">0</field>
@@ -252,7 +253,6 @@
         </shadow>
       </value>
     </block>
-
     <block type="environment_get_x">
       <value name="COORD">
         <shadow type="environment_position"></shadow>
@@ -264,11 +264,10 @@
       </value>
     </block>
     <block type="environment_get_neighbour">
+      <field name="DIRECTION">UP</field>
       <value name="COORD">
         <shadow type="environment_position"></shadow>
       </value>
-
-      <field name="DIRECTION">UP</field>
     </block>
   </category>
   <category name="Actions" colour="#5ba58c">
@@ -279,7 +278,6 @@
         </shadow>
       </value>
     </block>
-
     <block type="actions_walk">
       <value name="COORDINATE">
         <shadow type="environment_coordinate_pair">
@@ -288,7 +286,6 @@
               <field name="NUM">0</field>
             </shadow>
           </value>
-
           <value name="Y_COORD">
             <shadow type="math_number">
               <field name="NUM">0</field>

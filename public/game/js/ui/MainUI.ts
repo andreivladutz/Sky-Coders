@@ -1,9 +1,9 @@
-import UIComponent, { ButtonImage, UIImage } from "./UIComponent";
+import UIComponent, { ButtonImage, UIImage } from "./uiUtils/UIComponent";
 import UIScene from "../scenes/UIScene";
 import IsoScene from "../IsoPlugin/IsoScene";
 import CST from "../CST";
 import UIComponentsFact from "./UIComponentsFactory";
-import { MoveUIUtility, MoveUIDirection } from "./UIMovement";
+import { MoveUIUtility, MoveUIDirection } from "./uiUtils/UIMovement";
 import UIComponents from "./UIComponentsFactory";
 import ActorsManager from "../managers/ActorsManager";
 import SocketManager from "../online/SocketManager";
@@ -77,7 +77,7 @@ class MainUIButon extends ButtonImage<MainUI> {
         }
 
         let blocklyManager = this.parentUI.blocklyManager;
-        blocklyManager.showWorkspace(selectedActor);
+        blocklyManager.showWorkspace(selectedActor.codeHandler);
 
         break;
     }

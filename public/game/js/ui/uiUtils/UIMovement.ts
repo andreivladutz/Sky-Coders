@@ -2,9 +2,9 @@ import Tween = Phaser.Tweens.Tween;
 import GameObject = Phaser.GameObjects.GameObject;
 import Scene = Phaser.Scene;
 import Transform = Phaser.GameObjects.Components.Transform;
-import Manager from "../managers/Manager";
-import CST from "../CST";
-import UIScene from "../scenes/UIScene";
+import Manager from "../../managers/Manager";
+import CST from "../../CST";
+import UIScene from "../../scenes/UIScene";
 
 type MoveableGameObject = GameObject & Transform;
 

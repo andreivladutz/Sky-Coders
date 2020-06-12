@@ -1,9 +1,9 @@
-import UIComponent, { ButtonImage } from "./UIComponent";
+import UIComponent, { ButtonImage } from "./uiUtils/UIComponent";
 import UIScene from "../scenes/UIScene";
 import IsoScene from "../IsoPlugin/IsoScene";
 import CST from "../CST";
 import BuildingsManager from "../managers/BuildingsManager";
-import { MoveUIUtility, MoveUIDirection } from "./UIMovement";
+import { MoveUIUtility, MoveUIDirection } from "./uiUtils/UIMovement";
 import UIComponents from "./UIComponentsFactory";
 import BuildPlaceUI from "./BuildPlaceUI";
 import { BuildNames } from "../../../common/BuildingTypes";

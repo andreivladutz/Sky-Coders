@@ -12,9 +12,8 @@ import NavSpriteObject from "./NavSpriteObject";
 
 import ActorsManager from "../managers/ActorsManager";
 import { TileXY } from "../map/IsoBoard";
-import CharacterTerminal from "../Blockly/CharacterTerminal";
-import CodeInterpreter from "../Blockly/CodeInterpreter";
 import { GridColor } from "./IsoSpriteObject";
+import ActorCodeHandler from "./ActorCodeHandler";
 
 // mapping event to directions
 const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
@@ -63,16 +62,10 @@ export default class Actor extends NavSpriteObject {
 
   private walking: boolean = false;
   private direction: ACTOR_DIRECTIONS = ACTOR_DIRECTIONS.SE;
-
   // If a walking cycle is initiated from code, don't let the user change the direction
   private walkingFromCode: boolean = false;
 
-  // Each character has its terminal
-  public terminal: CharacterTerminal;
-  // Each character has its interpreter
-  public interpreter: CodeInterpreter;
-  // Each character has its blockly code
-  public blocklyCode: string = "";
+  public codeHandler: ActorCodeHandler;
 
   constructor(config: ActorConfig) {
     super(
@@ -94,9 +87,7 @@ export default class Actor extends NavSpriteObject {
 
     // subscribes itself to the Actors Manager
     this.actorsManager.sceneActors.push(this);
-
-    this.terminal = new CharacterTerminal(this.actorKey);
-    this.interpreter = new CodeInterpreter(this);
+    this.codeHandler = new ActorCodeHandler(this);
   }
 
   public focusCamera(): this {
@@ -135,6 +126,7 @@ export default class Actor extends NavSpriteObject {
    */
   makeInteractive(): this {
     this.makeSelectable().setSelectedTintColor(CST.ACTOR.SELECTION_TINT);
+    this.pressCancelsSelection = true;
 
     // when this actor gets SELECTED
     this.on(CST.EVENTS.OBJECT.SELECT, () => {
@@ -163,6 +155,16 @@ export default class Actor extends NavSpriteObject {
       this.disableGridDrawing();
 
       this.actorsManager.onActorDeselected(this);
+    });
+
+    this.on(CST.EVENTS.OBJECT.PRESS, async (pointer: Phaser.Input.Pointer) => {
+      let charaUI = this.actorsManager.charaUI;
+
+      if (!charaUI) {
+        charaUI = await this.actorsManager.initCharaUI(this);
+      }
+
+      charaUI.showCommandsMenu(this, pointer.x, pointer.y);
     });
 
     // play walk animation on walk event:

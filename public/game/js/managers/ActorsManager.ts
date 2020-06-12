@@ -2,6 +2,9 @@ import ACTORS_CST, { ACTOR_NAMES_ARR } from "../ACTORS_CST";
 import Actor, { ActorConfig } from "../gameObjects/Actor";
 import Manager from "./Manager";
 import CharacterUI from "../ui/CharacterUI";
+import CST from "../CST";
+import UIScene from "../scenes/UIScene";
+import IsoScene from "../IsoPlugin/IsoScene";
 
 // Singleton class handling the loading of the actor resources
 export default class ActorsManager extends Manager {
@@ -46,17 +49,25 @@ export default class ActorsManager extends Manager {
     this.loadResources(load);
   }
 
+  // Init charaUI internally or init will come from an actor
+  public async initCharaUI(actor: Actor) {
+    let UIComponents = (await import("../ui/UIComponentsFactory")).default;
+    let CharacterUI = (await import("../ui/CharacterUI")).default;
+
+    let gameScene = actor.scene as IsoScene;
+    let uiScene = gameScene.scene.get(CST.SCENES.UI) as UIScene;
+
+    // Ignore the ui scene and game scene
+    return (this.charaUI = UIComponents.getUIComponents(
+      CharacterUI,
+      uiScene,
+      gameScene
+    )[0] as CharacterUI);
+  }
+
   private async toggleCharaSelectionUI() {
     if (!this.charaUI) {
-      let UIComponents = (await import("../ui/UIComponentsFactory")).default;
-      let CharacterUI = (await import("../ui/CharacterUI")).default;
-
-      // Ignore the ui scene and game scene
-      this.charaUI = UIComponents.getUIComponents(
-        CharacterUI,
-        null,
-        null
-      )[0] as CharacterUI;
+      await this.initCharaUI(this.selectedActor);
     }
 
     if (this.charaUI.isEnabled) {

@@ -1,9 +1,11 @@
 // https://blockly-demo.appspot.com/static/demos/blockfactory/index.html#ru9enq
 import actionsCategory from "./blocksStubs/actions_stubs";
 import environmentCategory from "./blocksStubs/environment_stubs";
+import eventsCategory from "./blocksStubs/events_stubs";
 
 import blocksLang from "./blocksLang";
 import Blockly from "blockly";
+import { BlocklyJS } from "./codeUtils";
 
 interface Locales {
   RO: object;
@@ -21,8 +23,9 @@ export default function defineCustomBlocks(
   locales: Locales
 ) {
   // Add the JavaScript code generation
-  actionsCategory(Blockly);
-  environmentCategory(Blockly);
+  actionsCategory(Blockly as BlocklyJS);
+  environmentCategory(Blockly as BlocklyJS);
+  eventsCategory(Blockly as BlocklyJS);
 
   Blockly.defineBlocksWithJsonArray(blockDefs);
 

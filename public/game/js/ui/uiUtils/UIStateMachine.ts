@@ -1,15 +1,15 @@
-import StateMachine from "../utils/StateMachine";
-import BuildPlaceUI from "./BuildPlaceUI";
-import MainUI from "./MainUI";
-import UIComponents from "./UIComponentsFactory";
-import UIScene from "../scenes/UIScene";
-import IsoScene from "../IsoPlugin/IsoScene";
-import BuildMenuUI from "./BuildMenuUI";
-import CST from "../CST";
-import ActorsManager from "../managers/ActorsManager";
+import StateMachine from "../../utils/StateMachine";
+import BuildPlaceUI from "../BuildPlaceUI";
+import MainUI from "../MainUI";
+import UIComponents from "../UIComponentsFactory";
+import UIScene from "../../scenes/UIScene";
+import IsoScene from "../../IsoPlugin/IsoScene";
+import BuildMenuUI from "../BuildMenuUI";
+import CST from "../../CST";
+import ActorsManager from "../../managers/ActorsManager";
 
-import BuildingsManager from "../managers/BuildingsManager";
-import { BuildNames } from "../../../common/BuildingTypes";
+import BuildingsManager from "../../managers/BuildingsManager";
+import { BuildNames } from "../../../../common/BuildingTypes";
 
 const STATES = CST.STATES;
 

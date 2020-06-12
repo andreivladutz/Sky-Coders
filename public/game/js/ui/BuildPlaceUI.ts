@@ -2,11 +2,9 @@ import BuildingObject from "../gameObjects/BuildingObject";
 import IsoArrow, { ArrowDirection } from "../utils/drawables/IsoArrow";
 import IsoScene from "../IsoPlugin/IsoScene";
 
-import UIComponent from "./UIComponent";
+import UIComponent from "./uiUtils/UIComponent";
 import CST from "../CST";
 import UIScene from "../scenes/UIScene";
-import BuildMenuUI from "./BuildMenuUI";
-import UIComponents from "./UIComponentsFactory";
 import MapManager from "../managers/MapManager";
 
 interface Tile {

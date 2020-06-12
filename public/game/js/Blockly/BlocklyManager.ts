@@ -1,14 +1,15 @@
 import Manager from "../managers/Manager";
-import Blockly from "blockly";
+import Blockly, { Generator } from "blockly";
 import CST from "../CST";
 import GameWindow from "../ui/GameWindow";
-import Actor from "../gameObjects/Actor";
 
 import defineCustomBlocks from "./Workspace/blockDefs/customBlocks";
 import * as roLang from "blockly/msg/ro";
 import * as enLang from "blockly/msg/en";
+import ActorCodeHandler from "../gameObjects/ActorCodeHandler";
+import ActorsManager from "../managers/ActorsManager";
 
-const { JavaScript } = Blockly as any;
+const JavaScript: Generator = (Blockly as any).JavaScript;
 
 export default class BlocklyManager extends Manager {
   private readonly darkTheme: Blockly.Theme = (Blockly as any).Themes.Dark;
@@ -16,8 +17,11 @@ export default class BlocklyManager extends Manager {
     .Classic;
 
   public workspace: Blockly.WorkspaceSvg;
+  // The default workspace containing the three allowed command blocks
+  private defaultXMLWorkspace: HTMLDocument;
 
-  private currentActor: Actor;
+  // The current actor's code Handler
+  private currCodeHandler: ActorCodeHandler;
 
   private darkModeToggleButton: HTMLButtonElement;
   private window: GameWindow;
@@ -47,6 +51,15 @@ export default class BlocklyManager extends Manager {
     return JavaScript.workspaceToCode(this.workspace);
   }
 
+  // Let the codeHandler process the top blocks in its workspace
+  private sendWorkspaceToActor(codeHandler = this.currCodeHandler) {
+    codeHandler.processTopBlocks(
+      JavaScript,
+      this.workspace,
+      this.workspace.getTopBlocks(false)
+    );
+  }
+
   public closeWorkspace() {
     // Hide the button instantly
     this.darkModeToggleButton.style.display = "none";
@@ -57,43 +70,17 @@ export default class BlocklyManager extends Manager {
 
     // Save current's workspace state for this actor
     this.window.closeWindow();
-    this.currentActor.blocklyCode = this.getWorkspaceTextState();
+    this.currCodeHandler.blocklyWorkspace = this.getWorkspaceTextState();
 
-    let code = this.getCode();
-    this.currentActor.terminal.commandsHandler.outputRunningCode(
-      code.split("\n")
-    );
-
-    let interpreter = this.currentActor.interpreter;
-    interpreter.appendCode(code);
-
-    let step = () => {
-      let shouldContinue: boolean;
-
-      try {
-        shouldContinue = interpreter.stepThroughCode();
-      } catch (e) {
-        this.currentActor.terminal.commandsHandler.reportCodeError(e);
-      }
-
-      if (shouldContinue) {
-        setTimeout(step, 0);
-      }
-    };
-
-    step();
+    this.sendWorkspaceToActor();
   }
 
   // Show all workspace-related element with an animated transition
   // Opening the workspace for a specific actor
-  public showWorkspace(actor: Actor) {
-    this.currentActor = actor;
+  public showWorkspace(codeHandler: ActorCodeHandler) {
+    this.currCodeHandler = codeHandler;
 
-    try {
-      this.setWorkspaceStateFromText(actor.blocklyCode);
-    } catch {
-      this.workspace.clear();
-    }
+    this.loadWorkspaceFromActor(codeHandler);
 
     this.window.once(CST.WINDOW.OPEN_ANIM_EVENT, () => {
       this.darkModeToggleButton.style.display = "";
@@ -103,6 +90,27 @@ export default class BlocklyManager extends Manager {
 
     this.workspace.setVisible(true);
     Blockly.svgResize(this.workspace);
+  }
+
+  // Load the state stored as text for an actor
+  private loadWorkspaceFromActor(codeHandler: ActorCodeHandler) {
+    try {
+      // If the actor has no code, init it to the default workspace
+      if (!codeHandler.blocklyWorkspace) {
+        Blockly.Xml.clearWorkspaceAndLoadFromXml(
+          this.defaultXMLWorkspace.documentElement,
+          this.workspace
+        );
+
+        codeHandler.blocklyWorkspace = Blockly.Xml.domToText(
+          this.defaultXMLWorkspace.documentElement
+        );
+      } else {
+        this.setWorkspaceStateFromText(codeHandler.blocklyWorkspace);
+      }
+    } catch {
+      this.workspace.clear();
+    }
   }
 
   // Close and hide all workspace-related element
@@ -116,6 +124,7 @@ export default class BlocklyManager extends Manager {
   // The toolbox xml is being loaded by Phaser's loader and taken from Phaser's cache
   public init(cache: Phaser.Cache.CacheManager) {
     let toolboxXml = cache.xml.get(this.toolboxKey);
+    this.defaultXMLWorkspace = cache.xml.get(this.defaultWorkspaceKey);
 
     if (!toolboxXml) {
       throw new Error(
@@ -133,6 +142,16 @@ export default class BlocklyManager extends Manager {
 
     this.window.on(CST.WINDOW.CLOSE_EVENT, this.closeWorkspace.bind(this));
     this.hideWorkspace();
+
+    this.reloadAllCode();
+  }
+
+  // Reload all code / code commands and code events for all actors in the scene
+  private reloadAllCode() {
+    for (let actor of ActorsManager.getInstance().sceneActors) {
+      this.loadWorkspaceFromActor(actor.codeHandler);
+      this.sendWorkspaceToActor(actor.codeHandler);
+    }
   }
 
   private initDarkToggleButton() {
@@ -168,6 +187,8 @@ export default class BlocklyManager extends Manager {
       trashcan: true,
       renderer: "zelos"
     });
+
+    this.workspace.addChangeListener(Blockly.Events.disableOrphans);
   }
 
   // Init the custom Blockly blocks from the loaded json defs (already parsed)
@@ -183,8 +204,8 @@ export default class BlocklyManager extends Manager {
       EN: enLang
     });
 
-    Blockly.setLocale(enLang);
-    // Blockly.setLocale(roLang);
+    //Blockly.setLocale(enLang);
+    Blockly.setLocale(roLang);
   }
 
   // Load the toolbox xml
@@ -192,7 +213,7 @@ export default class BlocklyManager extends Manager {
     this.loadResources(load);
   }
 
-  // Load the toolbox and blocks json definitions
+  // Load the toolbox, default workspace and blocks json definitions
   loadResources(load: Phaser.Loader.LoaderPlugin) {
     const { RESOURCES } = CST.BLOCKLY;
     const { BLOCKS } = RESOURCES;
@@ -202,6 +223,8 @@ export default class BlocklyManager extends Manager {
     load.setPrefix(RESOURCES.BLOCKLY_PREFIX);
 
     load.xml(RESOURCES.TOOLBOX_KEY, RESOURCES.TOOLBOX_XML);
+    // Load the default workspace that has the three allowed command blocks
+    load.xml(RESOURCES.WORKSPACE_KEY, RESOURCES.DEFAULT_WORKSPACE_XML);
 
     // The path to the json blocks defs
     load.setPath(RESOURCES.PATH + BLOCKS.JSON_PATH);
@@ -221,6 +244,12 @@ export default class BlocklyManager extends Manager {
     const { RESOURCES: RESOURCES } = CST.BLOCKLY;
 
     return `${RESOURCES.BLOCKLY_PREFIX}${RESOURCES.TOOLBOX_KEY}`;
+  }
+
+  private get defaultWorkspaceKey() {
+    const { RESOURCES: RESOURCES } = CST.BLOCKLY;
+
+    return `${RESOURCES.BLOCKLY_PREFIX}${RESOURCES.WORKSPACE_KEY}`;
   }
 
   // Get the keys of all the json block definition files
