@@ -216,6 +216,11 @@ export default class LayersManager extends Manager {
       if (checkAgainstActors === true) {
         // take each grid tile of each actor and check it against each tile of this building
         for (let actor of ActorsManager.getInstance().sceneActors) {
+          // In the case we are checking an actor against the other actors
+          if (object === actor) {
+            continue;
+          }
+
           for (let actorTile of actor.getGridTiles()) {
             if (tile.x === actorTile.x && tile.y === actorTile.y) {
               return true;

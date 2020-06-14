@@ -3,7 +3,6 @@ import CST from "../CST";
 import Actor from "../gameObjects/Actor";
 import UIScene from "../scenes/UIScene";
 import IsoScene from "../IsoPlugin/IsoScene";
-import CameraManager from "../managers/CameraManager";
 import { CodeCommand } from "../gameObjects/ActorCodeHandler";
 
 export default class CharacterUI extends UIComponent {

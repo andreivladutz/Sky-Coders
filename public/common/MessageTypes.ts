@@ -1,11 +1,17 @@
 import * as BuildingTypes from "./BuildingTypes";
+import { CharacterDbInfo, Position } from "../../public/common/CharacterTypes";
 
 //  The server doesn't differentiate between a connection and a reconnection
 export namespace Connection {
-  export const CONNECT_EVENT = "first_connect";
-  export const RECONNECT_EVENT = "client_reconnect";
+  const PREFIX = "Connection.";
+  export const CONNECT_EVENT = `${PREFIX}first_connect`;
+  export const RECONNECT_EVENT = `${PREFIX}client_reconnect`;
 
-  export const INIT_UIDS_EVENT = "init_uids";
+  export const INIT_UIDS_EVENT = `${PREFIX}init_uids`;
+
+  // Redirect event, useful for redirecting the client to another path
+  export const REDIRECT_EVENT = `${PREFIX}redirect`;
+  export type Path = string;
 
   // These uids are transmitted on first connection from the server
   // to the client (via the GameInit event). On reconnection, the client sends them back to the sv
@@ -16,33 +22,28 @@ export namespace Connection {
 }
 
 // The first message sent by the server to the client for initialising the game
-export namespace GameInit {
+export namespace Game {
+  const PREFIX = "Game.";
+
   export interface Config {
     seed: string;
     // The buildings already placed by the user on the map
     buildings: BuildingTypes.DbBuildingInfo[];
   }
 
-  export const EVENT = "game_init";
-}
-
-// Redirect event, useful for redirecting the client to another path
-export namespace Redirect {
-  export const EVENT = "redirect";
-  export type Path = string;
-}
-
-export namespace GameLoaded {
-  export const EVENT = "game_loaded";
+  export const INIT_EVENT = `${PREFIX}game_init`;
+  export const LOAD_EVENT = `${PREFIX}game_loaded`;
 }
 
 export namespace BuildingPlacement {
+  const PREFIX = "Building.";
+
   // Request the placement of a building to the server
-  export const REQUEST_EVENT = "building_placed";
+  export const REQUEST_EVENT = `${PREFIX}building_placed`;
   // Placement approved
-  export const APPROVE_EVENT = "placement_approved";
+  export const APPROVE_EVENT = `${PREFIX}placement_approved`;
   // Placement denied
-  export const DENY_EVENT = "placement_deny";
+  export const DENY_EVENT = `${PREFIX}placement_deny`;
 
   export type DbBuilding = BuildingTypes.DbBuildingInfo;
   // When the placement gets approved, resource status is updated
@@ -50,4 +51,13 @@ export namespace BuildingPlacement {
   export interface ResourcesAfterPlacement extends BuildingTypes.Resources {
     buildingPosition: BuildingTypes.TilePosition;
   }
+}
+
+export namespace Characters {
+  const PREFIX = "Characters.";
+
+  export const NEW_CHARA_EVENT = `${PREFIX}new_chara`;
+  export const SEND_CHARAS_EVENT = `${PREFIX}send_charas`;
+  export type DbCharacter = CharacterDbInfo;
+  export type CharaPosition = Position;
 }

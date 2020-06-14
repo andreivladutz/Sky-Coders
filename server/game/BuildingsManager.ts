@@ -11,6 +11,7 @@ import GameInstance from "./GameInstance";
 import CST from "../SERVER_CST";
 
 import { NamespaceDebugger } from "../utils/debug";
+import GameObjectsManager from "./GameObjectsManager";
 const debug = new NamespaceDebugger("BuildingsManager");
 
 type DbInfo = DbBuildingInfo;
@@ -52,28 +53,14 @@ class IndexedBuilding implements BBox {
 }
 
 // Manage buildings for a connected client
-export default class BuildingsManager {
+export default class BuildingsManager extends GameObjectsManager {
   private rTree: RBush<IndexedBuilding>;
-  private gameInstanceParent: GameInstance;
-
-  private get islandDoc() {
-    return this.gameInstanceParent.currIslandDocument;
-  }
-  private get userDoc() {
-    return this.gameInstanceParent.user;
-  }
-  private get sender() {
-    return this.gameInstanceParent.sender;
-  }
-  // Get the resources on the game object of this user
-  private get resourcesDoc() {
-    return this.userDoc.game.resources;
-  }
 
   constructor(gameInstance: GameInstance) {
+    super(gameInstance);
+
     this.rTree = new RBush();
 
-    this.gameInstanceParent = gameInstance;
     gameInstance.on(CST.EVENTS.GAME.INITED, () => this.loadBuildings());
   }
 

@@ -265,29 +265,27 @@ export default class PlacementManager extends Manager {
 
         if (cfgObj.tree) {
           this.treesObjects.push(
-            new IsoSpriteObject(
+            new IsoSpriteObject({
               scene,
-              pos.x,
-              pos.y,
-              0,
-              TREE_ID,
-              this.envTexture,
-              treeFrame
-            )
+              tileX: pos.x,
+              tileY: pos.y,
+              objectId: TREE_ID,
+              texture: this.envTexture,
+              frame: treeFrame
+            })
           );
         }
 
         if (cfgObj.ore) {
           this.oreObjects.push(
-            new IsoSpriteObject(
+            new IsoSpriteObject({
               scene,
-              pos.x,
-              pos.y,
-              0,
-              ORE_ID,
-              this.envTexture,
-              cfgObj.ore
-            )
+              tileX: pos.x,
+              tileY: pos.y,
+              objectId: ORE_ID,
+              texture: this.envTexture,
+              frame: cfgObj.ore
+            })
           );
         }
       }

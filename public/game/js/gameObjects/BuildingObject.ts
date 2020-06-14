@@ -37,20 +37,19 @@ export default class BuildingObject extends IsoSpriteObject {
     tileX?: number,
     tileY?: number
   ) {
-    super(
+    super({
       scene,
-      tileX ?? 0,
-      tileY ?? 0,
-      0,
-      CST.LAYERS.OBJ_ID.BUILDING,
-      textureKey,
-      buildingFrame,
+      tileX: tileX ?? 0,
+      tileY: tileY ?? 0,
+      objectId: CST.LAYERS.OBJ_ID.BUILDING,
+      texture: textureKey,
+      frame: buildingFrame,
       // Do not place it on the layer of objects
-      false,
+      shouldBeAppliedToLayer: false,
       // override local computed tiles
       localTileX,
       localTileY
-    );
+    });
 
     this.buildingType = buildingType;
 

@@ -2,7 +2,7 @@ import * as cookie from "cookie";
 import GameInstance from "./GameInstance";
 import cryptr from "../utils/cryptr";
 import User, { UserType } from "../models/User";
-import { Redirect, Connection } from "../../public/common/MessageTypes";
+import { Connection } from "../../public/common/MessageTypes";
 import CST from "../SERVER_CST";
 
 import { NamespaceDebugger } from "../utils/debug";
@@ -121,7 +121,7 @@ export default class GamesManager {
       }
     }
 
-    socket.emit(Redirect.EVENT, logoutRoute);
+    socket.emit(Connection.REDIRECT_EVENT, logoutRoute);
 
     return this;
   }

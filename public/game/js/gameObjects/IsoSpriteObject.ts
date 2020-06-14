@@ -5,6 +5,46 @@ import CST from "../CST";
 import { TileXY } from "../map/IsoBoard";
 import LayersManager from "../managers/LayersManager";
 
+interface IsoSpriteConfig {
+  scene: Phaser.Scene;
+  tileX: number;
+  tileY: number;
+  z?: number;
+  objectId: number;
+  texture: string;
+  frame?: string | number;
+  // pass false to this argument to skip applying object to the grid layers
+  shouldBeAppliedToLayer?: boolean;
+  // override local compute tiles
+  localTileX?: number;
+  localTileY?: number;
+  // optional Tile layering
+  tileZ?: number;
+}
+
+function isDefinedOrDefault<T>(value: T, typeCheck: string, defaultValue: T) {
+  if (typeof value === typeCheck) {
+    return value;
+  }
+
+  return defaultValue;
+}
+
+function applyDefaultValues(config: IsoSpriteConfig) {
+  config.shouldBeAppliedToLayer = isDefinedOrDefault(
+    config.shouldBeAppliedToLayer,
+    "boolean",
+    true
+  );
+  config.localTileY = isDefinedOrDefault(
+    config.localTileY,
+    "number",
+    config.localTileX
+  );
+  config.tileZ = isDefinedOrDefault(config.tileZ, "number", 0);
+  config.z = isDefinedOrDefault(config.z, "number", 0);
+}
+
 export enum GridColor {
   DO_NOT_DRAW = -1,
   GREEN = CST.COLORS.GREEN,
@@ -84,48 +124,37 @@ export default class IsoSpriteObject extends IsoSprite {
   readonly TILE_SIZE3D = EnvironmentManager.getInstance().TILE_HEIGHT;
 
   //@ts-ignore
-  constructor(
-    scene: Phaser.Scene,
-    tileX: number,
-    tileY: number,
-    z: number,
-    objectId: number,
-    texture: string,
-    frame?: string | number,
-    // pass false to this argument to skip applying object to the grid layers
-    shouldBeAppliedToLayer: boolean = true,
-    // override local compute tiles
-    localTileX?: number,
-    localTileY: number = localTileX
-  ) {
+  constructor(config: IsoSpriteConfig) {
+    applyDefaultValues(config);
+
     super(
-      scene,
-      tileX * EnvironmentManager.getInstance().TILE_HEIGHT,
-      tileY * EnvironmentManager.getInstance().TILE_HEIGHT,
-      z,
-      texture,
-      frame
+      config.scene,
+      config.tileX * EnvironmentManager.getInstance().TILE_HEIGHT,
+      config.tileY * EnvironmentManager.getInstance().TILE_HEIGHT,
+      config.z,
+      config.texture,
+      config.frame
     );
-    this.objectId = objectId;
+    this.objectId = config.objectId;
 
-    this.addToGridAt(tileX, tileY);
+    this.addToGridAt(config.tileX, config.tileY, config.tileZ);
 
-    this.tileCoords.x = tileX;
-    this.tileCoords.y = tileY;
+    this.tileCoords.x = config.tileX;
+    this.tileCoords.y = config.tileY;
 
     // add myself to the scene
     // set the origin to default to the bottom right corner
     this.scene.add.existing(this.setOrigin(1, 1));
 
-    this.setOriginByFrame(frame);
+    this.setOriginByFrame(config.frame);
 
     this.computeTileArea();
     // override the computed local tiles
-    if (localTileX) {
-      this.overrideLocalTilePos(localTileX, localTileY);
+    if (typeof config.localTileX === "number") {
+      this.overrideLocalTilePos(config.localTileX, config.localTileY);
     }
 
-    if (shouldBeAppliedToLayer) {
+    if (config.shouldBeAppliedToLayer) {
       this.applyToLayer();
     }
 
@@ -199,58 +228,70 @@ export default class IsoSpriteObject extends IsoSprite {
           this.clearTint();
         }
       })
-      .on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-        // Consider the right mouse button as being a press action
-        if (pointer.rightButtonDown()) {
-          this.pressWasFired = true;
-          this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
-
-          return;
-        }
-
-        // Check for press event
-        this.pressTimeout = setTimeout(() => {
-          if (pointer.isDown) {
-            this.pressWasFired = true;
-            this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
-          }
-        }, CST.EVENTS.OBJECT.PRESS_TIME);
-      })
-      .on("pointerup", (pointer: Phaser.Input.Pointer) => {
-        // If the press event fired and it should cancel selection / deselection
-        if (this.pressWasFired && this.pressCancelsSelection) {
-          this.pressWasFired = false;
-
-          return;
-        }
-
-        clearTimeout(this.pressTimeout);
-        this.pressWasFired = false;
-        this.toggleSelected(pointer);
-      });
+      .on("pointerdown", this.checkPressLogic)
+      .on("pointerup", this.handleSelectionToggle);
 
     return this;
   }
 
+  // Handler function for "pointerdown" event -> checking PRESS
+  private checkPressLogic = (pointer: Phaser.Input.Pointer) => {
+    // Consider the right mouse button as being a press action
+    if (pointer.rightButtonDown()) {
+      this.pressWasFired = true;
+      this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
+
+      return;
+    }
+
+    // Check for press event
+    this.pressTimeout = setTimeout(() => {
+      if (pointer.isDown) {
+        this.pressWasFired = true;
+        this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
+      }
+    }, CST.EVENTS.OBJECT.PRESS_TIME);
+  };
+
+  // Handler function for "pointerup" event
+  private handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
+    // If the press event fired and it should cancel selection / deselection
+    if (this.pressWasFired && this.pressCancelsSelection) {
+      this.pressWasFired = false;
+
+      return;
+    }
+
+    // Cancel the listening for press event as this was canceled by this up event
+    clearTimeout(this.pressTimeout);
+    this.pressWasFired = false;
+    this.toggleSelected(pointer);
+  };
+
   // select or deselect the actor
-  toggleSelected(pointer?: Phaser.Input.Pointer) {
-    // this object was just deselected, emit the event
+  private toggleSelected(pointer: Phaser.Input.Pointer) {
     if (this.selected) {
       this.deselect(pointer);
     } else {
-      // this object was just selected, emit the event
-      this.emit(CST.EVENTS.OBJECT.SELECT, pointer);
-
-      this.selected = true;
-      this.setTint(this.selectedTintColor);
+      this.select(pointer);
     }
   }
 
   // Provide it as a different function so deselection logic can be overriden in the subclasses
-  deselect(pointer?: Phaser.Input.Pointer) {
+  // The pointer can be omitted if a deselection is fired by the actors manager for example.
+  public deselect(pointer?: Phaser.Input.Pointer) {
     this.clearTint();
-    this.emit(CST.EVENTS.OBJECT.DESELECT, pointer);
     this.selected = false;
+
+    this.emit(CST.EVENTS.OBJECT.DESELECT, pointer);
+  }
+
+  public select(pointer: Phaser.Input.Pointer) {
+    this.selected = true;
+    this.setTint(this.selectedTintColor);
+
+    // this object was just selected, emit the event
+    this.emit(CST.EVENTS.OBJECT.SELECT, pointer);
   }
 
   public setSelectedTintColor(color: number) {
@@ -258,8 +299,9 @@ export default class IsoSpriteObject extends IsoSprite {
   }
 
   // Add this object to the grid at the provided tile coords
-  public addToGridAt(tileX: number, tileY: number): this {
-    this.mapManager.addSpriteObjectToGrid(this, tileX, tileY);
+  // Added an optional tileZ coord to support layering and prevent the actors from getting bugged
+  public addToGridAt(tileX: number, tileY: number, tileZ: number = 0): this {
+    this.mapManager.addSpriteObjectToGrid(this, tileX, tileY, tileZ);
     return this;
   }
 

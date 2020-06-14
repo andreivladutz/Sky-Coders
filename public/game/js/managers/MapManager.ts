@@ -64,14 +64,14 @@ export default class MapManager extends Manager {
 
         this.tileMap.onTileOver(tile);
       })
-      .on(CST.EVENTS.MAP.TAP, (pointer, tile: TileXY) => {
+      .on(CST.EVENTS.MAP.TAP, (tap: any, tile: TileXY) => {
         if (this.events.shouldPreventDefault(tile)) {
           return;
         }
 
         // TODO: IF ON MOBILE (DETECT) then on tile over should be called
         //this.tileMap.onTileOver(tile);
-        this.events.emit(CST.EVENTS.MAP.TAP, tile);
+        this.events.emit(CST.EVENTS.MAP.TAP, tile, tap.lastPointer);
       })
       .on(CST.EVENTS.MAP.PRESS, (pointer, tile: TileXY) => {
         this.events.emit(CST.EVENTS.MAP.PRESS, tile);
@@ -140,18 +140,20 @@ export default class MapManager extends Manager {
   public addSpriteObjectToGrid(
     obj: IsoSpriteObject,
     tileX: number,
-    tileY: number
+    tileY: number,
+    tileZ: number = 0
   ) {
-    this.tileMap.isoBoard.board.addChess(obj, tileX, tileY);
+    this.tileMap.isoBoard.board.addChess(obj, tileX, tileY, tileZ);
   }
 
   // Moves a spirte object on the underlying game board
   public moveSpriteObjectToTiles(
     obj: IsoSpriteObject,
     tileX: number,
-    tileY: number
+    tileY: number,
+    tileZ: number = 0
   ) {
-    this.tileMap.isoBoard.board.moveChess(obj, tileX, tileY, 0);
+    this.tileMap.isoBoard.board.moveChess(obj, tileX, tileY, tileZ);
   }
 
   // Removes and destroys the "chess object" of this sprite from the underlying board

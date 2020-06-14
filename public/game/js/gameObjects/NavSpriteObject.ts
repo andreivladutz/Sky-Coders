@@ -11,8 +11,23 @@ interface TileXY {
   y: number;
 }
 
+interface NavSpriteConfig {
+  actorKey: string;
+  scene: Phaser.Scene;
+  tileX: number;
+  tileY: number;
+  z?: number;
+  objectId: number;
+  texture: string;
+  frame?: string | number;
+  // tileZ is needed to prevent bugs due to kick events on the rexBoard
+  tileZ: number;
+}
+
 // A navigating subclass of the sprite object
 export default class NavSpriteObject extends IsoSpriteObject {
+  // Remember the tileZ position
+  tileZ: number;
   pathFollowing: TileXY[];
   // MoveTo plugin instance used for moving this sprite
   moveTo: MoveTo;
@@ -26,20 +41,15 @@ export default class NavSpriteObject extends IsoSpriteObject {
   // this astar worker manager
   astarWorkerManager: AstarWorkerManager;
 
-  constructor(
-    actorKey: string,
-    scene: Phaser.Scene,
-    tileX: number,
-    tileY: number,
-    z: number,
-    objectId: number,
-    texture: string,
-    frame?: string | number
-  ) {
+  constructor(config: NavSpriteConfig) {
     // This type of object doesn't get applied to the layer as it travels all the time
-    super(scene, tileX, tileY, z, objectId, texture, frame, false);
+    super({
+      ...config,
+      shouldBeAppliedToLayer: false
+    });
 
-    this.actorKey = actorKey;
+    this.tileZ = config.tileZ;
+    this.actorKey = config.actorKey;
 
     // RexPlugins behaviour:
     this.moveTo = new MoveTo(this, {
@@ -49,7 +59,7 @@ export default class NavSpriteObject extends IsoSpriteObject {
         (EnvironmentManager.getInstance().TILE_WIDTH /
           CST.NAV_OBJECT.IDEAL_TILESIZE),
       rotateToTarget: false,
-      //occupiedTest: true
+      //occupiedTest: false,
       blockerTest: false
     });
 
@@ -115,7 +125,6 @@ export default class NavSpriteObject extends IsoSpriteObject {
   // find path to tileX and tileY and start moving towards there
   public async navigateTo(tileX: number, tileY: number) {
     this.pathFollowing = await this.findPathTo(tileX, tileY);
-
     this.moveAlongPath();
   }
 
@@ -173,41 +182,6 @@ export default class NavSpriteObject extends IsoSpriteObject {
     else if (angle > -135 && angle < -45) {
       this.emit(WALK_EV.S);
     }
-
-    // let dx = Math.floor(x - this.tileCoords.x),
-    //   dy = Math.floor(y - this.tileCoords.y);
-
-    // if (Math.abs(dx) === 1 && dy >= 3) {
-    //   this.emit(WALK_EV.S);
-    // } else if (Math.abs(dx) === 1 && dy <= -3) {
-    //   this.emit(WALK_EV.N);
-    // } else if (dx > 0) {
-    //   if (Math.abs(dy) === 1 && dx >= 3) {
-    //     this.emit(WALK_EV.E);
-    //   } else if (dy > 0) {
-    //     this.emit(WALK_EV.SE);
-    //   } else if (dy < 0) {
-    //     this.emit(WALK_EV.NE);
-    //   } else {
-    //     this.emit(WALK_EV.E);
-    //   }
-    // } else if (dx < 0) {
-    //   if (Math.abs(dy) === 1 && dx <= -3) {
-    //     this.emit(WALK_EV.W);
-    //   } else if (dy < 0) {
-    //     this.emit(WALK_EV.NW);
-    //   } else if (dy > 0) {
-    //     this.emit(WALK_EV.SW);
-    //   } else {
-    //     this.emit(WALK_EV.W);
-    //   }
-    // } else {
-    //   if (dy < 0) {
-    //     this.emit(WALK_EV.N);
-    //   } else if (dy > 0) {
-    //     this.emit(WALK_EV.S);
-    //   }
-    // }
 
     this.moveTo.moveTo(x, y);
   }

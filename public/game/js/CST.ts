@@ -199,7 +199,8 @@ export default {
     ORE_RADIUS: 5
   },
   ACTOR: {
-    SELECTION_TINT: 0xd0f5e9
+    SELECTION_TINT: 0xd0f5e9,
+    FOCUS_ZOOM_TIME: 750
   },
   NAV_OBJECT: {
     SPEED: 400,
@@ -433,8 +434,7 @@ export default {
     }
   },
   TERMINAL: {
-    ID: "termDiv",
-    WINDOW_ID: "terminalContainer",
+    CLASS: "termDiv",
     DEBOUNCE_TIME: 250,
     // color codes to use in the terminal
     COLORS: {

@@ -4,17 +4,10 @@ import IsoScene from "../IsoPlugin/IsoScene";
 
 import CameraManager from "../managers/CameraManager";
 import MapManager from "../managers/MapManager";
-import Actor from "../gameObjects/Actor";
-import { ACTOR_NAMES } from "../ACTORS_CST";
-import TileMap from "../map/TileMap";
 import BuildingsManager from "../managers/BuildingsManager";
-
-// TODO: remove global variables
-let actor: Actor;
+import ActorsManager from "../managers/ActorsManager";
 
 export default class GameScene extends IsoScene {
-  tileMap: TileMap;
-
   constructor() {
     const config = {
       key: CST.SCENES.GAME
@@ -53,7 +46,7 @@ export default class GameScene extends IsoScene {
     );
 
     // fire the map init
-    this.tileMap = MapManager.getInstance().initMap(this);
+    MapManager.getInstance().initMap(this);
 
     // init the camera controller
     CameraManager.getInstance({
@@ -63,17 +56,15 @@ export default class GameScene extends IsoScene {
       enableZoom: true
     });
 
+    // Place the buildings from the server
     BuildingsManager.getInstance().initBuildings(this);
 
-    actor = new Actor({
-      actorKey: ACTOR_NAMES.MALLACK,
-      tileX: 37,
-      tileY: 20,
-      z: 0,
-      scene: this
-    });
+    let actorsManager = ActorsManager.getInstance();
+    // Place the actors from the server
+    actorsManager.initCharacters(this);
 
-    actor.idleAnim().focusCamera();
+    // Pick a random actor and focus the camera on him
+    Phaser.Math.RND.pick(actorsManager.sceneActors).focusCamera();
 
     // MapManager.getInstance()
     //   .enableDebugging()
@@ -81,11 +72,6 @@ export default class GameScene extends IsoScene {
   }
 
   update() {
-    // console.log(this.children.sortByDepth(actor, obj));
-    // code to follow an actor
-    // MapManager.getInstance().setScrollOverTiles(
-    //   actor.gameObject.floatingTileX,
-    //   actor.gameObject.floatingTileY
-    // );
+    //
   }
 }

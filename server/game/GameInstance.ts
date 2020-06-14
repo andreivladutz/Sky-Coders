@@ -1,8 +1,4 @@
-import {
-  GameInit,
-  GameLoaded,
-  Connection
-} from "../../public/common/MessageTypes";
+import { Game, Connection } from "../../public/common/MessageTypes";
 import randomstring from "randomstring";
 import { EventEmitter } from "events";
 import CST from "../SERVER_CST";
@@ -16,6 +12,7 @@ import * as mongoose from "mongoose";
 import Document = mongoose.Document;
 
 import { NamespaceDebugger } from "../utils/debug";
+import CharactersManager from "./CharactersManager";
 const debug = new NamespaceDebugger("GameInstance");
 
 // An instance of a game for a particular user
@@ -32,8 +29,14 @@ export default class GameInstance extends EventEmitter {
 
   // The messages with buffering abstraction over the connection socket to this user
   public sender: BufferMessenger;
-  // The manager handling building related logic
-  private buildingsManger: BuildingsManager;
+
+  private objectsManagers: {
+    // The manager handling building related logic
+    buildingsManger?: BuildingsManager;
+    // The character's manager
+    charactersManager?: CharactersManager;
+  } = {};
+
   private updateInterval: any;
   // After a timeout time of being disconnected,
   // Declare the user logged out and clear the memory
@@ -58,10 +61,11 @@ export default class GameInstance extends EventEmitter {
   ) {
     super();
 
-    this.buildingsManger = new BuildingsManager(this);
-
     this.sender = new BufferMessenger(socket);
     this.userDocument = userDocument;
+
+    this.objectsManagers.buildingsManger = new BuildingsManager(this);
+    this.objectsManagers.charactersManager = new CharactersManager(this);
 
     // If the user is just reconnecting, then the game is already
     // inited on the client side
@@ -117,7 +121,7 @@ export default class GameInstance extends EventEmitter {
 
   private initListeners() {
     // Event emitted when the game on the client completely loaded
-    this.sender.once(GameLoaded.EVENT, () => {
+    this.sender.once(Game.LOAD_EVENT, () => {
       if (this._isGameInited) {
         return;
       }
@@ -142,7 +146,7 @@ export default class GameInstance extends EventEmitter {
       );
     });
 
-    this.buildingsManger.initListeners();
+    this.objectsManagers.buildingsManger.initListeners();
   }
 
   // Fire the initialisation event
@@ -173,12 +177,13 @@ export default class GameInstance extends EventEmitter {
     this.seed = this.currIslandDocument.seed;
 
     // Init the game on the client side by sending the intial cfg
-    let gameConfig: GameInit.Config = {
+    let gameConfig: Game.Config = {
       seed: this.seed,
       buildings: this.currIslandDocument.buildings
     };
 
-    this.sender.emit(GameInit.EVENT, gameConfig);
+    this.sender.emit(Game.INIT_EVENT, gameConfig);
+    this.objectsManagers.charactersManager.sendCharacters();
 
     // Send the uids used to identify the client
     let uids: Connection.Uids = {
@@ -206,7 +211,8 @@ export default class GameInstance extends EventEmitter {
     let islandDoc = new Island({
       // generate a random 32 length string
       seed: randomstring.generate(),
-      buildings: []
+      buildings: [],
+      characters: []
     });
 
     // Save the new island document so it can be found on the next join

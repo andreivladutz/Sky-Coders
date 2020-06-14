@@ -5,6 +5,9 @@ import CharacterUI from "../ui/CharacterUI";
 import CST from "../CST";
 import UIScene from "../scenes/UIScene";
 import IsoScene from "../IsoPlugin/IsoScene";
+import GameManager from "../online/GameManager";
+import LayersManager from "./LayersManager";
+import MapManager from "./MapManager";
 
 // Singleton class handling the loading of the actor resources
 export default class ActorsManager extends Manager {
@@ -14,22 +17,77 @@ export default class ActorsManager extends Manager {
   selectedActor: Actor = null;
   charaUI: CharacterUI;
 
+  // Init all characters coming from the server (all positioned)
+  // And position the characters that have to be positioned
+  public initCharacters(gameScene: IsoScene) {
+    let charaMsgr = GameManager.getInstance().messengers.characters;
+
+    // Ack functions that take in the position of the new actor
+    for (let [characterInfo, positionAck] of charaMsgr.positioningAcks) {
+      let actor = new Actor({
+        tileX: 0,
+        tileY: 0,
+        scene: gameScene,
+        actorKey: characterInfo.actorKey,
+        dbArrayPos: characterInfo.arrayPos
+      });
+
+      this.placeActor(actor, this.sceneActors);
+      positionAck({ x: actor.tileX, y: actor.tileY });
+    }
+
+    let existingCharas = charaMsgr.existingCharas;
+    console.log(existingCharas);
+
+    for (let existingActor of existingCharas) {
+      new Actor({
+        scene: gameScene,
+        actorKey: existingActor.actorKey,
+        tileX: existingActor.position.x,
+        tileY: existingActor.position.y,
+        dbArrayPos: existingActor.arrayPos
+      });
+    }
+  }
+
+  // Place an actor on the INITED map
+  private placeActor(actor: Actor, actorsArray: Actor[]) {
+    // TODO: in the future let the user place the actors manually
+    // do not risk not finding a good positioning
+    let foundPosition: boolean;
+    let layerManager = LayersManager.getInstance();
+    let mapManager = MapManager.getInstance();
+
+    let RND = Phaser.Math.RND;
+
+    do {
+      foundPosition = true;
+
+      let tileX = RND.integerInRange(0, mapManager.mapWidth - 1);
+      let tileY = RND.integerInRange(0, mapManager.mapHeight - 1);
+
+      actor.setTilePosition(tileX, tileY);
+
+      if (layerManager.isColliding(actor, true)) {
+        foundPosition = false;
+      }
+    } while (!foundPosition);
+  }
+
   // when an actor gets selected, the actorsManager should be informed
   public onActorSelected(actor: Actor) {
     // there is another actor selected, deselect him
     if (this.selectedActor && this.selectedActor !== actor) {
-      this.selectedActor.toggleSelected();
+      this.selectedActor.deselect();
     }
 
     this.selectedActor = actor;
-    this.toggleCharaSelectionUI();
+    this.toggleCharaSelectionUI(true);
   }
 
-  public onActorDeselected(actor: Actor) {
-    if (this.selectedActor === actor) {
-      this.toggleCharaSelectionUI();
-      this.selectedActor = null;
-    }
+  public onActorDeselected() {
+    this.toggleCharaSelectionUI(false);
+    this.selectedActor = null;
   }
 
   // Cancels the movement of all actors
@@ -65,15 +123,22 @@ export default class ActorsManager extends Manager {
     )[0] as CharacterUI);
   }
 
-  private async toggleCharaSelectionUI() {
+  // Turn on or off the chara selection UI
+  private async toggleCharaSelectionUI(turnOn: boolean) {
     if (!this.charaUI) {
+      // The character is only needed to get the game and the ui scenes
       await this.initCharaUI(this.selectedActor);
     }
 
-    if (this.charaUI.isEnabled) {
-      this.charaUI.turnOff();
+    if (turnOn) {
+      if (this.charaUI.isEnabled) {
+        this.charaUI.turnOff();
+        this.charaUI.enable(this.selectedActor);
+      } else {
+        this.charaUI.enable(this.selectedActor);
+      }
     } else {
-      this.charaUI.enable(this.selectedActor);
+      this.charaUI.turnOff();
     }
   }
 

@@ -1,7 +1,6 @@
 import { BuildingPlacement } from "../../../common/MessageTypes";
 import SocketManager from "./SocketManager";
 import BuildingsManager from "../managers/BuildingsManager";
-import IsoScene from "../IsoPlugin/IsoScene";
 
 /**
  * When placing a building, the server takes the final decisions

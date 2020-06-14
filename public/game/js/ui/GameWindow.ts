@@ -15,12 +15,13 @@ import EventEmitter = Phaser.Events.EventEmitter;
  */
 export default class GameWindow extends EventEmitter {
   private windowOverlay: HTMLDivElement;
-  private windowContainer: HTMLDivElement;
+  public windowContainer: HTMLDivElement;
 
   public constructor(windowElement?: HTMLDivElement) {
     super();
 
     this.initContainerElement(windowElement);
+    this.hideWindow();
   }
 
   // Add the animation class so a transition is animated via css

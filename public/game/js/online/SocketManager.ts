@@ -1,6 +1,6 @@
 import ClientSocketIo from "socket.io-client";
 
-import { Redirect, Connection } from "../../../common/MessageTypes";
+import { Connection } from "../../../common/MessageTypes";
 import BufferMessenger from "../../../common/MessageHandlers/BufferMessenger";
 import Manager from "../managers/Manager";
 import CST from "../CST";
@@ -68,7 +68,7 @@ export default class SocketManager extends Manager {
   // Core events like Redirect
   private listenToSystemEvents() {
     // Redirect the client to the given path
-    this.on(Redirect.EVENT, (newPath: Redirect.Path) => {
+    this.on(Connection.REDIRECT_EVENT, (newPath: Connection.Path) => {
       this.redirectClient(newPath);
     });
 

@@ -14,6 +14,7 @@ import ActorsManager from "../managers/ActorsManager";
 import { TileXY } from "../map/IsoBoard";
 import { GridColor } from "./IsoSpriteObject";
 import ActorCodeHandler from "./ActorCodeHandler";
+import CameraManager from "../managers/CameraManager";
 
 // mapping event to directions
 const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
@@ -55,6 +56,8 @@ export interface ActorConfig {
   group?: Phaser.GameObjects.Group;
   // the current frame
   frame?: string | number;
+  // The position of this actor in the server-side db
+  dbArrayPos: number;
 }
 
 export default class Actor extends NavSpriteObject {
@@ -65,43 +68,63 @@ export default class Actor extends NavSpriteObject {
   // If a walking cycle is initiated from code, don't let the user change the direction
   private walkingFromCode: boolean = false;
 
+  private dbArrayPos: number;
+
   public codeHandler: ActorCodeHandler;
 
   constructor(config: ActorConfig) {
-    super(
-      config.actorKey,
-      config.scene,
-      config.tileX,
-      config.tileY,
-      config.z,
-      CST.LAYERS.ACTOR_ID,
-      config.actorKey,
-      config.frame
-    );
+    super({
+      ...config,
+      // Place the actors at different rexBoard's tileZ coords so they don't collide
+      tileZ: ActorsManager.getInstance().sceneActors.length + 1,
+      objectId: CST.LAYERS.ACTOR_ID,
+      texture: config.actorKey
+    });
 
     if (config.group) {
       config.group.add(this);
     }
+
+    this.dbArrayPos = config.dbArrayPos;
 
     this.createAnims().makeInteractive();
 
     // subscribes itself to the Actors Manager
     this.actorsManager.sceneActors.push(this);
     this.codeHandler = new ActorCodeHandler(this);
+
+    this.idleAnim();
   }
 
   public focusCamera(): this {
     this.mapManager.setScrollOverTiles(this.tileX, this.tileY);
+    CameraManager.getInstance().camera.zoomTo(1, CST.ACTOR.FOCUS_ZOOM_TIME);
 
     return this;
   }
 
   // Keep it as a separate function so we can then remove the listener
-  navigationHandler = (tile: TileXY) => {
+  private navigationHandler = (tile: TileXY) => {
     if (!this.tileCoordsOnThisGrid(tile.x, tile.y) && !this.walkingFromCode) {
       this.navigateTo(tile.x, tile.y);
     }
   };
+
+  private firstTapHandler: (t: TileXY, p: Phaser.Input.Pointer) => void = null;
+  // We need the closure
+  private createFirstTapHandler(downX: number, downY: number) {
+    this.firstTapHandler = (tile: TileXY, tapPointer: Phaser.Input.Pointer) => {
+      let tapX = Math.floor(tapPointer.worldX);
+      let tapY = Math.floor(tapPointer.worldY);
+
+      // TapPointer === pointer if the same pointer that fires the selection fires a map tap too
+      if (tapX !== downX || tapY !== downY) {
+        this.navigationHandler(tile);
+      }
+
+      this.mapManager.events.on(CST.EVENTS.MAP.TAP, this.navigationHandler);
+    };
+  }
 
   // Handle a navigation request from Blockly code.
   // While walking from code user walk commands are disabled
@@ -121,41 +144,20 @@ export default class Actor extends NavSpriteObject {
     return navigationEnded;
   }
 
+  // Overriden setTilePosition that also move the actor on the rexBoard
+  public setTilePosition(tileX: number, tileY: number): this {
+    super.setTilePosition(tileX, tileY);
+
+    this.mapManager.moveSpriteObjectToTiles(this, tileX, tileY, this.tileZ);
+    return this;
+  }
+
   /* Make the character:
    *  - selectable
    */
   makeInteractive(): this {
     this.makeSelectable().setSelectedTintColor(CST.ACTOR.SELECTION_TINT);
     this.pressCancelsSelection = true;
-
-    // when this actor gets SELECTED
-    this.on(CST.EVENTS.OBJECT.SELECT, () => {
-      this.mapManager.events.on(CST.EVENTS.MAP.TAP, this.navigationHandler);
-
-      // Pick a random grid color
-      let randomColor = Phaser.Math.RND.pick([
-        GridColor.YELLOW,
-        GridColor.ORANGE,
-        GridColor.BLUE,
-        GridColor.NEUTRAL_GREEN,
-        GridColor.PURPLE,
-        GridColor.PINK
-      ]);
-      this.enableGridDrawing(randomColor);
-
-      this.actorsManager.onActorSelected(this);
-    });
-
-    // when this actor gets DESELECTED
-    this.on(CST.EVENTS.OBJECT.DESELECT, () => {
-      // stop listening to tap events
-      this.mapManager.events.off(CST.EVENTS.MAP.TAP, this.navigationHandler);
-
-      // Disable the grid
-      this.disableGridDrawing();
-
-      this.actorsManager.onActorDeselected(this);
-    });
 
     this.on(CST.EVENTS.OBJECT.PRESS, async (pointer: Phaser.Input.Pointer) => {
       let charaUI = this.actorsManager.charaUI;
@@ -181,10 +183,12 @@ export default class Actor extends NavSpriteObject {
   }
 
   // override the deselect function
-  deselect(pointer?: Phaser.Input.Pointer) {
+  public deselect(pointer?: Phaser.Input.Pointer) {
     // if no pointer is provided just deselect
+    // fired by the actorsmanager
     if (!pointer) {
       super.deselect();
+      return this.onDeselected();
     }
 
     // check if the pointer is above the object's grid only to deselect
@@ -195,7 +199,46 @@ export default class Actor extends NavSpriteObject {
 
     if (this.tileCoordsOnThisGrid(x, y)) {
       super.deselect();
+      this.onDeselected();
     }
+  }
+
+  public select(pointer: Phaser.Input.Pointer) {
+    super.select(pointer);
+    this.onSelected(pointer);
+  }
+
+  // After this actor gets DESELECTED
+  private onDeselected() {
+    this.mapManager.events.off(CST.EVENTS.MAP.TAP, this.firstTapHandler);
+    // stop listening to tap events
+    this.mapManager.events.off(CST.EVENTS.MAP.TAP, this.navigationHandler);
+    // Disable the grid
+    this.disableGridDrawing();
+
+    this.actorsManager.onActorDeselected();
+  }
+
+  private onSelected(pointer: Phaser.Input.Pointer) {
+    let downX = Math.floor(pointer.worldX);
+    let downY = Math.floor(pointer.worldY);
+    this.createFirstTapHandler(downX, downY);
+
+    // First make sure we prevent a navigation tap the same time the actor is selected
+    this.mapManager.events.once(CST.EVENTS.MAP.TAP, this.firstTapHandler);
+
+    // Pick a random grid color
+    let randomColor = Phaser.Math.RND.pick([
+      GridColor.YELLOW,
+      GridColor.ORANGE,
+      GridColor.BLUE,
+      GridColor.NEUTRAL_GREEN,
+      GridColor.PURPLE,
+      GridColor.PINK
+    ]);
+    this.enableGridDrawing(randomColor);
+
+    this.actorsManager.onActorSelected(this);
   }
 
   // Play the walking animation in the provided direction

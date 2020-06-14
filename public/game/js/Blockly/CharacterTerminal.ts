@@ -32,6 +32,8 @@ export default class CharacterTerminal {
     this.terminal = new Terminal();
     this.terminal.open(document.body);
 
+    // The div window "containing" the terminal
+    this.terminalWindow = new GameWindow();
     this.registerWindowResizing();
     this.runTerminal(actorKey);
 
@@ -39,10 +41,6 @@ export default class CharacterTerminal {
 
     this.terminal.element.style.display = "none";
 
-    // The div window "containing" the terminal
-    this.terminalWindow = new GameWindow(
-      document.getElementById(CST.TERMINAL.WINDOW_ID) as HTMLDivElement
-    );
     this.terminalWindow.on(CST.WINDOW.CLOSE_EVENT, () => {
       this.close();
     });
@@ -271,7 +269,11 @@ export default class CharacterTerminal {
   }
 
   private computeWindowPercentages() {
-    let div = document.getElementById(CST.TERMINAL.ID);
+    // Create and append the div that dictates the terminal size
+    let div = document.createElement("div");
+    div.classList.add(CST.TERMINAL.CLASS);
+    this.terminalWindow.windowContainer.appendChild(div);
+
     let divParent = div.parentElement;
 
     let computedStyle = getComputedStyle(div);
@@ -342,8 +344,8 @@ export default class CharacterTerminal {
   }
 
   public close(): this {
-    this.terminalWindow.closeWindow();
     this.terminal.element.style.display = "none";
+    this.terminalWindow.closeWindow();
 
     return this;
   }

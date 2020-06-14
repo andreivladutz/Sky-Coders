@@ -7,13 +7,9 @@ import LoaderInjector, {
 import BuildingObject from "../gameObjects/BuildingObject";
 import IsoScene from "../IsoPlugin/IsoScene";
 
-import BuildingTypes, {
-  BuildNames,
-  DbBuildingInfo
-} from "../../../common/BuildingTypes";
+import BuildingTypes, { BuildNames } from "../../../common/BuildingTypes";
 import { BuildingPlacement } from "../../../common/MessageTypes";
 import GameManager from "../online/GameManager";
-import BuildingsMessenger from "../online/BuildingsMessenger";
 
 export default class BuildingsManager extends Manager
   implements LoadingInjectedManager {

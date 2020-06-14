@@ -87,12 +87,13 @@ button#terminalButton:hover {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
-#termDiv {
+.termDiv {
   width: 99%;
   height: 98%;
 }
 
 .xterm.terminal {
+  z-index: 5;
   position: fixed;
   top: 0;
   left: 0;

@@ -1,12 +1,9 @@
 import SYSTEM from "./system/system";
+import { ACTOR_NAMES, ACTOR_NAMES_ARR } from "../../common/CharacterTypes";
+
+export { ACTOR_NAMES, ACTOR_NAMES_ARR };
 
 const VARIANT = SYSTEM.VARIANT;
-
-export enum ACTOR_NAMES {
-  MALLACK = "Mallack"
-}
-
-export const ACTOR_NAMES_ARR = [ACTOR_NAMES.MALLACK];
 
 export enum ACTOR_STATES {
   WALK = "WALK",
