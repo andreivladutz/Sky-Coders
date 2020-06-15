@@ -24,7 +24,7 @@ function topLevelIsEvent(type: TopLevelBlocks) {
 
 export default class ActorCodeHandler {
   // Keep a reference to the parent Actor
-  private parentActor: Actor;
+  public parentActor: Actor;
   // Keep an array of Blockly-defined commands
   // And their associated code to be run
   public codeCommands: CodeCommand[];

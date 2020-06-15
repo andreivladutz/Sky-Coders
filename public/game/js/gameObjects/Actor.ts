@@ -15,6 +15,8 @@ import { TileXY } from "../map/IsoBoard";
 import { GridColor } from "./IsoSpriteObject";
 import ActorCodeHandler from "./ActorCodeHandler";
 import CameraManager from "../managers/CameraManager";
+import CommonCST from "../../../common/CommonCST";
+import BlocklyManager from "../Blockly/BlocklyManager";
 
 // mapping event to directions
 const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
@@ -56,8 +58,10 @@ export interface ActorConfig {
   group?: Phaser.GameObjects.Group;
   // the current frame
   frame?: string | number;
-  // The position of this actor in the server-side db
-  dbArrayPos: number;
+  // The id of this actor in the server-side db
+  dbId: string;
+  // The state of the blockly workspace from the db
+  blocklyWorkspace: string;
 }
 
 export default class Actor extends NavSpriteObject {
@@ -68,7 +72,9 @@ export default class Actor extends NavSpriteObject {
   // If a walking cycle is initiated from code, don't let the user change the direction
   private walkingFromCode: boolean = false;
 
-  private dbArrayPos: number;
+  private dbId: string;
+  // Send often updates when the workspace is on
+  private dbUpdatesInterval: any;
 
   public codeHandler: ActorCodeHandler;
 
@@ -85,22 +91,51 @@ export default class Actor extends NavSpriteObject {
       config.group.add(this);
     }
 
-    this.dbArrayPos = config.dbArrayPos;
+    this.dbId = config.dbId;
 
     this.createAnims().makeInteractive();
 
     // subscribes itself to the Actors Manager
     this.actorsManager.sceneActors.push(this);
     this.codeHandler = new ActorCodeHandler(this);
+    this.codeHandler.blocklyWorkspace = config.blocklyWorkspace;
 
     this.idleAnim();
   }
 
   public focusCamera(): this {
-    this.mapManager.setScrollOverTiles(this.tileX, this.tileY);
-    CameraManager.getInstance().camera.zoomTo(1, CST.ACTOR.FOCUS_ZOOM_TIME);
+    CameraManager.getInstance().flyToObject(this);
 
     return this;
+  }
+
+  // Center the game camera on this actor instantly with no effect
+  public centerCameraOn(): this {
+    this.mapManager.setScrollOverTiles(this.tileX, this.tileY);
+
+    return this;
+  }
+
+  // Send updates to the db
+  private updateDb() {
+    this.actorsManager.sendActorUpdates(this, this.dbId);
+  }
+
+  // TODO: In the future show some feedback to the user
+  // Send the state of the workspace more oftenly while the blockly window is on
+  public setIntervalDbUpdates() {
+    this.dbUpdatesInterval = setInterval(() => {
+      this.codeHandler.blocklyWorkspace = BlocklyManager.getInstance().getWorkspaceTextState();
+      this.updateDb();
+    }, CommonCST.CHARACTERS.UPDATES_INTERVAL);
+  }
+
+  // After the workspace closes
+  public clearIntervalDbUpdates() {
+    clearInterval(this.dbUpdatesInterval);
+
+    // The blocklyWorspace has been set by the closeWindow method in the Blockly manager
+    this.updateDb();
   }
 
   // Keep it as a separate function so we can then remove the listener
@@ -147,8 +182,8 @@ export default class Actor extends NavSpriteObject {
   // Overriden setTilePosition that also move the actor on the rexBoard
   public setTilePosition(tileX: number, tileY: number): this {
     super.setTilePosition(tileX, tileY);
-
     this.mapManager.moveSpriteObjectToTiles(this, tileX, tileY, this.tileZ);
+
     return this;
   }
 
@@ -176,8 +211,13 @@ export default class Actor extends NavSpriteObject {
       });
     });
 
-    // play idle anims when the actor stop walking
-    this.on(CST.NAV_OBJECT.EVENTS.IDLE, this.idleAnim, this);
+    // Play the idle anims when the actor stops walking
+    // And send its new position to the db
+    this.on(CST.NAV_OBJECT.EVENTS.IDLE, () => {
+      this.idleAnim();
+
+      this.updateDb();
+    });
 
     return this;
   }

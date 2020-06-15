@@ -1,6 +1,5 @@
 import SocketManager from "./SocketManager";
 import { Characters } from "../../../common/MessageTypes";
-import { AsyncLocalStorage } from "async_hooks";
 
 type PositionAckFunc = (pos: Characters.CharaPosition) => void;
 
@@ -29,6 +28,11 @@ export default class CharactersMessenger {
     this.socketManager = socketManager;
 
     this.registerEventListening();
+  }
+
+  // Send updates to the sv (position and Blockly workspace)
+  public updateCharacter(actorInfo: Characters.DbCharacter) {
+    this.socketManager.emit(Characters.UPDATE_CHARA_EVENT, actorInfo);
   }
 
   private registerEventListening() {

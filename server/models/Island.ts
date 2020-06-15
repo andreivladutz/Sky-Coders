@@ -1,18 +1,20 @@
 import * as mongoose from "mongoose";
 import Document = mongoose.Document;
+import DocumentArray = mongoose.Types.DocumentArray;
+
 import { DbBuildingInfo, BuildNames } from "../../public/common/BuildingTypes";
 import {
   ACTOR_NAMES_ARR,
   CharacterDbInfo
 } from "../../public/common/CharacterTypes";
 
-export interface BuildingType extends DbBuildingInfo {}
-export interface CharacterType extends CharacterDbInfo {}
+export interface BuildingType extends DbBuildingInfo, Document {}
+export interface CharacterType extends CharacterDbInfo, Document {}
 
 export interface IslandType extends Document {
   seed: string;
-  buildings: BuildingType[];
-  characters: CharacterType[];
+  buildings: DocumentArray<BuildingType>;
+  characters: DocumentArray<CharacterType>;
 }
 
 const IslandSchema = new mongoose.Schema(

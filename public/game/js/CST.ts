@@ -93,7 +93,9 @@ export default {
     // how many tiles around the view area to add when computing which tiles are visible
     VIEWRECT_TILE_PAD: 6,
     // don t let the user scroll outside of the map
-    PANLIMIT_RATIO: 4
+    PANLIMIT_RATIO: 4,
+    // Keep preventing the user from zooming this amount of time after a pan animation has ended
+    EXTRA_ZOOM_PREVENTION: 250
   },
   // options for the board grid
   GRID: {
@@ -200,7 +202,8 @@ export default {
   },
   ACTOR: {
     SELECTION_TINT: 0xd0f5e9,
-    FOCUS_ZOOM_TIME: 750
+    FOCUS_ZOOM_TIME: 750,
+    FOCUS_PAN_TIME: 500
   },
   NAV_OBJECT: {
     SPEED: 400,

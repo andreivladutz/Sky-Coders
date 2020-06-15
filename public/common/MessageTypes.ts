@@ -58,6 +58,8 @@ export namespace Characters {
 
   export const NEW_CHARA_EVENT = `${PREFIX}new_chara`;
   export const SEND_CHARAS_EVENT = `${PREFIX}send_charas`;
+  export const UPDATE_CHARA_EVENT = `${PREFIX}update_chara`;
+
   export type DbCharacter = CharacterDbInfo;
   export type CharaPosition = Position;
 }

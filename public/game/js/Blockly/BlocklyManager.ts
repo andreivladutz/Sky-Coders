@@ -73,6 +73,9 @@ export default class BlocklyManager extends Manager {
     this.currCodeHandler.blocklyWorkspace = this.getWorkspaceTextState();
 
     this.sendWorkspaceToActor();
+
+    // Stop sending updates to the db so often
+    this.currCodeHandler.parentActor.clearIntervalDbUpdates();
   }
 
   // Show all workspace-related element with an animated transition
@@ -90,6 +93,9 @@ export default class BlocklyManager extends Manager {
 
     this.workspace.setVisible(true);
     Blockly.svgResize(this.workspace);
+
+    // Send updates to the db more often to prevent code loss
+    this.currCodeHandler.parentActor.setIntervalDbUpdates();
   }
 
   // Load the state stored as text for an actor

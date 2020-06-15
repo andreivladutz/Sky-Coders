@@ -12,8 +12,8 @@ export interface Position {
 // What details about a character are being stored in the db
 export interface CharacterDbInfo {
   actorKey: ACTOR_NAMES;
-  // The position of the character in the db array
-  arrayPos: number;
+  // The id of the character in the db array
+  _id: any;
   // The tile positioning
   position?: Position;
   // The blockly xml worskpace state

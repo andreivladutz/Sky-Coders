@@ -1,4 +1,4 @@
-import ACTORS_CST, { ACTOR_NAMES_ARR } from "../ACTORS_CST";
+import ACTORS_CST, { ACTOR_NAMES_ARR, ACTOR_NAMES } from "../ACTORS_CST";
 import Actor, { ActorConfig } from "../gameObjects/Actor";
 import Manager from "./Manager";
 import CharacterUI from "../ui/CharacterUI";
@@ -12,40 +12,39 @@ import MapManager from "./MapManager";
 // Singleton class handling the loading of the actor resources
 export default class ActorsManager extends Manager {
   // all actors in this scene
-  sceneActors: Actor[] = [];
+  public sceneActors: Actor[] = [];
   // currently selected Actor
-  selectedActor: Actor = null;
-  charaUI: CharacterUI;
+  public selectedActor: Actor = null;
+  public charaUI: CharacterUI;
+  // The messenger used to talk to the server "about" the game charas
+  public charaMsgr = GameManager.getInstance().messengers.characters;
 
   // Init all characters coming from the server (all positioned)
   // And position the characters that have to be positioned
   public initCharacters(gameScene: IsoScene) {
-    let charaMsgr = GameManager.getInstance().messengers.characters;
-
     // Ack functions that take in the position of the new actor
-    for (let [characterInfo, positionAck] of charaMsgr.positioningAcks) {
+    for (let [characterInfo, positionAck] of this.charaMsgr.positioningAcks) {
       let actor = new Actor({
         tileX: 0,
         tileY: 0,
         scene: gameScene,
         actorKey: characterInfo.actorKey,
-        dbArrayPos: characterInfo.arrayPos
+        dbId: characterInfo._id,
+        blocklyWorkspace: characterInfo.workspaceBlockly
       });
 
       this.placeActor(actor, this.sceneActors);
       positionAck({ x: actor.tileX, y: actor.tileY });
     }
 
-    let existingCharas = charaMsgr.existingCharas;
-    console.log(existingCharas);
-
-    for (let existingActor of existingCharas) {
+    for (let existingActor of this.charaMsgr.existingCharas) {
       new Actor({
         scene: gameScene,
         actorKey: existingActor.actorKey,
         tileX: existingActor.position.x,
         tileY: existingActor.position.y,
-        dbArrayPos: existingActor.arrayPos
+        dbId: existingActor._id,
+        blocklyWorkspace: existingActor.workspaceBlockly
       });
     }
   }
@@ -72,6 +71,19 @@ export default class ActorsManager extends Manager {
         foundPosition = false;
       }
     } while (!foundPosition);
+  }
+
+  // Send updates to the server about the actor
+  public sendActorUpdates(actor: Actor, dbId: string) {
+    this.charaMsgr.updateCharacter({
+      actorKey: actor.actorKey as ACTOR_NAMES,
+      _id: dbId,
+      position: {
+        x: actor.tileX,
+        y: actor.tileY
+      },
+      workspaceBlockly: actor.codeHandler.blocklyWorkspace
+    });
   }
 
   // when an actor gets selected, the actorsManager should be informed

@@ -448,6 +448,11 @@ export default class IsoSpriteObject extends IsoSprite {
     return this.tileCoords.y;
   }
 
+  // Get this game's object world coords
+  public get worldPosition() {
+    return this.mapManager.tileToWorldCoords(this.tileX, this.tileY);
+  }
+
   public setTilePosition(tileX: number, tileY: number): this {
     this.tileCoords.x = tileX;
     this.tileCoords.y = tileY;

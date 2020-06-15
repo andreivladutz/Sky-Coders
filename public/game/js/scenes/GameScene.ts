@@ -64,7 +64,7 @@ export default class GameScene extends IsoScene {
     actorsManager.initCharacters(this);
 
     // Pick a random actor and focus the camera on him
-    Phaser.Math.RND.pick(actorsManager.sceneActors).focusCamera();
+    Phaser.Math.RND.pick(actorsManager.sceneActors).centerCameraOn();
 
     // MapManager.getInstance()
     //   .enableDebugging()

@@ -4,6 +4,7 @@ import { Pan, Pinch } from "phaser3-rex-plugins/plugins/gestures";
 import Manager from "./Manager";
 import CST from "../CST";
 import MapManager from "./MapManager";
+import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 
 type Camera = Phaser.Cameras.Scene2D.Camera;
 
@@ -24,6 +25,10 @@ export default class CameraManager extends Manager {
   pan: Pan;
   // utility for camera zooming
   pinch: Pinch;
+
+  // When a zoom transition is happening prevent the user from zooming in and out
+  // Just so we can prevent any artifacts
+  private zoomPrevention: boolean = false;
 
   public static readonly EVENTS = new Phaser.Events.EventEmitter();
 
@@ -59,6 +64,44 @@ export default class CameraManager extends Manager {
     }
 
     setTimeout(() => CameraManager.EVENTS.emit(CST.CAMERA.MOVE_EVENT), 0);
+
+    return this;
+  }
+
+  // Transition nicely to focusing on a game object
+  flyToObject(object: IsoSpriteObject): this {
+    let { x, y } = object.worldPosition;
+
+    // Let the camera take over the controls
+    this.zoomPrevention = true;
+    this.camera.stopFollow();
+
+    this.camera.pan(x, y, CST.ACTOR.FOCUS_PAN_TIME);
+    this.camera.zoomTo(1, CST.ACTOR.FOCUS_ZOOM_TIME);
+
+    this.camera.on(Phaser.Cameras.Scene2D.Events.PAN_COMPLETE, () => {
+      this.window.x = x;
+      this.window.y = y;
+
+      // Restore the camera control to the user
+      this.followWindowObject();
+
+      setTimeout(
+        () => (this.zoomPrevention = false),
+        CST.CAMERA.EXTRA_ZOOM_PREVENTION
+      );
+    });
+
+    return this;
+  }
+
+  private followWindowObject(): this {
+    this.camera.startFollow(
+      this.window,
+      false,
+      CST.CAMERA.PAN_LERP,
+      CST.CAMERA.PAN_LERP
+    );
 
     return this;
   }
@@ -136,14 +179,7 @@ export default class CameraManager extends Manager {
       this
     );
 
-    this.camera.startFollow(
-      this.window,
-      false,
-      CST.CAMERA.PAN_LERP,
-      CST.CAMERA.PAN_LERP
-    );
-
-    return this;
+    return this.followWindowObject();
   }
 
   enableZoom(): this {
@@ -154,6 +190,10 @@ export default class CameraManager extends Manager {
 
     // made a function so code doesn't get dupplicated
     let zoomCamera = (zoomFactor: number) => {
+      if (this.zoomPrevention) {
+        return;
+      }
+
       let oldZoom = this.camera.zoom;
       this.camera.setZoom(this.camera.zoom * zoomFactor);
 
