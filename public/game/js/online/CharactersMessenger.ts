@@ -1,10 +1,9 @@
-import SocketManager from "./SocketManager";
 import { Characters } from "../../../common/MessageTypes";
+import Messenger from "./Messenger";
 
 type PositionAckFunc = (pos: Characters.CharaPosition) => void;
 
-export default class CharactersMessenger {
-  private socketManager: SocketManager;
+export default class CharactersMessenger extends Messenger {
   // An array of characters that have to be inited and positioned
   // (This happens when a new client is being created => no previous charas)
   private _positioningAcks: [Characters.DbCharacter, PositionAckFunc][] = [];
@@ -24,18 +23,12 @@ export default class CharactersMessenger {
     return charas;
   }
 
-  constructor(socketManager: SocketManager) {
-    this.socketManager = socketManager;
-
-    this.registerEventListening();
-  }
-
   // Send updates to the sv (position and Blockly workspace)
   public updateCharacter(actorInfo: Characters.DbCharacter) {
     this.socketManager.emit(Characters.UPDATE_CHARA_EVENT, actorInfo);
   }
 
-  private registerEventListening() {
+  protected registerEventListening() {
     this.socketManager.on(
       Characters.NEW_CHARA_EVENT,
       (newChara: Characters.DbCharacter, ackPosition: PositionAckFunc) => {

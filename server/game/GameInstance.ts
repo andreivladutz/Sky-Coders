@@ -10,9 +10,11 @@ import BuildingsManager from "./BuildingsManager";
 
 import * as mongoose from "mongoose";
 import Document = mongoose.Document;
+import DocumentArray = mongoose.Types.DocumentArray;
 
 import { NamespaceDebugger } from "../utils/debug";
 import CharactersManager from "./CharactersManager";
+import { ResourcesType } from "../models/GameSchema";
 const debug = new NamespaceDebugger("GameInstance");
 
 // An instance of a game for a particular user
@@ -179,6 +181,7 @@ export default class GameInstance extends EventEmitter {
     // Init the game on the client side by sending the intial cfg
     let gameConfig: Game.Config = {
       seed: this.seed,
+      resources: this.userDocument.game.resources,
       buildings: this.currIslandDocument.buildings
     };
 
@@ -199,8 +202,8 @@ export default class GameInstance extends EventEmitter {
     this.userDocument.game = {
       resources: {
         coins: CST.GAME_CONFIG.INITIAL_COINS
-      },
-      islands: []
+      } as ResourcesType,
+      islands: [] as DocumentArray<IslandType>
     };
 
     await this.createIsland();

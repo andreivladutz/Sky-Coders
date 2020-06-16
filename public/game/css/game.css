@@ -3,6 +3,11 @@
   src: url("/game/css/fonts/Roboto.ttf") format("truetype");
 }
 
+@font-face {
+  font-family: "Odibee";
+  src: url("/game/css/fonts/Odibee.ttf") format("truetype");
+}
+
 * {
   margin: 0;
   padding: 0;

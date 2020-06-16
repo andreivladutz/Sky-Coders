@@ -60,7 +60,10 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   physics: {
     default: "arcade"
   },
-  plugins: pluginsConfig
+  plugins: pluginsConfig,
+  dom: {
+    createContainer: true
+  }
 };
 
 export default gameConfig;

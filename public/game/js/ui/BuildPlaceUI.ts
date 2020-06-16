@@ -187,6 +187,7 @@ export default class BuildPlaceUI extends UIComponent {
 
   // get the origins of the iso arrows (around the building) to be displayed
   private computeArrowsPosition(): this {
+    // Positioning is computed in tile coordinates
     let grid = this.buildPlacing.getGridAsMatrix(),
       width = grid[0].length,
       height = grid.length;
@@ -200,14 +201,24 @@ export default class BuildPlaceUI extends UIComponent {
     this.arrowsTilePositions[EAST].x += CST.UI.BUILD_PLACE.ARROW_OFFSET * 2;
     this.arrowsTilePositions[WEST].x -= CST.UI.BUILD_PLACE.ARROW_OFFSET;
 
+    if (height % 2 === 0) {
+      this.arrowsTilePositions[EAST].y = this.arrowsTilePositions[WEST].y =
+        this.arrowsTilePositions[WEST].y - 0.5;
+    }
+
     // NORTH and SOUTH
-    let frontMidPt = Math.floor(width / 2);
+    let frontMidPt = Math.ceil(width / 2);
 
     this.arrowsTilePositions[NORTH] = grid[0][frontMidPt];
     this.arrowsTilePositions[SOUTH] = grid[height - 1][frontMidPt];
 
     this.arrowsTilePositions[NORTH].y -= CST.UI.BUILD_PLACE.ARROW_OFFSET * 2;
     this.arrowsTilePositions[SOUTH].y += CST.UI.BUILD_PLACE.ARROW_OFFSET;
+
+    if (width % 2 === 0) {
+      this.arrowsTilePositions[NORTH].x += 1;
+      this.arrowsTilePositions[SOUTH].x += 1;
+    }
 
     return this;
   }

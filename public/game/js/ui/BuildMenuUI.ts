@@ -260,6 +260,19 @@ export default class BuildMenuUI extends UIComponent {
   // the buttons for the side menu
   private initBuildingsButtons(sizer: any) {
     const buildingManager = BuildingsManager.getInstance();
+    let textureKey = buildingManager.getTextureKey();
+
+    // Compute the size of the buttons relative to the game screen,
+    // relative to the first building button
+    let firstFrameName =
+      buildingManager.buildingFrames[Object.values(BuildNames)[0]];
+    let firstFrameWidth = this.gameScene.textures.getFrame(
+      textureKey,
+      firstFrameName
+    ).width;
+    let gameWidth = this.gameScene.game.scale.width;
+
+    let scaleRatio = (gameWidth / firstFrameWidth) * BUILD_MENU.BUTTONS_SIZE;
 
     for (let frameName of Object.values(BuildNames)) {
       let buttonImage = new SideMenuButton(
@@ -267,10 +280,10 @@ export default class BuildMenuUI extends UIComponent {
         this,
         0,
         0,
-        buildingManager.getTextureKey(),
+        textureKey,
         frameName,
         buildingManager.buildingFrames[frameName]
-      ).setScale(BUILD_MENU.BUTTONS_SIZE);
+      ).setScale(scaleRatio);
 
       sizer.add(buttonImage);
     }

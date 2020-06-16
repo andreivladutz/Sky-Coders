@@ -1,13 +1,17 @@
 import * as mongoose from "mongoose";
 import { IslandType } from "./Island";
+import DocumentArray = mongoose.Types.DocumentArray;
+import Document = mongoose.Document;
 
 // The Resources interface
 import * as BuildingTypes from "../../public/common/BuildingTypes";
 import Resources = BuildingTypes.Resources;
 
+export interface ResourcesType extends Document, Resources {}
+
 export interface GameType {
-  islands: IslandType[];
-  resources: Resources;
+  islands: DocumentArray<IslandType>;
+  resources: ResourcesType;
 }
 
 const ResourceSchema = new mongoose.Schema({

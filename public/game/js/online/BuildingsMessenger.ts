@@ -1,14 +1,14 @@
 import { BuildingPlacement } from "../../../common/MessageTypes";
-import SocketManager from "./SocketManager";
 import BuildingsManager from "../managers/BuildingsManager";
+import SocketManager from "./SocketManager";
+import Messenger from "./Messenger";
 
 /**
  * When placing a building, the server takes the final decisions
  *  Whether the user has enough resources, whether the positioning is valid
  *
  */
-export default class BuildingsMessenger {
-  private socketManager: SocketManager;
+export default class BuildingsMessenger extends Messenger {
   private buildsManager: BuildingsManager;
 
   // Keep the buildings until they get fetched by the mapManager
@@ -31,10 +31,8 @@ export default class BuildingsMessenger {
   }
 
   constructor(socketManager: SocketManager) {
-    this.socketManager = socketManager;
+    super(socketManager);
     this.buildsManager = BuildingsManager.getInstance();
-
-    this.registerEventListening();
   }
 
   /**
@@ -70,7 +68,7 @@ export default class BuildingsMessenger {
   /**
    * Listen to buildings-related events
    */
-  private registerEventListening() {
+  protected registerEventListening() {
     // The server accepts the placement of a building
     this.socketManager.on(
       BuildingPlacement.APPROVE_EVENT,

@@ -8,18 +8,26 @@ import UIComponents from "./UIComponentsFactory";
 import ActorsManager from "../managers/ActorsManager";
 import SocketManager from "../online/SocketManager";
 import BlocklyManager from "../Blockly/BlocklyManager";
+import SVGObject from "./uiObjects/SVGObject";
+import RoundRectObject from "./uiObjects/RoundRectObject";
+import GameManager from "../online/GameManager";
 
 type Image = Phaser.GameObjects.Image;
 const Image = Phaser.GameObjects.Image;
 
 export default class MainUI extends UIComponent {
   public mainButtons: MainGameButtons;
+  public resources: ResourcesStatus;
   public blocklyManager: BlocklyManager;
 
   constructor(uiScene: UIScene, gameScene: IsoScene) {
     super(uiScene, gameScene);
 
     this.mainButtons = new MainGameButtons(uiScene, this);
+    this.resources = new ResourcesStatus(uiScene, this);
+    this.resources.updateCoinsValue(
+      GameManager.getInstance().messengers.resources.initialResources.coins
+    );
 
     this.blocklyManager = BlocklyManager.getInstance();
     this.blocklyManager.init(this.uiScene.cache);
@@ -84,6 +92,84 @@ class MainUIButon extends ButtonImage<MainUI> {
   };
 }
 
+const COINS = CST.UI.COINS;
+
+class ResourcesStatus {
+  uiScene: UIScene;
+  mainUI: MainUI;
+
+  // The object used as icon for the coins
+  private coinsIcon: SVGObject;
+  private coinsBg: RoundRectObject;
+
+  private paddingSize: number;
+
+  constructor(uiScene: UIScene, mainUI: MainUI) {
+    this.uiScene = uiScene;
+    this.mainUI = mainUI;
+
+    this.initIcons();
+
+    this.uiScene.scale.on("resize", this.repositionIcons, this);
+  }
+
+  public updateCoinsValue(coins: number): this {
+    this.coinsBg.setText(`${coins} ${COINS.COINS_SUFFIX}`);
+    this.repositionIcons();
+
+    return this;
+  }
+
+  private initIcons() {
+    // The size of the bottom tiled bar
+    let { realHeight: height } = this.mainUI.mainButtons.bottomTileSize;
+    let gameScale = this.uiScene.game.scale;
+    let coinSize = height * COINS.RATIO;
+
+    let goldCoinKey = `${COINS.PREFIX}${COINS.TYPES.GOLD.KEY}`;
+
+    this.coinsIcon = new SVGObject(
+      this.uiScene,
+      gameScale.width,
+      gameScale.height,
+      goldCoinKey
+    )
+      .setOrigin(1, 0.5)
+      .setWidth(coinSize);
+
+    this.coinsBg = new RoundRectObject(
+      this.uiScene,
+      gameScale.width,
+      gameScale.height
+    )
+      .setOrigin(1, 1)
+      .setTextWithStyle(`0 ${COINS.COINS_SUFFIX}`, COINS.FONT_SIZE, "Odibee");
+
+    // Fill the whole bottom bar
+    this.paddingSize = (height - this.coinsBg.displayHeight) / 2;
+    this.coinsBg
+      .setPadding(this.paddingSize / 4)
+      .setPadding(this.paddingSize, true);
+
+    this.repositionIcons();
+  }
+
+  private repositionIcons() {
+    // The size of the bottom tiled bar
+    let { realHeight: height } = this.mainUI.mainButtons.bottomTileSize;
+    let gameScale = this.uiScene.game.scale;
+    let coinSize = height * COINS.RATIO;
+
+    // Center the icon on the bottom bar
+    this.coinsIcon.y = gameScale.height - coinSize + (height - coinSize) * 0.5;
+    this.coinsBg.y = gameScale.height - this.paddingSize / 2;
+
+    this.coinsBg.x = gameScale.width - this.paddingSize * 2;
+    this.coinsIcon.x =
+      this.coinsBg.x - this.coinsBg.displayWidth - this.paddingSize * 4;
+  }
+}
+
 // Add the Main Game Buttons to the UI Scene
 class MainGameButtons {
   uiScene: UIScene;
@@ -95,6 +181,13 @@ class MainGameButtons {
   tiledRenderTexture: Phaser.GameObjects.RenderTexture;
   // keep a reference to the mainUi class
   mainUI: MainUI;
+
+  // The size of the bottom ui tile
+  public bottomTileSize: {
+    realWidth: number;
+    realHeight: number;
+  };
+  private plankFrame: string;
 
   constructor(uiScene: UIScene, mainUI: MainUI) {
     this.uiScene = uiScene;
@@ -196,19 +289,28 @@ class MainGameButtons {
     this.buttonsSizer.setVisible(false);
   }
 
+  private getPlankFrameSize(texture: string) {
+    this.plankFrame = this.uiCompFact.buttonsFrames[
+      CST.BUTTONS.TYPES.WOOD_PLANK
+    ];
+    // get the width and the height of the wood plank
+    this.bottomTileSize = this.uiScene.textures.get(texture).frames[
+      this.plankFrame
+    ];
+  }
+
   private tileBottomBar(texture: string): this {
-    // destroy the old render texture (this is being called again on game resize)
+    // Kill the old render texture with fire (this is being called again on game resize)
     if (this.tiledRenderTexture) {
       this.tiledRenderTexture.destroy();
     }
 
-    let scale = this.uiScene.game.scale,
-      frame = this.uiCompFact.buttonsFrames[CST.BUTTONS.TYPES.WOOD_PLANK];
+    if (!this.bottomTileSize) {
+      this.getPlankFrameSize(texture);
+    }
 
-    // get the width and the height of the wood plank
-    let { realWidth: width, realHeight: height } = this.uiScene.textures.get(
-      texture
-    ).frames[frame];
+    let scale = this.uiScene.game.scale,
+      { realWidth: width, realHeight: height } = this.bottomTileSize;
 
     this.tiledRenderTexture = this.uiScene.add
       .renderTexture(0, scale.height, scale.width, height)
@@ -219,7 +321,7 @@ class MainGameButtons {
     let noOfTiles = Math.round(scale.width / width);
 
     for (let i = 0; i <= noOfTiles; i++) {
-      this.tiledRenderTexture.drawFrame(texture, frame, i * width, 0);
+      this.tiledRenderTexture.drawFrame(texture, this.plankFrame, i * width, 0);
     }
 
     return this;

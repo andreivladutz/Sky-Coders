@@ -7,7 +7,6 @@ import {
   ISOMETRIC
 } from "../../IsoPlugin/IsoPlugin";
 import EnvironmentManager from "../../managers/EnvironmentManager";
-import CameraManager from "../../managers/CameraManager";
 
 export enum ArrowDirection {
   NORTH = CST.ARROW_SHAPE.NORTH,
@@ -17,6 +16,26 @@ export enum ArrowDirection {
 }
 
 let bounds = new Phaser.Geom.Rectangle();
+
+let makeSizesRelative = (function() {
+  let sizesAreRelative = false;
+
+  return function makeSizesRelative(CURR_TILEH: number) {
+    if (sizesAreRelative) {
+      return;
+    }
+
+    let AS = CST.ARROW_SHAPE;
+    let ratio = CURR_TILEH / AS.REFERENCE_TILEH;
+
+    AS.ARROWH *= ratio;
+    AS.BASEW *= ratio;
+    AS.BASEH *= ratio;
+    AS.HEADW *= ratio;
+
+    sizesAreRelative = true;
+  };
+})();
 
 /**
  * Draw an isometric arrow shape
@@ -145,6 +164,8 @@ function getIsoArrowPoints(
   direction: ArrowDirection,
   bounds: Phaser.Geom.Rectangle
 ) {
+  makeSizesRelative(EnvironmentManager.getInstance().TILE_HEIGHT);
+
   const AS = CST.ARROW_SHAPE,
     projector = new Projector(scene, ISOMETRIC);
 

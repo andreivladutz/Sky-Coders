@@ -87,6 +87,17 @@ export default class UIComponents extends Manager
 
   public async preload(load: Loader.LoaderPlugin) {
     LoaderInjector.Inject(this, this.buttonsFrames, CST.BUTTONS)(load);
+
+    // Load the coins SVGs
+    load.setPath(CST.UI.COINS.PATH);
+    load.setPrefix(CST.UI.COINS.PREFIX);
+
+    for (let coinCfg of Object.values(CST.UI.COINS.TYPES)) {
+      load.html(coinCfg.KEY, coinCfg.FILENAME);
+    }
+
+    load.setPath();
+    load.setPrefix();
   }
 
   public static getInstance(): UIComponents {

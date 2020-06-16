@@ -27,9 +27,12 @@ export namespace Game {
 
   export interface Config {
     seed: string;
+    resources: BuildingTypes.Resources;
     // The buildings already placed by the user on the map
     buildings: BuildingTypes.DbBuildingInfo[];
   }
+
+  export type Resources = BuildingTypes.Resources;
 
   export const INIT_EVENT = `${PREFIX}game_init`;
   export const LOAD_EVENT = `${PREFIX}game_loaded`;

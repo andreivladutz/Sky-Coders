@@ -283,6 +283,8 @@ export default {
     }
   },
   ARROW_SHAPE: {
+    // Make the arrow size relative to this tile height
+    REFERENCE_TILEH: 148,
     BASEW: 100,
     BASEH: 150,
     HEADW: 100,
@@ -294,6 +296,42 @@ export default {
     Z_EFFECT: 40
   },
   UI: {
+    // The coins' svgs
+    COINS: {
+      PATH: "svg/ui/coins/",
+      PREFIX: "COINS.",
+      TYPES: {
+        GOLD: {
+          FILENAME: "gold_coin.svg",
+          KEY: "gold_coin"
+        },
+        PURPLE: {
+          FILENAME: "purple_coin.svg",
+          KEY: "purple_coin"
+        },
+        PURPLE_SIMPLE: {
+          FILENAME: "purple_coin_simple.svg",
+          KEY: "purple_coin_simple"
+        }
+      },
+      // The ratio relative to the bottom bar
+      RATIO: 0.75,
+      // Append CiBo coins suffix
+      COINS_SUFFIX: "CB",
+      FONT_SIZE: 24
+    },
+    ROUND_RECT: {
+      DEFAULT_RADIUS: 10,
+      DEFAULT_COLOR: 0x4e342e,
+      DEFAULT_STYLE: {
+        "-webkit-user-select": "none" /* Chrome all / Safari all */,
+        "-moz-user-select": "none" /* Firefox all */,
+        "-ms-user-select": "none" /* IE 10+ */,
+        "user-select": "none" /* Likely future */,
+        color: "white",
+        "text-align": "center"
+      }
+    },
     MODAL: {
       ID: "modal-window",
       TITLE: "modal-window-title",
