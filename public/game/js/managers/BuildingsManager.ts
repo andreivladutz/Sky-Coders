@@ -10,6 +10,9 @@ import IsoScene from "../IsoPlugin/IsoScene";
 import BuildingTypes, { BuildNames } from "../../../common/BuildingTypes";
 import { BuildingPlacement } from "../../../common/MessageTypes";
 import GameManager from "../online/GameManager";
+import ResourcesUI from "../ui/ResourcesUI";
+import UIScene from "../scenes/UIScene";
+import UIComponents from "../ui/UIComponentsFactory";
 
 export default class BuildingsManager extends Manager
   implements LoadingInjectedManager {
@@ -19,6 +22,8 @@ export default class BuildingsManager extends Manager
   // Will be injected by the LoaderInjector class
   loadResources: (load: Phaser.Loader.LoaderPlugin) => void;
   getTextureKey: () => string;
+
+  private resourcesUI: ResourcesUI;
 
   // The buildings currently awaiting the server's aknowledgement
   // Indexed by [y][x] coords
@@ -54,11 +59,21 @@ export default class BuildingsManager extends Manager
     );
   }
 
+  private initResourcesUI(gameScene: IsoScene) {
+    this.resourcesUI = UIComponents.getUIComponents(
+      ResourcesUI,
+      gameScene.scene.get(CST.SCENES.UI) as UIScene,
+      gameScene
+    )[0] as ResourcesUI;
+  }
+
   /**
    * Place buildings at the begining of the game
    * @param buildings array of DbBuildingInfo from the server
    */
   public initBuildings(gameScene: IsoScene) {
+    this.initResourcesUI(gameScene);
+
     let buildsMessenger = GameManager.getInstance().messengers.buildings;
     let buildings = buildsMessenger.initialBuildings;
 
@@ -66,9 +81,12 @@ export default class BuildingsManager extends Manager
       let { x, y } = building.position;
       // TODO: lastProdTime
 
-      this.create(gameScene, building.buildingType, x, y)
-        .enableBuildPlacing()
-        .placeBuilding(false);
+      let buildingObject = this.create(gameScene, building.buildingType, x, y);
+      buildingObject.enableBuildPlacing().placeBuilding(false);
+
+      buildingObject.lastProdTime = building.lastProdTime;
+
+      this.resourcesUI.showProductionReady(buildingObject);
     }
   }
 

@@ -173,4 +173,38 @@ globalThis.NavObjectHelpers = class {
     // this tile is safe to walk on
     return true;
   }
+
+  // Custom cb to check if a navObject reached a tile
+  reachedTileCb(currTile, destinationTile) {
+    // tiles ocuppied by this object
+    let gridTiles = this.getGridTiles(currTile.x, currTile.y);
+
+    // check if any of the tiles of this object's grid overlaps the destinationTile
+    for (let tile of gridTiles) {
+      if (tile.x === destinationTile.x && tile.y === destinationTile.y) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // Returns a callback for the easystar that has closure over the acceptable tiles
+  getReachedObjectCb(acceptableTiles) {
+    return function(currTile) {
+      // tiles ocuppied by this object
+      let gridTiles = this.getGridTiles(currTile.x, currTile.y);
+
+      // check if any of the tiles of this object's grid overlaps the destinationTile
+      for (let tile of gridTiles) {
+        for (let destinationTile of acceptableTiles) {
+          if (tile.x === destinationTile.x && tile.y === destinationTile.y) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    };
+  }
 };

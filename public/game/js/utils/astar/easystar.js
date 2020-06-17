@@ -63,12 +63,25 @@ EasyStar.js = function() {
   var canWalkOnCb;
   var canWalkOnCbScope;
 
-  // call this to set custom callback checking if a tile can be walked on
+  // Added custom callback to check in other ways if the destination has been reached
+  var reachedDestinationCb;
+  var reachedDestinationCbScope;
+
+  // call this to set a custom callback checking if a tile can be walked on
   // the callback's function signature should be:
   // cb(tile: {x, y}): boolean
   this.setCanWalkOnCb = function(cb, cbScope) {
     canWalkOnCb = cb;
     canWalkOnCbScope = cbScope;
+
+    return this;
+  };
+
+  // the callback's function signature should be:
+  // cb(currTile: {x, y}, destinationTile: {x, y}): boolean
+  this.setReachedDestinationCb = function(cb, cbScope) {
+    reachedDestinationCb = cb;
+    reachedDestinationCbScope = cbScope;
 
     return this;
   };
@@ -443,7 +456,7 @@ EasyStar.js = function() {
     }
 
     // Also if a canWalkOn callback is provided, check the end tile against that
-    if (!checkCustomWalkable(endX, endY)) {
+    if (!checkCustomEndIsWalkable(endX, endY)) {
       callbackWrapper(null);
       return;
     }
@@ -531,7 +544,15 @@ EasyStar.js = function() {
       var searchNode = instance.openList.pop();
 
       // Handles the case where we have found the destination
-      if (instance.endX === searchNode.x && instance.endY === searchNode.y) {
+      // Allow for custom "reached" callbacks
+      if (
+        (instance.endX === searchNode.x && instance.endY === searchNode.y) ||
+        (reachedDestinationCb &&
+          reachedDestinationCb.call(reachedDestinationCbScope, searchNode, {
+            x: instance.endX,
+            y: instance.endY
+          }))
+      ) {
         var path = [];
         path.push({ x: searchNode.x, y: searchNode.y });
         var parent = searchNode.parent;
@@ -798,6 +819,30 @@ EasyStar.js = function() {
     }
 
     return isWalkable;
+  };
+
+  // Check all posible configurations for placing an object grid
+  // If any of the neighbours of the end tile is custom walkable then we good
+  var checkCustomEndIsWalkable = function(endX, endY) {
+    let directions = [
+      [0, 0],
+      [-1, -1],
+      [0, -1],
+      [1, -1],
+      [1, 0],
+      [1, 1],
+      [0, 1],
+      [-1, 1],
+      [-1, 0]
+    ];
+
+    for (let [dX, dY] of directions) {
+      if (checkCustomWalkable(endX + dX, endY + dY)) {
+        return true;
+      }
+    }
+
+    return false;
   };
 
   /**

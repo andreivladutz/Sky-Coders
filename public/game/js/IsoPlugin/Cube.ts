@@ -9,6 +9,17 @@ interface CubeInterface {
   height: number;
 }
 
+export enum CubeIndices {
+  BOTTOM_LEFT_BACK = 0,
+  TOP_LEFT_BACK = 1,
+  BOTTOM_LEFT_FRONT = 2,
+  TOP_LEFT_FRONT = 3,
+  BOTTOM_RIGHT_BACK = 4,
+  TOP_RIGHT_BACK = 5,
+  BOTTOM_RIGHT_FRONT = 6,
+  TOP_RIGHT_FRONT = 7
+}
+
 /**
  * @class Cube
  *
@@ -16,12 +27,12 @@ interface CubeInterface {
  * Creates a new Cube object with the bottom-back corner specified by the x, y and z parameters, with the specified breadth (widthX), depth (widthY) and height parameters. If you call this function without parameters, a Cube with x, y, z, breadth, depth and height properties set to 0 is created.
  */
 class Cube implements CubeInterface {
-  x: number;
-  y: number;
-  z: number;
-  widthX: number;
-  widthY: number;
-  height: number;
+  public x: number;
+  public y: number;
+  public z: number;
+  public widthX: number;
+  public widthY: number;
+  public height: number;
   private _corners: Array<Point3>;
 
   /**
@@ -220,6 +231,7 @@ class Cube implements CubeInterface {
 
   /**
    * Updates and returns an Array of eight Point3 objects containing the corners of this Cube.
+   * The order of these corners is defined in @type {CubeIndices} enum. import { CubeIndices } from "./Cube";
    * @method Cube#getCorners
    * @return {Array<Point3>} The corners of this Cube expressed as an Array of eight Point3 objects.
    */

@@ -108,6 +108,33 @@ export default class AstarWorkerManager extends Manager {
     });
   }
 
+  /**
+   * Find a path to an object instead of a tile
+   * @param actorKey the unique key of this type of object
+   * @param startTile the starting point of the path
+   * @param acceptableTiles the row of tiles around the object
+   *
+   * @returns {Promise<TileXY[]>} a promise that will be fullfilled as soon as the path is calculated
+   *  if no path is found null will be the fullfilled value of the promise
+   */
+  findPathToObject(
+    actorKey: string,
+    startTile: TileXY,
+    acceptableTiles: TileXY[]
+  ): Promise<TileXY[]> {
+    let requestId = this.requestId++;
+
+    this.sendMessage(actorKey, WK_CST.MSG.FIND_PATH_TO_OBJECT, {
+      startTile,
+      acceptableTiles,
+      requestId
+    });
+
+    return new Promise((resolve, reject) => {
+      this.pathFindingPromiseResolvers[requestId] = resolve;
+    });
+  }
+
   // all workers should apply this layer
   applyLayer(layer: TileXY[]) {
     for (let actorKey in this.astarWorkers) {

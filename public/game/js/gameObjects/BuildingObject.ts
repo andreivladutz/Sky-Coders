@@ -7,6 +7,8 @@ import MapManager from "../managers/MapManager";
 import IsoScene from "../IsoPlugin/IsoScene";
 // import LayersManager from "../managers/LayersManager";
 import BuildingTypes, { BuildNames } from "../../../common/BuildingTypes";
+import ActorsManager from "../managers/ActorsManager";
+import Modal from "../ui/Modal";
 
 interface Tile {
   x: number;
@@ -65,13 +67,33 @@ export default class BuildingObject extends IsoSpriteObject {
 
     // when this actor gets SELECTED
     this.on(CST.EVENTS.OBJECT.SELECT, () => {
+      this.setTint();
+      this.actorWalkToBuilding();
+
       console.log("BUILDING SELECTED");
     });
 
     // when this actor gets DESELECTED
     this.on(CST.EVENTS.OBJECT.DESELECT, () => {
+      this.actorWalkToBuilding();
       console.log("BUILDING DESELECTED");
     });
+
+    return this;
+  }
+
+  // Send an actor to a certain building
+  public actorWalkToBuilding(
+    currActor = ActorsManager.getInstance().selectedActor
+  ): this {
+    if (currActor) {
+      currActor.navigateToObject([
+        {
+          x: this.tileX + 3,
+          y: this.tileY + 3
+        }
+      ]);
+    }
 
     return this;
   }

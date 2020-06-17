@@ -1,4 +1,5 @@
-import UIComponent, { ButtonImage } from "./uiUtils/UIComponent";
+import UIComponent from "./uiUtils/UIComponent";
+import ButtonImage from "./uiObjects/ButtonImage";
 import UIScene from "../scenes/UIScene";
 import IsoScene from "../IsoPlugin/IsoScene";
 import CST from "../CST";

@@ -33,6 +33,14 @@ let Worker = new (class AstarWorker {
           messageData.requestId
         );
         break;
+      // Finding a path to an object is different than finding a path to a single tile
+      case WORKER_CST.MSG.FIND_PATH_TO_OBJECT:
+        this.findPathToObject(
+          messageData.startTile,
+          messageData.acceptableTiles,
+          messageData.requestId
+        );
+        break;
       case WORKER_CST.MSG.APPLY_LAYER:
         this.applyLayer(messageData);
         break;
@@ -57,7 +65,8 @@ let Worker = new (class AstarWorker {
       .enableSync()
       .setIterationsPerCalculation(WORKER_CST.ITERATIONS_PER_CALCULATION)
       // the callback used to determine if the object can walk on a tile or not
-      .setCanWalkOnCb(this.navObject.walkableCallback, this.navObject);
+      .setCanWalkOnCb(this.navObject.walkableCallback, this.navObject)
+      .setReachedDestinationCb(this.navObject.reachedTileCb, this.navObject);
   }
 
   initActor(actorConfig) {
@@ -103,6 +112,23 @@ let Worker = new (class AstarWorker {
     if (!responseReceived) {
       this.onPathFound(null, requestId);
     }
+  }
+
+  // The acceptable tiles are the tiles around the object that this nav wants to "reach"
+  findPathToObject(startTile, acceptableTiles, requestId) {
+    console.log("HMPH");
+
+    this.easystar.setReachedDestinationCb(
+      this.navObject.getReachedObjectCb(acceptableTiles),
+      this.navObject
+    );
+
+    this.findPath(startTile, acceptableTiles[0], requestId);
+
+    this.easystar.setReachedDestinationCb(
+      this.navObject.reachedTileCb,
+      this.navObject
+    );
   }
 
   onPathFound(path, requestId) {

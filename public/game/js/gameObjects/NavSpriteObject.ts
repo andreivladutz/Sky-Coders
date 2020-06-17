@@ -106,6 +106,18 @@ export default class NavSpriteObject extends IsoSpriteObject {
     );
   }
 
+  // find a path from this actor's current position to the object
+  public async findPathToObject(acceptableTiles: TileXY[]): Promise<TileXY[]> {
+    return await this.astarWorkerManager.findPathToObject(
+      this.actorKey,
+      {
+        x: this.tileX,
+        y: this.tileY
+      },
+      acceptableTiles
+    );
+  }
+
   // If the path to (tileX, tileY) is not null then it means it is reachable
   public async isCoordReachable(
     tileX: number,
@@ -125,6 +137,12 @@ export default class NavSpriteObject extends IsoSpriteObject {
   // find path to tileX and tileY and start moving towards there
   public async navigateTo(tileX: number, tileY: number) {
     this.pathFollowing = await this.findPathTo(tileX, tileY);
+    this.moveAlongPath();
+  }
+
+  // Navigate to an object having a set of acceptableTiles around the object
+  public async navigateToObject(acceptableTiles: TileXY[]) {
+    this.pathFollowing = await this.findPathToObject(acceptableTiles);
     this.moveAlongPath();
   }
 

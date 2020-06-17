@@ -47,6 +47,7 @@ export default class GameScene extends IsoScene {
 
     // fire the map init
     MapManager.getInstance().initMap(this);
+    // MapManager.getInstance().enableDebugging();
 
     // init the camera controller
     CameraManager.getInstance({
@@ -66,8 +67,6 @@ export default class GameScene extends IsoScene {
     // Pick a random actor and focus the camera on him
     Phaser.Math.RND.pick(actorsManager.sceneActors).centerCameraOn();
 
-    // MapManager.getInstance()
-    //   .enableDebugging()
     // actor.enableDebugging();
   }
 

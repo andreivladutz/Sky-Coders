@@ -138,13 +138,6 @@ export default class Actor extends NavSpriteObject {
     this.updateDb();
   }
 
-  // Keep it as a separate function so we can then remove the listener
-  private navigationHandler = (tile: TileXY) => {
-    if (!this.tileCoordsOnThisGrid(tile.x, tile.y) && !this.walkingFromCode) {
-      this.navigateTo(tile.x, tile.y);
-    }
-  };
-
   private firstTapHandler: (t: TileXY, p: Phaser.Input.Pointer) => void = null;
   // We need the closure
   private createFirstTapHandler(downX: number, downY: number) {
@@ -160,6 +153,13 @@ export default class Actor extends NavSpriteObject {
       this.mapManager.events.on(CST.EVENTS.MAP.TAP, this.navigationHandler);
     };
   }
+
+  // Keep it as a separate function so we can then remove the listener
+  private navigationHandler = (tile: TileXY) => {
+    if (!this.tileCoordsOnThisGrid(tile.x, tile.y) && !this.walkingFromCode) {
+      this.navigateTo(tile.x, tile.y);
+    }
+  };
 
   // Handle a navigation request from Blockly code.
   // While walking from code user walk commands are disabled

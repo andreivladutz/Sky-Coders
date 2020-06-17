@@ -481,8 +481,10 @@ export default class IsoSpriteObject extends IsoSprite {
   }
 
   // if body debugging is enabled, the body of this object will be drawn
-  public enableDebugging() {
+  public enableDebugging(): this {
     this.mapManager.addToDebuggingObjects(this);
+
+    return this;
   }
 
   private setOriginByFrame(frame?: string | number) {

@@ -318,7 +318,9 @@ export default {
       RATIO: 0.75,
       // Append CiBo coins suffix
       COINS_SUFFIX: "CB",
-      FONT_SIZE: 24
+      FONT_SIZE: 24,
+      BOUNCE_DELTAY: 100,
+      BOUNCE_TIME: 1500
     },
     ROUND_RECT: {
       DEFAULT_RADIUS: 10,

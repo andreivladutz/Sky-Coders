@@ -5,7 +5,9 @@ globalThis.WORKER_CST = {
     INIT_ACTOR: 2,
     FIND_PATH: 3,
     APPLY_LAYER: 4,
-    REMOVE_LAYER: 5
+    REMOVE_LAYER: 5,
+    // Finding a path to an object is different than finding a path to a single tile
+    FIND_PATH_TO_OBJECT: 6
   },
   // Format of a message
   MESSAGE_TYPE: "messageType",
