@@ -11,7 +11,7 @@ import SocketManager from "../online/SocketManager";
 import BlocklyManager from "../Blockly/BlocklyManager";
 import SVGObject from "./uiObjects/SVGObject";
 import RoundRectObject from "./uiObjects/RoundRectObject";
-import GameManager from "../online/GameManager";
+import CameraManager from "../managers/CameraManager";
 
 type Image = Phaser.GameObjects.Image;
 const Image = Phaser.GameObjects.Image;
@@ -26,9 +26,6 @@ export default class MainUI extends UIComponent {
 
     this.mainButtons = new MainGameButtons(uiScene, this);
     this.resources = new ResourcesStatus(uiScene, this);
-    this.resources.updateCoinsValue(
-      GameManager.getInstance().messengers.resources.initialResources.coins
-    );
 
     this.blocklyManager = BlocklyManager.getInstance();
     this.blocklyManager.init(this.uiScene.cache);
@@ -201,7 +198,15 @@ class MainGameButtons {
     this.uiScene.scale.on("resize", this.tileBottomBar.bind(this, texture));
   }
 
-  initButtons(textureKey: string): this {
+  public get bottomBarBounds() {
+    return this.tiledRenderTexture.getBounds();
+  }
+
+  public get mainButtonsBounds() {
+    return this.buttonsSizer.backgroundChildren[0].getBounds();
+  }
+
+  private initButtons(textureKey: string): this {
     let background = new UIImage(
       this.uiScene,
       0,

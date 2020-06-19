@@ -99,6 +99,7 @@ export default class GameInstance extends EventEmitter {
 
     // Stop the update interval
     clearInterval(this.updateInterval);
+    this.objectsManagers.buildingsManger.cleanUp();
   }
 
   // Replace the socket used for comunicating to this particular user (on socket reconnect)

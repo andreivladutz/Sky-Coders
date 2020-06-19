@@ -5,6 +5,7 @@ import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 import IsoScene from "../IsoPlugin/IsoScene";
 import ActorsManager from "./ActorsManager";
 import AstarWorkerManager from "./AstarWorkerManager";
+import { TileXY } from "../map/IsoBoard";
 
 interface Tile {
   x: number;
@@ -197,19 +198,7 @@ export default class LayersManager extends Manager {
     // check if any of the tiles of this object's grid overlaps an empty tile or another object
     for (let tile of gridTiles) {
       // also check if any of the object's grid tile ended up being out of world bounds
-      if (
-        tile.x < 0 ||
-        tile.x >= this.mapWidth ||
-        tile.y < 0 ||
-        tile.y >= this.mapHeight
-      ) {
-        return true;
-      }
-
-      if (
-        this.getTileConfig(tile.x, tile.y).id === CST.ENVIRONMENT.EMPTY_TILE ||
-        this.objectLayer[tile.y][tile.x] !== CST.ENVIRONMENT.EMPTY_TILE
-      ) {
+      if (this.isTileColliding(tile)) {
         return true;
       }
 
@@ -231,6 +220,27 @@ export default class LayersManager extends Manager {
     }
 
     // this tile is safe to walk on
+    return false;
+  }
+
+  // Check if tile is outside the map bounds or colliding with an object
+  public isTileColliding(tile: TileXY): boolean {
+    if (
+      tile.x < 0 ||
+      tile.x >= this.mapWidth ||
+      tile.y < 0 ||
+      tile.y >= this.mapHeight
+    ) {
+      return true;
+    }
+
+    if (
+      this.getTileConfig(tile.x, tile.y).id === CST.ENVIRONMENT.EMPTY_TILE ||
+      this.objectLayer[tile.y][tile.x] !== CST.ENVIRONMENT.EMPTY_TILE
+    ) {
+      return true;
+    }
+
     return false;
   }
 

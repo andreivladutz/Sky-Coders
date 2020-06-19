@@ -174,7 +174,8 @@ export default {
     PREFIX: "Buildings/",
     TYPES: {
       RESIDENTIAL: "residential"
-    }
+    },
+    SELECTION_TINT: 0xe6e6fa
   },
   BUTTONS: {
     // the key of the atlas resource
@@ -263,7 +264,7 @@ export default {
     TILES: 1,
     WORLD_GRID: 2,
     OBJECT_GRID: 3,
-    UI: Infinity
+    UI: 4
   },
   // CONSTANTS FOR THE LAYER MANAGER
   LAYERS: {
@@ -320,7 +321,9 @@ export default {
       COINS_SUFFIX: "CB",
       FONT_SIZE: 24,
       BOUNCE_DELTAY: 100,
-      BOUNCE_TIME: 1500
+      BOUNCE_TIME: 1500,
+      // Time needed to go out of the screen
+      COLLECT_ANIM_TIME: 250
     },
     ROUND_RECT: {
       DEFAULT_RADIUS: 10,

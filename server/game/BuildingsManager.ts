@@ -1,11 +1,12 @@
 import RBush, { BBox } from "rbush";
 import BuildingTypes, {
-  DbBuildingInfo,
   BuildingType,
   Resources
 } from "../../public/common/BuildingTypes";
 
-import { BuildingPlacement } from "../../public/common/MessageTypes";
+import { ObjectId } from "mongodb";
+
+import { Buildings } from "../../public/common/MessageTypes";
 import GameInstance from "./GameInstance";
 
 import CST from "../SERVER_CST";
@@ -14,8 +15,8 @@ import { NamespaceDebugger } from "../utils/debug";
 import GameObjectsManager from "./GameObjectsManager";
 const debug = new NamespaceDebugger("BuildingsManager");
 
-type DbInfo = DbBuildingInfo;
-type ResAfterPlace = BuildingPlacement.ResourcesAfterPlacement;
+type DbInfo = Buildings.DbBuilding;
+type ResAfterPlace = Buildings.ResourcesAfterPlacement;
 
 // Index buildings in an rTree for fast retrieving
 // and collision checking (i.e. not allowing the user to place overlaying buildings)
@@ -27,11 +28,13 @@ class IndexedBuilding implements BBox {
   // The building document saved in the db
   dbBuildingDoc: DbInfo;
   // A reference to the building type
-  buildingType: BuildingType;
+  // No need to store the building type on each instance
+  public get buildingType(): BuildingType {
+    return BuildingTypes[this.dbBuildingDoc.buildingType];
+  }
 
   constructor(dbBuilding: DbInfo) {
     this.dbBuildingDoc = dbBuilding;
-    this.buildingType = BuildingTypes[dbBuilding.buildingType];
 
     this.computeBBox();
   }
@@ -61,7 +64,9 @@ export default class BuildingsManager extends GameObjectsManager {
 
     this.rTree = new RBush();
 
-    gameInstance.on(CST.EVENTS.GAME.INITED, () => this.loadBuildings());
+    gameInstance.on(CST.EVENTS.GAME.INITED, () => {
+      this.loadBuildings();
+    });
   }
 
   // Load the existing buildings into the rTree
@@ -76,12 +81,92 @@ export default class BuildingsManager extends GameObjectsManager {
   // Init listeners on the BufferMessenger used by gameInstance (`sender` property)
   public initListeners() {
     // Client player placed a building on the map
-    this.sender.on(BuildingPlacement.REQUEST_EVENT, (buildingInfo: DbInfo) =>
-      this.handleBuildPlacement(buildingInfo)
+    this.sender.on(
+      Buildings.REQUEST_EVENT,
+      this.handleBuildPlacement.bind(this)
+    );
+
+    this.sender.on(
+      Buildings.COLLECTED_EVENT,
+      this.handleCollectEvent.bind(this)
     );
   }
 
-  private handleBuildPlacement(buildingInfo: DbInfo) {
+  // Method used to clean up the internals when a user logs out
+  public cleanUp() {
+    // clearInterval(this.buildingsUpdateInterval);
+  }
+
+  // The user collected a building. Check if the collection was valid
+  private handleCollectEvent(buildingId: string, ackCb: Buildings.CollectAck) {
+    let collectedBuild = this.islandDoc.buildings.id(buildingId);
+    let responseEvent: string;
+
+    // If the collected building doesn't exist then deny the collection
+    if (!collectedBuild) {
+      responseEvent = Buildings.DENY_COLLECT_EVENT;
+    } else {
+      // Get the type this building belongs to
+      let buildingType = BuildingTypes[collectedBuild.buildingType];
+
+      // Check if the production is ready (i.e. the building has something to collect)
+      if (
+        Date.now() - collectedBuild.lastProdTime >=
+        buildingType.productionTime
+      ) {
+        responseEvent = Buildings.ACCEPT_COLLECT_EVENT;
+      } else {
+        responseEvent = Buildings.DENY_COLLECT_EVENT;
+      }
+    }
+
+    let currResources: Resources = this.resourcesDoc,
+      resourcesAfter: Resources;
+
+    // The collection has been accepted so we should collect resources
+    if (responseEvent === Buildings.ACCEPT_COLLECT_EVENT) {
+      let { productionResources } = BuildingTypes[collectedBuild.buildingType];
+
+      // TODO: If more resources, count them in here
+      let collectResources = {
+        coins: -productionResources.coins
+      };
+
+      // Spend negative resources i.e. collect !
+      resourcesAfter = this.spendResources(
+        currResources,
+        collectResources,
+        true
+      );
+
+      // The building has just been collected now
+      collectedBuild.lastProdTime = Date.now();
+    } else {
+      resourcesAfter = currResources;
+    }
+
+    // Respond with the resources status for this building
+    let responseResources: Buildings.ResourcesAfterCollect = {
+      // TODO: keep an eye for more resources
+      coins: resourcesAfter.coins,
+      _id: buildingId,
+      lastProdTime: collectedBuild.lastProdTime
+    };
+
+    ackCb(responseEvent, responseResources);
+  }
+
+  // Get the type and the position of the building the user is trying to place on the map
+  // And apply the logic needed to check the validity of this placement
+  private handleBuildPlacement(clientBuilding: Buildings.ClientBuilding) {
+    let { buildingType, position } = clientBuilding;
+
+    let buildingInfo = {
+      _id: new ObjectId(),
+      buildingType,
+      position,
+      lastProdTime: Date.now()
+    };
     // Prepare the building for indexing in the RTree, also get the building type object
     let indexedBuilding = new IndexedBuilding(buildingInfo);
 
@@ -108,8 +193,8 @@ export default class BuildingsManager extends GameObjectsManager {
     approved: boolean
   ) {
     let responseEvent = approved
-      ? BuildingPlacement.APPROVE_EVENT
-      : BuildingPlacement.DENY_EVENT;
+      ? Buildings.APPROVE_EVENT
+      : Buildings.DENY_EVENT;
 
     let resourcesAfterPlacing = this.resourcesAfterPlace(
       indexedBuilding,
@@ -138,14 +223,17 @@ export default class BuildingsManager extends GameObjectsManager {
       ? this.spendResources(currResources, costResources, true)
       : currResources) as ResAfterPlace;
 
+    // Also send the db _id to the server so we can easily identify a building by the db id
     return {
+      _id: indexedBuilding.dbBuildingDoc._id,
+      // TODO: Check out the resources status
       coins: resourcesAfterPlacing.coins,
       buildingPosition: indexedBuilding.dbBuildingDoc.position
     };
   }
 
   /**
-   * Spend resources on a building
+   * Spend resources on a building ( If the resources to spend are negative than it's a collect function :) )
    * @param currResources user resources before buying
    * @param costResources the cost of a building
    * @param modifyInPlace whether the currResources object should be modified or
@@ -162,6 +250,7 @@ export default class BuildingsManager extends GameObjectsManager {
       spendableResources = currResources;
     } else {
       // Copy the currResources
+      // TODO: If more resources later, change the copy logic
       spendableResources = {
         coins: currResources.coins
       };

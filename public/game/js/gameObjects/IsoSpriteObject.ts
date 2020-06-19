@@ -254,7 +254,7 @@ export default class IsoSpriteObject extends IsoSprite {
   };
 
   // Handler function for "pointerup" event
-  private handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
+  protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
     // If the press event fired and it should cancel selection / deselection
     if (this.pressWasFired && this.pressCancelsSelection) {
       this.pressWasFired = false;
@@ -294,8 +294,10 @@ export default class IsoSpriteObject extends IsoSprite {
     this.emit(CST.EVENTS.OBJECT.SELECT, pointer);
   }
 
-  public setSelectedTintColor(color: number) {
+  public setSelectedTintColor(color: number): this {
     this.selectedTintColor = color;
+
+    return this;
   }
 
   // Add this object to the grid at the provided tile coords
@@ -346,6 +348,38 @@ export default class IsoSpriteObject extends IsoSprite {
     }
 
     return gridMatrix;
+  }
+
+  // Get a padding of tiles around the grid matrix
+  public getGridTilePadding(): TileXY[] {
+    let padding = [];
+
+    let checkAndPushPadTile = (x: number, y: number) => {
+      let dX = x - this.localTileX,
+        dy = y - this.localTileY;
+
+      let paddingTile = { x: this.tileX + dX, y: this.tileY + dy };
+
+      if (!this.layersManager.isTileColliding(paddingTile)) {
+        padding.push(paddingTile);
+      }
+    };
+
+    // Pad left and right
+    for (let x of [-1, this.tileWidthX]) {
+      for (let y = -1; y <= this.tileWidthY; y++) {
+        checkAndPushPadTile(x, y);
+      }
+    }
+
+    // Pad top and bottom
+    for (let y of [-1, this.tileWidthY]) {
+      for (let x = 0; x < this.tileWidthX; x++) {
+        checkAndPushPadTile(x, y);
+      }
+    }
+
+    return padding;
   }
 
   // function called on each scene update event

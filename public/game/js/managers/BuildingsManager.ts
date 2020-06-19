@@ -8,23 +8,28 @@ import BuildingObject from "../gameObjects/BuildingObject";
 import IsoScene from "../IsoPlugin/IsoScene";
 
 import BuildingTypes, { BuildNames } from "../../../common/BuildingTypes";
-import { BuildingPlacement } from "../../../common/MessageTypes";
+import { Buildings } from "../../../common/MessageTypes";
 import GameManager from "../online/GameManager";
-import ResourcesUI from "../ui/ResourcesUI";
-import UIScene from "../scenes/UIScene";
-import UIComponents from "../ui/UIComponentsFactory";
+
+import Group = Phaser.GameObjects.Group;
+import BuildingsMessenger from "../online/BuildingsMessenger";
+import ResourcesManager from "./ResourcesManager";
 
 export default class BuildingsManager extends Manager
   implements LoadingInjectedManager {
   // the frames of the buildings indexed by their identifier i.e. "residential", etcetera..
-  buildingFrames: FramesMap = {};
+  public buildingFrames: FramesMap = {};
 
   // Will be injected by the LoaderInjector class
   loadResources: (load: Phaser.Loader.LoaderPlugin) => void;
   getTextureKey: () => string;
 
-  private resourcesUI: ResourcesUI;
+  private resourcesManager: ResourcesManager;
+  // Keep a reference to all the game building objects
+  public sceneBuildings: Group;
 
+  // Keep a reference to the buildings messenger talking to the server
+  private buildsMessenger: BuildingsMessenger;
   // The buildings currently awaiting the server's aknowledgement
   // Indexed by [y][x] coords
   private buildsAwaitingSv: {
@@ -47,7 +52,7 @@ export default class BuildingsManager extends Manager
 
     let { localTileX, localTileY } = BuildingTypes[buildingType].localPos;
 
-    return new BuildingObject(
+    let building = new BuildingObject(
       gameScene,
       buildingType,
       textureKey,
@@ -57,14 +62,38 @@ export default class BuildingsManager extends Manager
       tileX,
       tileY
     );
+    this.sceneBuildings.add(building);
+
+    return building;
   }
 
-  private initResourcesUI(gameScene: IsoScene) {
-    this.resourcesUI = UIComponents.getUIComponents(
-      ResourcesUI,
-      gameScene.scene.get(CST.SCENES.UI) as UIScene,
-      gameScene
-    )[0] as ResourcesUI;
+  private initComponents(gameScene: IsoScene) {
+    this.resourcesManager = ResourcesManager.getInstance();
+    this.resourcesManager.initResourcesUi(gameScene);
+
+    this.sceneBuildings = new Group(gameScene);
+
+    this.buildsMessenger = GameManager.getInstance().messengers.buildings;
+
+    gameScene.events.on("update", this.onUpdate.bind(this));
+  }
+
+  // Update all buildings
+  private onUpdate() {
+    this.sceneBuildings.children.iterate((building: BuildingObject) => {
+      building.update();
+    });
+  }
+
+  public onProductionReady(building: BuildingObject) {
+    this.resourcesManager.resourcesUi.showProductionReady(building);
+  }
+
+  public onProductionCollected(building: BuildingObject) {
+    // Hide the animated coin
+    this.resourcesManager.resourcesUi.hideProductionReady(
+      building.productionCoin
+    );
   }
 
   /**
@@ -72,22 +101,57 @@ export default class BuildingsManager extends Manager
    * @param buildings array of DbBuildingInfo from the server
    */
   public initBuildings(gameScene: IsoScene) {
-    this.initResourcesUI(gameScene);
+    this.initComponents(gameScene);
 
-    let buildsMessenger = GameManager.getInstance().messengers.buildings;
-    let buildings = buildsMessenger.initialBuildings;
+    let buildings = this.buildsMessenger.initialBuildings;
 
     for (let building of buildings) {
       let { x, y } = building.position;
-      // TODO: lastProdTime
 
       let buildingObject = this.create(gameScene, building.buildingType, x, y);
       buildingObject.enableBuildPlacing().placeBuilding(false);
+      buildingObject.dbId = building._id;
 
       buildingObject.lastProdTime = building.lastProdTime;
-
-      this.resourcesUI.showProductionReady(buildingObject);
     }
+  }
+
+  // Collect the resources produced by a building
+  public collectBuilding(building: BuildingObject) {
+    // Hide the coin. The coin is being hidden by the building
+    // this.onProductionCollected(building);
+
+    // Update the resources and lastProdTime locally until the server responds
+    this.resourcesManager.spendCollectResourcesClientSide(
+      BuildingTypes[building.buildingType].productionResources,
+      false
+    );
+    building.lastProdTime = Date.now();
+
+    this.buildsMessenger.collectBuildingMessage(building);
+  }
+
+  // public onCollectionAccepted(
+  //   building: BuildingObject,
+  //   resourcesStatus: Buildings.ResourcesAfterCollect
+  // ) {
+  //   this.onCollectionResolved(building, resourcesStatus);
+  // }
+
+  // public onCollectionDenied(
+  //   building: BuildingObject,
+  //   resourcesStatus: Buildings.ResourcesAfterCollect
+  // ) {
+  //   this.onCollectionResolved(building, resourcesStatus);
+  // }
+
+  // TODO: For now these functions do not differ
+  public onCollectionResolved(
+    building: BuildingObject,
+    resourcesStatus: Buildings.ResourcesAfterCollect
+  ) {
+    building.lastProdTime = resourcesStatus.lastProdTime;
+    this.resourcesManager.setResources(resourcesStatus);
   }
 
   /**
@@ -95,6 +159,17 @@ export default class BuildingsManager extends Manager
    * Let the server know and await its aknowledgement
    */
   public onBuildingPlaced(building: BuildingObject) {
+    let buildingCost = BuildingTypes[building.buildingType].buildCost;
+    // The spend function return false if there are insufficient funds
+    if (
+      !this.resourcesManager.spendCollectResourcesClientSide(buildingCost, true)
+    ) {
+      // TODO: TOAST INSUFFICIENT FUNDS
+      building.removeBuilding();
+
+      return;
+    }
+
     if (!this.buildsAwaitingSv[building.tileY]) {
       this.buildsAwaitingSv[building.tileY] = {};
     }
@@ -102,18 +177,14 @@ export default class BuildingsManager extends Manager
     // Map the building awaiting confirmation from the server until it comes
     this.buildsAwaitingSv[building.tileY][building.tileX] = building;
 
-    let buildsMessenger = GameManager.getInstance().messengers.buildings;
-
-    buildsMessenger.buildingPlacementMessage({
+    this.buildsMessenger.buildingPlacementMessage({
       // The name of the building used to identify it in the building types
       buildingType: building.buildingType,
       // The tile position of this building
       position: {
         x: building.tileX,
         y: building.tileY
-      },
-      // The last time this building produced resources (were collected)
-      lastProdTime: building.lastProdTime
+      }
     });
   }
 
@@ -123,10 +194,12 @@ export default class BuildingsManager extends Manager
    *  and the position of the building that should have been placed on the map
    *  (tile coordinates) used to identify the building in the buildsAwaitingSv Map
    */
-  public onPlacementAllowed(
-    buildingInfo: BuildingPlacement.ResourcesAfterPlacement
-  ) {
+  public onPlacementAllowed(buildingInfo: Buildings.ResourcesAfterPlacement) {
     console.log("BUILDING ALLOWED");
+
+    // Save the db id on the building for easier retrieval at a later time
+    let { x, y } = buildingInfo.buildingPosition;
+    this.buildsAwaitingSv[y][x].dbId = buildingInfo._id;
 
     this.onBuildingAcknowledged(buildingInfo);
   }
@@ -137,13 +210,10 @@ export default class BuildingsManager extends Manager
    *  and the position of the building that should have been placed on the map
    *  (tile coordinates) used to identify the building in the buildsAwaitingSv Map
    */
-  public onPlacementDenied(
-    buildingInfo: BuildingPlacement.ResourcesAfterPlacement
-  ) {
+  public onPlacementDenied(buildingInfo: Buildings.ResourcesAfterPlacement) {
     console.log("BUILDING DENIED");
 
     let { x, y } = buildingInfo.buildingPosition;
-
     this.buildsAwaitingSv[y][x].removeBuilding();
 
     this.onBuildingAcknowledged(buildingInfo);
@@ -156,11 +226,13 @@ export default class BuildingsManager extends Manager
    *  (tile coordinates) used to identify the building in the buildsAwaitingSv Map
    */
   private onBuildingAcknowledged(
-    buildingInfo: BuildingPlacement.ResourcesAfterPlacement
+    buildingInfo: Buildings.ResourcesAfterPlacement
   ) {
     delete this.buildsAwaitingSv[buildingInfo.buildingPosition.y][
       buildingInfo.buildingPosition.x
     ];
+
+    this.resourcesManager.setResources(buildingInfo);
   }
 
   async preload(load: Phaser.Loader.LoaderPlugin) {

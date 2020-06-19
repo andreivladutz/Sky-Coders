@@ -1,9 +1,11 @@
+const TY = 5;
+
 export default class SVGObject extends Phaser.GameObjects.DOMElement {
   // Importing Illustrator SVGs needs classes' numbers changed
   private static lastUsedClass: number = 0;
   // Each svg will have ids appended with their instance id to make them unique
   private static instances: number = 0;
-  private static readonly uniqueStringAppend = "SVGObject";
+  private static readonly uniqueStringAppend = "SVG";
 
   constructor(scene: Phaser.Scene, x: number, y: number, cacheKey: string) {
     super(scene, x, y);
@@ -12,6 +14,14 @@ export default class SVGObject extends Phaser.GameObjects.DOMElement {
     this.scene.add.existing(this);
 
     SVGObject.instances++;
+  }
+
+  public setVisible(visible: boolean): this {
+    (this.node as HTMLElement).style.visibility = visible
+      ? "visible"
+      : "hidden";
+
+    return this;
   }
 
   // Prevent class numbers from colliding
@@ -43,7 +53,7 @@ export default class SVGObject extends Phaser.GameObjects.DOMElement {
       // Replace the matched cls-*number* but make sure the number is not part of a bigger number
       svg = svg.replace(
         new RegExp(`${match}(?!\\d)`, "g"),
-        `cls-${newClassNo}`
+        `class_${newClassNo}`
       );
     }
 

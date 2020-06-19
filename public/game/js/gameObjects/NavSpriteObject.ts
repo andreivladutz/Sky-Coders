@@ -27,19 +27,24 @@ interface NavSpriteConfig {
 // A navigating subclass of the sprite object
 export default class NavSpriteObject extends IsoSpriteObject {
   // Remember the tileZ position
-  tileZ: number;
-  pathFollowing: TileXY[];
+  protected tileZ: number;
+  private _pathFollowing: TileXY[];
+  // A promise that informs how the travel to a certain destination concluded
+  // Resolves to true if the destination was reached, or false otherwise
+  public destinationConclusion: Promise<boolean>;
+  // The resolver function of the current destinationConclusion promise
+  private conclusionResolver: (value: boolean) => void = () => {};
   // MoveTo plugin instance used for moving this sprite
-  moveTo: MoveTo;
+  private moveTo: MoveTo;
 
   // the size of the map in tiles
-  mapWidth: number = 0;
-  mapHeight: number = 0;
+  protected mapWidth: number = 0;
+  protected mapHeight: number = 0;
 
-  actorKey: string;
+  public actorKey: string;
 
   // this astar worker manager
-  astarWorkerManager: AstarWorkerManager;
+  protected astarWorkerManager: AstarWorkerManager;
 
   constructor(config: NavSpriteConfig) {
     // This type of object doesn't get applied to the layer as it travels all the time
@@ -80,6 +85,29 @@ export default class NavSpriteObject extends IsoSpriteObject {
         tileWidthY: this.tileWidthY
       });
     }
+  }
+
+  protected get pathFollowing(): TileXY[] {
+    return this._pathFollowing;
+  }
+
+  // When setting a new path a destinationConclusion promise is being created and can be listened to
+  protected set pathFollowing(path: TileXY[]) {
+    // If the old path didn't resolve yet resolve it to false as it failed
+    if (this._pathFollowing) {
+      this.conclusionResolver(false);
+    }
+
+    this.destinationConclusion = new Promise(resolve => {
+      this.conclusionResolver = resolve;
+
+      // If the path is null the destination will not be reached
+      if (path === null) {
+        resolve(false);
+      }
+    });
+
+    this._pathFollowing = path;
   }
 
   // a way to cancel this object's movement
@@ -148,10 +176,14 @@ export default class NavSpriteObject extends IsoSpriteObject {
 
   // Method that recursively calls itself while this actor is moving, until the movement is over
   private moveAlongPath() {
-    // The object reached it's destination
+    // The object reached its destination
     if (!this.pathFollowing || this.pathFollowing.length === 0) {
       if (!this.moveTo.isRunning) {
         this.emit(CST.NAV_OBJECT.EVENTS.IDLE);
+
+        if (this.pathFollowing && this.pathFollowing.length === 0) {
+          this.conclusionResolver(true);
+        }
       }
       return;
     }

@@ -38,7 +38,7 @@ export namespace Game {
   export const LOAD_EVENT = `${PREFIX}game_loaded`;
 }
 
-export namespace BuildingPlacement {
+export namespace Buildings {
   const PREFIX = "Building.";
 
   // Request the placement of a building to the server
@@ -48,12 +48,42 @@ export namespace BuildingPlacement {
   // Placement denied
   export const DENY_EVENT = `${PREFIX}placement_deny`;
 
+  // Updates between the server and the client:
+
+  // The building has been collected on the client
+  export const COLLECTED_EVENT = `${PREFIX}collected`;
+  export const ACCEPT_COLLECT_EVENT = `${PREFIX}collect_accepted`;
+  export const DENY_COLLECT_EVENT = `${PREFIX}collect_denied`;
+
   export type DbBuilding = BuildingTypes.DbBuildingInfo;
+  // The client building misses the _id and lastProdTime properties
+  export interface ClientBuilding {
+    // The name of the building used to identify it in the building types
+    buildingType: BuildingTypes.BuildNames;
+    // The tile position of this building
+    position: BuildingTypes.TilePosition;
+  }
   // When the placement gets approved, resource status is updated
   // Also, we need to identify the subject, i.e. the building, by its unique position
   export interface ResourcesAfterPlacement extends BuildingTypes.Resources {
+    // Send the db id
+    _id: string;
     buildingPosition: BuildingTypes.TilePosition;
   }
+
+  // After the user tries to collect some resources, send the result
+  export interface ResourcesAfterCollect extends BuildingTypes.Resources {
+    // Send the db id
+    _id: string;
+    // Also send the lastProdTime so there are no clocks desynchronizations
+    lastProdTime: number;
+  }
+
+  // The acknowledge callback that responds to a collect event
+  export type CollectAck = (
+    respEvent: string,
+    res: ResourcesAfterCollect
+  ) => void;
 }
 
 export namespace Characters {

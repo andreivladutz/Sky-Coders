@@ -1,7 +1,8 @@
-import { BuildingPlacement } from "../../../common/MessageTypes";
+import { Buildings } from "../../../common/MessageTypes";
 import BuildingsManager from "../managers/BuildingsManager";
 import SocketManager from "./SocketManager";
 import Messenger from "./Messenger";
+import BuildingObject from "../gameObjects/BuildingObject";
 
 /**
  * When placing a building, the server takes the final decisions
@@ -12,8 +13,8 @@ export default class BuildingsMessenger extends Messenger {
   private buildsManager: BuildingsManager;
 
   // Keep the buildings until they get fetched by the mapManager
-  private _initialBuildings: BuildingPlacement.DbBuilding[];
-  public set initialBuildings(buildings: BuildingPlacement.DbBuilding[]) {
+  private _initialBuildings: Buildings.DbBuilding[];
+  public set initialBuildings(buildings: Buildings.DbBuilding[]) {
     // Initial building can be set only once (by the gameManager)
     if (this._initialBuildings === null) {
       return;
@@ -41,9 +42,19 @@ export default class BuildingsMessenger extends Messenger {
    *
    *  The server decides if the placement is valid or not
    */
-  public buildingPlacementMessage(buildingInfo: BuildingPlacement.DbBuilding) {
+  public buildingPlacementMessage(buildingInfo: Buildings.ClientBuilding) {
     // Request the server to place this building
-    this.socketManager.emit(BuildingPlacement.REQUEST_EVENT, buildingInfo);
+    this.socketManager.emit(Buildings.REQUEST_EVENT, buildingInfo);
+  }
+
+  // Send a request to collect the building with dbId
+  // Pass an ACK function so we get the response directly to this specific building and event
+  public collectBuildingMessage(building: BuildingObject) {
+    this.socketManager.emit(
+      Buildings.COLLECTED_EVENT,
+      building.dbId,
+      this.collectAckWithClosure(building)
+    );
   }
 
   /**
@@ -53,16 +64,45 @@ export default class BuildingsMessenger extends Messenger {
    */
   private handlePlacementResponse(
     responseEvent: string,
-    resourcesStatus: BuildingPlacement.ResourcesAfterPlacement
+    resourcesStatus: Buildings.ResourcesAfterPlacement
   ) {
     switch (responseEvent) {
-      case BuildingPlacement.APPROVE_EVENT:
+      case Buildings.APPROVE_EVENT:
         this.buildsManager.onPlacementAllowed(resourcesStatus);
         break;
-      case BuildingPlacement.DENY_EVENT:
+      case Buildings.DENY_EVENT:
         this.buildsManager.onPlacementDenied(resourcesStatus);
         break;
     }
+  }
+
+  // Create and return an ack function that has closure over the building that sent the collect request event
+  private collectAckWithClosure(building: BuildingObject) {
+    /**
+     * Process the response from the server after a collect request
+     * (The acknowledge cb passed to COLLECTED_EVENT emit)
+     *
+     * @param responseEvent ACCEPT_COLLECT_EVENT or DENY_COLLECT_EVENT
+     * @param resourcesStatus The resources after processing the collect request
+     */
+    return (
+      responseEvent: string,
+      resourcesStatus: Buildings.ResourcesAfterCollect
+    ) => {
+      if (building.dbId !== resourcesStatus._id) {
+        throw new Error(
+          "BuildingsMessenger Error: The collected building's id differs from the received _id."
+        );
+      }
+
+      // if (responseEvent === Buildings.ACCEPT_COLLECT_EVENT) {
+      //   this.buildsManager.onCollectionAccepted(building, resourcesStatus);
+      // } else if (responseEvent === Buildings.DENY_COLLECT_EVENT) {
+      //   this.buildsManager.onCollectionDenied(building, resourcesStatus);
+      // }
+
+      this.buildsManager.onCollectionResolved(building, resourcesStatus);
+    };
   }
 
   /**
@@ -71,14 +111,14 @@ export default class BuildingsMessenger extends Messenger {
   protected registerEventListening() {
     // The server accepts the placement of a building
     this.socketManager.on(
-      BuildingPlacement.APPROVE_EVENT,
-      this.handlePlacementResponse.bind(this, BuildingPlacement.APPROVE_EVENT)
+      Buildings.APPROVE_EVENT,
+      this.handlePlacementResponse.bind(this, Buildings.APPROVE_EVENT)
     );
 
     // The server denies the placement of a building
     this.socketManager.on(
-      BuildingPlacement.DENY_EVENT,
-      this.handlePlacementResponse.bind(this, BuildingPlacement.DENY_EVENT)
+      Buildings.DENY_EVENT,
+      this.handlePlacementResponse.bind(this, Buildings.DENY_EVENT)
     );
   }
 }

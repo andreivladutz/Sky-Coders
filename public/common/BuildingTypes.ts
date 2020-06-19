@@ -57,6 +57,8 @@ export class BuildingType {
 
 // The information held on a building in the server's db
 export interface DbBuildingInfo {
+  // The db _id
+  _id: any;
   // The name of the building used to identify it in the building types
   buildingType: BuildNames;
   // The tile position of this building
@@ -73,7 +75,7 @@ const BuildingTypes = {
     6,
     3,
     3,
-    1000,
+    5000,
     { coins: 100 },
     { coins: 100 }
   )

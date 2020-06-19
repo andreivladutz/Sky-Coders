@@ -34,6 +34,7 @@ let Worker = new (class AstarWorker {
         );
         break;
       // Finding a path to an object is different than finding a path to a single tile
+      // There are more available tiles that you can reach
       case WORKER_CST.MSG.FIND_PATH_TO_OBJECT:
         this.findPathToObject(
           messageData.startTile,
@@ -86,44 +87,63 @@ let Worker = new (class AstarWorker {
 
   // each path finding instance has a request id where it came from
   // and each instance has an instance id which can be used to cancel the path finding process
-  findPath(startTile, endTile, requestId) {
+  findPath(startTile, endTiles, requestId) {
     let responseReceived = false;
+    let pathFound = false;
+    // Accept more endTiles
+    endTiles = endTiles instanceof Array ? endTiles : [endTiles];
 
     let responseCb = path => {
       responseReceived = true;
 
-      this.onPathFound(path, requestId);
+      // If the path received is null it means the endTile is considered "unwalkable"
+      // And the algorithm doesn't even try to calculate a path
+      if (path !== null) {
+        pathFound = true;
+        this.onPathFound(path, requestId);
+      }
     };
 
-    let instanceId = this.easystar.findPath(
-      startTile.x,
-      startTile.y,
-      endTile.x,
-      endTile.y,
-      responseCb
-    );
+    for (let endTile of endTiles) {
+      let instanceId = this.easystar.findPath(
+        startTile.x,
+        startTile.y,
+        endTile.x,
+        endTile.y,
+        responseCb
+      );
 
-    // try to compute the path
-    this.easystar.calculate();
-    // whether it succedeed or not, cancel the path finding
-    this.easystar.cancelPath(instanceId);
+      // try to compute the path
+      this.easystar.calculate();
+      // whether it succedeed or not, cancel the path finding
+      this.easystar.cancelPath(instanceId);
+
+      // If any of the endTiles succeeds stop trying for the rest of the tiles
+      if (pathFound) {
+        break;
+      }
+    }
 
     // if it didn't succeed then probably the end tile cannot be reached
+    // (i.e. it searched for too long and didn't find the end of the path)
     if (!responseReceived) {
       this.onPathFound(null, requestId);
+
+      // Return false immediately so we know outside that the navObject didn't succeed
+      return false;
     }
+
+    return true;
   }
 
   // The acceptable tiles are the tiles around the object that this nav wants to "reach"
   findPathToObject(startTile, acceptableTiles, requestId) {
-    console.log("HMPH");
-
     this.easystar.setReachedDestinationCb(
       this.navObject.getReachedObjectCb(acceptableTiles),
       this.navObject
     );
 
-    this.findPath(startTile, acceptableTiles[0], requestId);
+    this.findPath(startTile, acceptableTiles, requestId);
 
     this.easystar.setReachedDestinationCb(
       this.navObject.reachedTileCb,

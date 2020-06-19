@@ -8,7 +8,7 @@ import IsoScene from "../IsoPlugin/IsoScene";
 // import LayersManager from "../managers/LayersManager";
 import BuildingTypes, { BuildNames } from "../../../common/BuildingTypes";
 import ActorsManager from "../managers/ActorsManager";
-import Modal from "../ui/Modal";
+import { SVGCoin } from "../ui/ResourcesUI";
 
 interface Tile {
   x: number;
@@ -17,13 +17,22 @@ interface Tile {
 
 export default class BuildingObject extends IsoSpriteObject {
   public buildingType: BuildNames;
+  // Keep the id of the building in the db
+  public dbId: string;
   // The last time this building produced resources (were collected)
+  // TODO: Show a timer
   public lastProdTime: number;
+  // Boolean to know if the production is ready
+  public isProductionReady: boolean = false;
+
+  // The coin that's showing above a building when it is collected
+  public productionCoin: SVGCoin;
 
   // whether this building can be moved
   private movementEnabled: boolean = false;
   // whether the building can be placed at current tile positions or not
   private canBePlacedHere: boolean = false;
+  protected buildingsManager: BuildingsManager = BuildingsManager.getInstance();
 
   /**
    * @param buildingType from CST.BUILDING.TYPES
@@ -62,40 +71,50 @@ export default class BuildingObject extends IsoSpriteObject {
     // this.layersManager.debugLayers(scene);
   }
 
-  public makeInteractive(): this {
-    this.makeSelectable().setSelectedTintColor(CST.ACTOR.SELECTION_TINT);
+  public update() {
+    if (
+      Date.now() - this.lastProdTime >=
+      BuildingTypes[this.buildingType].productionTime
+    ) {
+      // Was false and became true. Show the coin animation
+      if (this.isProductionReady === false) {
+        this.buildingsManager.onProductionReady(this);
+      }
 
-    // when this actor gets SELECTED
-    this.on(CST.EVENTS.OBJECT.SELECT, () => {
-      this.setTint();
-      this.actorWalkToBuilding();
+      this.isProductionReady = true;
+    } else {
+      // The building was collected, hide the coin
+      if (this.isProductionReady === true) {
+        this.buildingsManager.onProductionCollected(this);
+      }
 
-      console.log("BUILDING SELECTED");
-    });
-
-    // when this actor gets DESELECTED
-    this.on(CST.EVENTS.OBJECT.DESELECT, () => {
-      this.actorWalkToBuilding();
-      console.log("BUILDING DESELECTED");
-    });
-
-    return this;
+      this.isProductionReady = false;
+    }
   }
 
-  // Send an actor to a certain building
-  public actorWalkToBuilding(
-    currActor = ActorsManager.getInstance().selectedActor
-  ): this {
-    if (currActor) {
-      currActor.navigateToObject([
-        {
-          x: this.tileX + 3,
-          y: this.tileY + 3
-        }
-      ]);
-    }
+  public makeInteractive(): this {
+    return this.makeSelectable().setSelectedTintColor(
+      CST.BUILDINGS.SELECTION_TINT
+    );
+  }
 
-    return this;
+  // Handler function for "pointerup" event. Override the one in IsoSpriteObject
+  protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
+    this.actorWalkToBuilding();
+  };
+
+  // Send an actor to this building for collecting purposes
+  public async actorWalkToBuilding(
+    currActor = ActorsManager.getInstance().selectedActor
+  ) {
+    if (currActor) {
+      await currActor.navigateToObject(this.getGridTilePadding());
+      let reachedDest = await currActor.destinationConclusion;
+
+      if (reachedDest && this.isProductionReady) {
+        this.buildingsManager.collectBuilding(this);
+      }
+    }
   }
 
   private positionToCenter() {
@@ -127,8 +146,9 @@ export default class BuildingObject extends IsoSpriteObject {
       this.layersManager.removeObjectFromLayer(this);
     }
 
-    this.disableInteractive();
-
+    this.removeInteractive();
+    // Remove the building from the buildings' phaser group
+    this.buildingsManager.sceneBuildings.remove(this);
     this.mapManager.removeSpriteObjectFromBoard(this);
     this.destroy();
     // also destroy the grid graphics
@@ -173,7 +193,7 @@ export default class BuildingObject extends IsoSpriteObject {
 
     if (emitPlacingToServer) {
       // Let the buildings manager know a building has been placed
-      BuildingsManager.getInstance().onBuildingPlaced(this);
+      this.buildingsManager.onBuildingPlaced(this);
     }
 
     // the building could be placed
