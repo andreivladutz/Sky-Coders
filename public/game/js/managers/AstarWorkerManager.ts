@@ -86,6 +86,7 @@ export default class AstarWorkerManager extends Manager {
    * @param actorKey the unique key of this type of object
    * @param startTile the starting point of the path
    * @param endTile the ending point of the path
+   * @param strictPath should go strictly to endTile or being near it is ok
    *
    * @returns {Promise<TileXY[]>} a promise that will be fullfilled as soon as the path is calculated
    *  if no path is found null will be the fullfilled value of the promise
@@ -93,14 +94,16 @@ export default class AstarWorkerManager extends Manager {
   findPath(
     actorKey: string,
     startTile: TileXY,
-    endTile: TileXY
+    endTile: TileXY,
+    strictPath: boolean
   ): Promise<TileXY[]> {
     let requestId = this.requestId++;
 
     this.sendMessage(actorKey, WK_CST.MSG.FIND_PATH, {
       startTile,
       endTile,
-      requestId
+      requestId,
+      strictPath
     });
 
     return new Promise((resolve, reject) => {

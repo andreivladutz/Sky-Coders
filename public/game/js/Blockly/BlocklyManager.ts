@@ -126,8 +126,9 @@ export default class BlocklyManager extends Manager {
     this.darkModeToggleButton.style.display = "none";
   }
 
-  // Init should be called before using the workspace! (It is called in the MainUI constructor)
+  // Init should be called before using the workspace! (It is called by the ActorsManager after initing all actors)
   // The toolbox xml is being loaded by Phaser's loader and taken from Phaser's cache
+  // The init method HAS to be called after all actors have been created as it loads the code from their workspace
   public init(cache: Phaser.Cache.CacheManager) {
     let toolboxXml = cache.xml.get(this.toolboxKey);
     this.defaultXMLWorkspace = cache.xml.get(this.defaultWorkspaceKey);

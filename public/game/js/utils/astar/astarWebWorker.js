@@ -27,11 +27,21 @@ let Worker = new (class AstarWorker {
         this.initActor(messageData);
         break;
       case WORKER_CST.MSG.FIND_PATH:
-        this.findPath(
-          messageData.startTile,
-          messageData.endTile,
-          messageData.requestId
-        );
+        // If the Actor uses Blockly, strictPath is desirable as it forces the actor
+        // to go exactly to the endTile coords (it is not enough for its grid to touch those coords)
+        if (messageData.strictPath) {
+          this.findStrictPath(
+            messageData.startTile,
+            messageData.endTile,
+            messageData.requestId
+          );
+        } else {
+          this.findPath(
+            messageData.startTile,
+            messageData.endTile,
+            messageData.requestId
+          );
+        }
         break;
       // Finding a path to an object is different than finding a path to a single tile
       // There are more available tiles that you can reach
@@ -134,6 +144,18 @@ let Worker = new (class AstarWorker {
     }
 
     return true;
+  }
+
+  // Don't use the reached callback. Walk strictly to endTile
+  findStrictPath(startTile, endTile, requestId) {
+    this.easystar.setReachedDestinationCb(null, null);
+
+    this.findPath(startTile, endTile, requestId);
+
+    this.easystar.setReachedDestinationCb(
+      this.navObject.reachedTileCb,
+      this.navObject
+    );
   }
 
   // The acceptable tiles are the tiles around the object that this nav wants to "reach"

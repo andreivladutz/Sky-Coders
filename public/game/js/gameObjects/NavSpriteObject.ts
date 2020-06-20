@@ -116,7 +116,11 @@ export default class NavSpriteObject extends IsoSpriteObject {
   }
 
   // find a path from this actor's current position to the (tileX, tileY) position
-  public async findPathTo(tileX: number, tileY: number): Promise<TileXY[]> {
+  public async findPathTo(
+    tileX: number,
+    tileY: number,
+    strictPath: boolean
+  ): Promise<TileXY[]> {
     if (tileX !== Math.floor(tileX) || tileY !== Math.floor(tileY)) {
       return null;
     }
@@ -130,7 +134,8 @@ export default class NavSpriteObject extends IsoSpriteObject {
       {
         x: tileX,
         y: tileY
-      }
+      },
+      strictPath
     );
   }
 
@@ -149,7 +154,8 @@ export default class NavSpriteObject extends IsoSpriteObject {
   // If the path to (tileX, tileY) is not null then it means it is reachable
   public async isCoordReachable(
     tileX: number,
-    tileY: number
+    tileY: number,
+    strictPath: boolean
   ): Promise<boolean> {
     if (tileX < 0 || tileX >= this.mapManager.mapWidth) {
       return false;
@@ -159,12 +165,12 @@ export default class NavSpriteObject extends IsoSpriteObject {
       return false;
     }
 
-    return (await this.findPathTo(tileX, tileY)) !== null;
+    return (await this.findPathTo(tileX, tileY, strictPath)) !== null;
   }
 
   // find path to tileX and tileY and start moving towards there
-  public async navigateTo(tileX: number, tileY: number) {
-    this.pathFollowing = await this.findPathTo(tileX, tileY);
+  public async navigateTo(tileX: number, tileY: number, strictPath: boolean) {
+    this.pathFollowing = await this.findPathTo(tileX, tileY, strictPath);
     this.moveAlongPath();
   }
 

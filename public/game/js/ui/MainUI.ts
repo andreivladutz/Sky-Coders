@@ -28,7 +28,6 @@ export default class MainUI extends UIComponent {
     this.resources = new ResourcesStatus(uiScene, this);
 
     this.blocklyManager = BlocklyManager.getInstance();
-    this.blocklyManager.init(this.uiScene.cache);
   }
 
   // Enable the UI main buttons

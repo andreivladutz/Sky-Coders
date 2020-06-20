@@ -8,6 +8,7 @@ import IsoScene from "../IsoPlugin/IsoScene";
 import GameManager from "../online/GameManager";
 import LayersManager from "./LayersManager";
 import MapManager from "./MapManager";
+import BlocklyManager from "../Blockly/BlocklyManager";
 
 // Singleton class handling the loading of the actor resources
 export default class ActorsManager extends Manager {
@@ -47,6 +48,9 @@ export default class ActorsManager extends Manager {
         blocklyWorkspace: existingActor.workspaceBlockly
       });
     }
+
+    // After all characters have been inited, init the blockly manager
+    BlocklyManager.getInstance().init(gameScene.cache);
   }
 
   // Place an actor on the INITED map

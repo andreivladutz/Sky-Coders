@@ -105,7 +105,7 @@ export default class CodeInterpreter {
       yCoord: number,
       finishedCb: (b: boolean) => void
     ) => {
-      finishedCb(await this.actor.isCoordReachable(xCoord, yCoord));
+      finishedCb(await this.actor.isCoordReachable(xCoord, yCoord, true));
     };
 
     let getXCoordWrapper = () => {

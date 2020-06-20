@@ -61,6 +61,9 @@ export default class ResourcesUI extends UIComponent {
     });
 
     coin.animationTween.on("complete", () => {
+      coin.animationTween.remove();
+      coin.animationTween = null;
+
       this.coins.killAndHide(coin);
     });
   }

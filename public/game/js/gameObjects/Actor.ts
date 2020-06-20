@@ -155,28 +155,28 @@ export default class Actor extends NavSpriteObject {
   }
 
   // Keep it as a separate function so we can then remove the listener
+  // When navigating by user input do not navigate stricly, reaching the coordinate with the grid is enough
   private navigationHandler = (tile: TileXY) => {
     if (!this.tileCoordsOnThisGrid(tile.x, tile.y) && !this.walkingFromCode) {
-      this.navigateTo(tile.x, tile.y);
+      this.navigateTo(tile.x, tile.y, false);
     }
   };
 
   // Handle a navigation request from Blockly code.
   // While walking from code user walk commands are disabled
-  public navigationBlocklyHandler(x: number, y: number): Promise<any> {
+  public async navigationBlocklyHandler(x: number, y: number) {
     // Promise that resolves once the character reached its destination
-    let navigationEnded = new Promise(resolve => {
-      this.once(CST.NAV_OBJECT.EVENTS.IDLE, () => {
-        this.walkingFromCode = false;
+    // let navigationEnded = new Promise(resolve => {
+    //   this.once(CST.NAV_OBJECT.EVENTS.IDLE, () => {
 
-        resolve();
-      });
-    });
+    //     resolve();
+    //   });
+    // });
 
     this.walkingFromCode = true;
-    this.navigateTo(x, y);
-
-    return navigationEnded;
+    await this.navigateTo(x, y, true);
+    await this.destinationConclusion;
+    this.walkingFromCode = false;
   }
 
   // Overriden setTilePosition that also move the actor on the rexBoard
