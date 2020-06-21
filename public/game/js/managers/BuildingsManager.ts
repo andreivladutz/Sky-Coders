@@ -154,22 +154,27 @@ export default class BuildingsManager extends Manager
     this.resourcesManager.setResources(resourcesStatus);
   }
 
-  /**
-   * @param building The building that got placed on the client-side
-   * Let the server know and await its aknowledgement
-   */
-  public onBuildingPlaced(building: BuildingObject) {
+  /** Check if the user has sufficient funds to place @param building */
+  public hasSufficientFunds(building: BuildingObject) {
     let buildingCost = BuildingTypes[building.buildingType].buildCost;
     // The spend function return false if there are insufficient funds
     if (
       !this.resourcesManager.spendCollectResourcesClientSide(buildingCost, true)
     ) {
-      // TODO: TOAST INSUFFICIENT FUNDS
-      building.removeBuilding();
+      let lang = GameManager.getInstance().langFile;
+      this.resourcesManager.mainUi.toast.showMsg(lang.buildings.noFunds);
 
-      return;
+      return false;
     }
 
+    return true;
+  }
+
+  /**
+   * @param building The building that got placed on the client-side
+   * Let the server know and await its aknowledgement
+   */
+  public onBuildingPlaced(building: BuildingObject) {
     if (!this.buildsAwaitingSv[building.tileY]) {
       this.buildsAwaitingSv[building.tileY] = {};
     }

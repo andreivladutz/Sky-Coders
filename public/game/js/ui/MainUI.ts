@@ -11,7 +11,7 @@ import SocketManager from "../online/SocketManager";
 import BlocklyManager from "../Blockly/BlocklyManager";
 import SVGObject from "./uiObjects/SVGObject";
 import RoundRectObject from "./uiObjects/RoundRectObject";
-import CameraManager from "../managers/CameraManager";
+import Toast from "./uiObjects/Toast";
 
 type Image = Phaser.GameObjects.Image;
 const Image = Phaser.GameObjects.Image;
@@ -19,6 +19,7 @@ const Image = Phaser.GameObjects.Image;
 export default class MainUI extends UIComponent {
   public mainButtons: MainGameButtons;
   public resources: ResourcesStatus;
+  public toast: Toast;
   public blocklyManager: BlocklyManager;
 
   constructor(uiScene: UIScene, gameScene: IsoScene) {
@@ -28,6 +29,8 @@ export default class MainUI extends UIComponent {
     this.resources = new ResourcesStatus(uiScene, this);
 
     this.blocklyManager = BlocklyManager.getInstance();
+
+    this.toast = new Toast(uiScene);
   }
 
   // Enable the UI main buttons

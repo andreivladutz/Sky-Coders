@@ -108,7 +108,7 @@ export default class LayersManager extends Manager {
     }
 
     // notify astar worker to apply the layer but apply only buildings
-    if (id === CST.LAYERS.OBJ_ID.BUILDING) {
+    if (id === CST.LAYERS.OBJ_ID.BUILDING || id === CST.LAYERS.OBJ_ID.ORE) {
       this.notifyAstarWorker(objLayerTiles);
     }
     // for trees, add only the origin tile to the grid
@@ -154,7 +154,7 @@ export default class LayersManager extends Manager {
     }
 
     // notify astar worker to remove the layer but remove only buildings
-    if (id === CST.LAYERS.OBJ_ID.BUILDING) {
+    if (id === CST.LAYERS.OBJ_ID.BUILDING || id === CST.LAYERS.OBJ_ID.ORE) {
       this.notifyAstarWorker(gridTiles, true);
     }
     // for trees, remove only the origin tile from the grid

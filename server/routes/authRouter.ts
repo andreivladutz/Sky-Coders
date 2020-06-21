@@ -7,6 +7,8 @@ import User, { UserType } from "../models/User";
 import { redirectToLogin } from "../authentication/authenticateMiddleware";
 import { default as validation } from "../validation/UserValidation";
 import CST from "../SERVER_CST";
+import { LanguageIds } from "../../public/common/Languages/LangFileInterface";
+import LangManager from "../../public/common/Languages/LangManager";
 
 // If debugging is active this will write logs to the console
 const debug = Debug("authRouter");
@@ -44,7 +46,7 @@ function redirectAuthenticatedMw(
   res.redirect("/");
 }
 
-function logoutMw(req: express.Request, res: express.Response) {
+async function logoutMw(req: express.Request, res: express.Response) {
   let user = req.user as UserType;
   // If the user gets kicked we mimic logout without actually deleting the session
   let userKicked = req.query[CST.ROUTES.LOGOUT_PARAM.KICK];
@@ -66,11 +68,17 @@ function logoutMw(req: express.Request, res: express.Response) {
     req.logout();
   }
 
-  let logoutMessage = "You have been logged out!",
-    reason;
+  let lang = (
+    await LangManager.getInstance().get(
+      String(req.cookies[CST.LANGUAGE_COOKIE])
+    )
+  ).loginMessages;
+
+  let logoutMessage = lang.logoutMessage,
+    reason: any;
 
   if ((reason = req.query[CST.ROUTES.LOGOUT_PARAM.REASON])) {
-    logoutMessage += ` Reason: ${reason}`;
+    logoutMessage += ` ${lang.reason}: ${reason}`;
   }
 
   // Tell the redirection function the user is being kicked if there's a query param
@@ -79,6 +87,12 @@ function logoutMw(req: express.Request, res: express.Response) {
 
 async function registrationMw(req: express.Request, res: express.Response) {
   const { name, email, password, password_confirm }: UserRegCfg = req.body;
+
+  let lang = await LangManager.getInstance().get(
+    String(req.cookies[CST.LANGUAGE_COOKIE])
+  );
+  let loginMsgLang = lang.loginMessages;
+  let registerLang = lang.register;
 
   let user = new User({
     name,
@@ -93,6 +107,7 @@ async function registrationMw(req: express.Request, res: express.Response) {
   // And display the validation errors to the user
   if (errorMessages.length) {
     res.render("register", {
+      ...registerLang,
       errorMessages,
       name,
       email,
@@ -102,6 +117,7 @@ async function registrationMw(req: express.Request, res: express.Response) {
 
     return;
   }
+
   // Succesful registration, try to save the user
 
   try {
@@ -111,23 +127,76 @@ async function registrationMw(req: express.Request, res: express.Response) {
     await user.save();
   } catch (err) {
     res.statusCode = 500;
-    res.render("register");
+    res.render("register", registerLang);
 
     console.error(
       `Internal Error! could not save user ${user.name} to the database!`
     );
 
-    redirectToLogin(
-      req,
-      res,
-      "Registration failed! Please try again later!",
-      false
-    );
+    redirectToLogin(req, res, loginMsgLang.registerFailed, false);
 
     return;
   }
 
-  redirectToLogin(req, res, "You have been successfully registered!");
+  redirectToLogin(req, res, loginMsgLang.registerSuccessful);
+}
+
+// Render the login and register pages keeping count of the user selected language:
+
+async function handleLoginGet(req: express.Request, res: express.Response) {
+  let langManager = LangManager.getInstance();
+  // The language code saved in a cookie in the browser
+  let langCodeCookie = req.cookies[CST.LANGUAGE_COOKIE];
+  // The language code set as a query parameter. THIS HAS PRIORITY
+  let langCodeQuery = req.query[CST.ROUTES.LOGIN_PARAM.LANG_CODE] as string;
+
+  let langCode: string;
+
+  if (langCodeQuery) {
+    langCode = langCodeQuery;
+  } else {
+    langCode = langCodeCookie || "";
+  }
+
+  langCode = langManager.getLangCodeOrDefault(String(langCode));
+
+  // If the user selected another language as his primary language then save the choice in a cookie
+  if (langCodeQuery && langCode === langCodeQuery) {
+    res.cookie(CST.LANGUAGE_COOKIE, langCode);
+  }
+
+  let lang = (await langManager.get(langCode)).login;
+
+  let chosenLanguageId: {
+    flagCode: string;
+    langName: string;
+    langCode: string;
+  };
+  for (let languageDescr of LanguageIds) {
+    if (languageDescr.langCode === langCode) {
+      chosenLanguageId = languageDescr;
+      break;
+    }
+  }
+
+  res.render("login", {
+    ...lang,
+    // The current chosen language
+    flagCode: chosenLanguageId.flagCode,
+    langName: chosenLanguageId.langName,
+    // The rest of the languages and render details
+    langs: LanguageIds
+  });
+}
+
+async function handleRegisterGet(req: express.Request, res: express.Response) {
+  // The language code saved in a cookie in the browser
+  let lang = (
+    await LangManager.getInstance().get(
+      String(req.cookies[CST.LANGUAGE_COOKIE])
+    )
+  ).register;
+  res.render("register", lang);
 }
 
 const router = express.Router();
@@ -139,8 +208,8 @@ router
   .get("/logout", logoutMw)
   // If the user is already authenticated, redirect him to the game
   .use(redirectAuthenticatedMw)
-  .get("/login", (req, res) => res.render("login"))
-  .get("/register", (req, res) => res.render("register"))
+  .get("/login", handleLoginGet)
+  .get("/register", handleRegisterGet)
   // Handle login with passport
   .post(
     "/login",

@@ -4,6 +4,7 @@ import GameSubDoc, { GameType } from "./GameSchema";
 import { default as validate } from "../validation/UserValidation";
 // Hash the password before saving it to the db
 import * as bcrypt from "bcryptjs";
+import LangManager from "../../public/common/Languages/LangManager";
 
 type Document = mongoose.Document;
 
@@ -11,6 +12,8 @@ export interface UserType extends Document {
   name: string;
   email: string;
   password: string;
+  // The current chosen language code
+  languageCode: string;
   date?: Date;
   game?: GameType;
 
@@ -33,6 +36,10 @@ const UserSchema = new mongoose.Schema({
   },
   password: {
     type: String
+  },
+  languageCode: {
+    type: String,
+    enum: Object.keys(LangManager.LANGS)
   },
   date: {
     type: Date,

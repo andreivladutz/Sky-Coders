@@ -4,6 +4,7 @@ import socketIo from "socket.io";
 import * as http from "http";
 
 import flash from "connect-flash";
+import * as cookieParser from "cookie-parser";
 import * as session from "express-session";
 import * as passport from "passport";
 import * as mongoose from "mongoose";
@@ -49,6 +50,9 @@ export default class ConfigManager {
         saveUninitialized: true
       })
     );
+
+    // Parse the cookies
+    app.use(cookieParser());
 
     // Use passport middleware for auth
     app.use(passport.initialize());

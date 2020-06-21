@@ -182,6 +182,7 @@ export default class GameInstance extends EventEmitter {
     // Init the game on the client side by sending the intial cfg
     let gameConfig: Game.Config = {
       seed: this.seed,
+      languageCode: this.userDocument.languageCode,
       resources: this.userDocument.game.resources,
       buildings: this.currIslandDocument.buildings
     };

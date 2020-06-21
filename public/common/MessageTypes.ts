@@ -27,6 +27,8 @@ export namespace Game {
 
   export interface Config {
     seed: string;
+    // The choice of language from the login page
+    languageCode: string;
     resources: BuildingTypes.Resources;
     // The buildings already placed by the user on the map
     buildings: BuildingTypes.DbBuildingInfo[];

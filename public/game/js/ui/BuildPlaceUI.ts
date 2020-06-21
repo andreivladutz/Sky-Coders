@@ -6,6 +6,7 @@ import UIComponent from "./uiUtils/UIComponent";
 import CST from "../CST";
 import UIScene from "../scenes/UIScene";
 import MapManager from "../managers/MapManager";
+import BuildingsManager from "../managers/BuildingsManager";
 
 interface Tile {
   x: number;
@@ -68,7 +69,10 @@ export default class BuildPlaceUI extends UIComponent {
 
   // check if the building can be placed
   checkBuildingPlaceable(): boolean {
-    return this.buildPlacing.canBePlaced();
+    return (
+      this.buildPlacing.canBePlaced() &&
+      BuildingsManager.getInstance().hasSufficientFunds(this.buildPlacing)
+    );
   }
 
   // If the user chooses another building to place while placing

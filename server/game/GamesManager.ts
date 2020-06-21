@@ -7,6 +7,7 @@ import CST from "../SERVER_CST";
 
 import { NamespaceDebugger } from "../utils/debug";
 import MessageSender from "../../public/common/MessageHandlers/MessageSender";
+import LangManager from "../../public/common/Languages/LangManager";
 const debug = new NamespaceDebugger("GamesManager");
 
 // Singleton manager of the game instances
@@ -237,7 +238,7 @@ export default class GamesManager {
     // decrypt the user id
     let userId = cryptr.decrypt(encryptedId);
     // Retrieve the user
-    let user = await User.findById(userId);
+    let user = (await User.findById(userId)) as UserType;
 
     if (!user) {
       this.logoutUser(socket);
@@ -245,7 +246,13 @@ export default class GamesManager {
       return null;
     }
 
-    return user as UserType;
+    // Make sure the language code is correct
+    let langCode = LangManager.getInstance().getLangCodeOrDefault(
+      parsedCookies[CST.LANGUAGE_COOKIE]
+    );
+    user.languageCode = langCode;
+
+    return user;
   }
 
   private addDisconnectListener(user: UserType, socket: SocketIO.Socket) {

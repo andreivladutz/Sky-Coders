@@ -12,15 +12,12 @@ export enum TopLevelBlocks {
   COMMAND = "command"
 }
 
+const { TOPBLOCK_REGEX } = CST.BLOCKLY;
+
 export type CodeCommand = {
   name: string;
   code: string;
 };
-
-// If the top level block is not a command then it is an event
-function topLevelIsEvent(type: TopLevelBlocks) {
-  return type !== TopLevelBlocks.COMMAND;
-}
 
 export default class ActorCodeHandler {
   // Keep a reference to the parent Actor
@@ -32,6 +29,8 @@ export default class ActorCodeHandler {
   private registeredEvents: {
     [EventType: string]: () => void;
   }[] = [];
+  // A functions map of pairs (functionName, functionCode)
+  private functionsMap: Map<string, string>;
 
   // Each character has its terminal
   public terminal: CharacterTerminal;
@@ -47,6 +46,7 @@ export default class ActorCodeHandler {
     this.interpreter = new CodeInterpreter(this.parentActor);
   }
 
+  // First process the functions, then the rest of the top blocks
   public processTopBlocks(
     JavaScript: Generator,
     workspace: Workspace,
@@ -56,15 +56,12 @@ export default class ActorCodeHandler {
     this.codeCommands = [];
     this.unregisterCodeEvents();
 
-    for (let topBlock of topBlocks) {
-      // Generate the variables for the workspace
-      JavaScript.init(workspace);
-      // Generate the code for each top block
-      let blockCode = JavaScript.blockToCode(topBlock) as string;
-      // Append the extra generated functions
-      blockCode = JavaScript.finish(blockCode);
+    // A functions map of pairs (functionName, functionCode)
+    this.functionsMap = new Map();
 
-      this.processTopBlock(topBlock, blockCode);
+    // Process the functions:
+    for (let topBlock of topBlocks) {
+      this.processTopBlock(topBlock, workspace, JavaScript);
     }
   }
 
@@ -73,15 +70,38 @@ export default class ActorCodeHandler {
    * @param topBlock the block that's being processed
    * @param blockCode the block's string code to be run
    */
-  private processTopBlock(topBlock: Block, blockCode: string) {
+  private processTopBlock(
+    topBlock: Block,
+    workspace: Workspace,
+    JavaScript: Generator
+  ) {
+    // Generate the variables for the workspace
+    JavaScript.init(workspace);
+    // Generate the code for each top block
+    let blockCode = JavaScript.blockToCode(topBlock) as string;
+    // Append the extra generated functions
+    blockCode = JavaScript.finish(blockCode);
+
     let blockType = topBlock.type as TopLevelBlocks;
 
+    // The top level blocks can be procedures!
+    if (TOPBLOCK_REGEX.FUNCTION.test(blockType)) {
+      // Get the callable name of the function. It will be used to identify the function call inside the code
+      let functionName = JavaScript.variableDB_.getDistinctName(
+        topBlock.getFieldValue("NAME"),
+        Blockly.Procedures.NAME_TYPE
+      );
+
+      this.functionsMap.set(functionName, blockCode);
+      // Define the functions inside the scope of the interpreter so they can be run
+      this.interpreter.appendCode(blockCode);
+    }
     // The top level blocks can be events
-    if (topLevelIsEvent(blockType)) {
+    else if (TOPBLOCK_REGEX.EVENT.test(blockType)) {
       this.registerCodeEvent(blockType, blockCode);
     }
     // Or command blocks
-    else {
+    else if (TOPBLOCK_REGEX.COMMAND.test(blockType)) {
       this.codeCommands.push({
         name: topBlock.getFieldValue("NAME"),
         code: blockCode
@@ -128,18 +148,25 @@ export default class ActorCodeHandler {
 
   // Run the code for a command / event block
   public runBlocklyCode(code: string) {
-    this.terminal.commandsHandler.outputRunningCode(
-      code.trimLeft().split("\n")
-    );
+    code = code.trimLeft();
+    let outputCode = code;
 
-    let interpreter = this.interpreter;
-    interpreter.appendCode(code);
+    // Check if the block code runs any of the defined functions and output the code
+    for (let [functionName, functionCode] of this.functionsMap) {
+      // If the block code calls any function we have to append the function's code
+      if (~outputCode.search(functionName)) {
+        outputCode = `${functionCode}\n${outputCode}`;
+      }
+    }
+
+    this.terminal.commandsHandler.outputRunningCode(outputCode.split("\n"));
+    this.interpreter.appendCode(code);
 
     let step = () => {
       let shouldContinue: boolean;
 
       try {
-        shouldContinue = interpreter.stepThroughCode();
+        shouldContinue = this.interpreter.stepThroughCode();
       } catch (e) {
         this.terminal.commandsHandler.reportCodeError(e);
       }

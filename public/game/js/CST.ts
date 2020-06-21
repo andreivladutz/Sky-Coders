@@ -297,6 +297,11 @@ export default {
     Z_EFFECT: 40
   },
   UI: {
+    // Toast display message
+    TOAST: {
+      TRANSITION_TIME: 200,
+      DISPLAY_TIME: 2000
+    },
     // The coins' svgs
     COINS: {
       PATH: "svg/ui/coins/",
@@ -453,6 +458,12 @@ export default {
         FILENAME_SUFFIX: "_blocks.json",
         CATEGORIES: ["actions", "environment", "events"]
       }
+    },
+    // Regex used to identify the top blocks
+    TOPBLOCK_REGEX: {
+      FUNCTION: /^procedure/,
+      COMMAND: /^command$/,
+      EVENT: /^event/
     }
   },
   WINDOW: {

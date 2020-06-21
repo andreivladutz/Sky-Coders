@@ -1,9 +1,9 @@
 import AnimationHandler from "./AnimationHandler.js";
+import LoginLanguage from "../../users_route/js/Login/loginLanguage.js";
 
 const BTN_ID = "login-btn";
 const EMAIL = "email";
 const PASS = "password";
-const LOGIN_PATH = "/users/login";
 
 function redirectTo(route) {
   location.href = route;
@@ -16,6 +16,9 @@ function redirectTo(route) {
   if (!loginButton) {
     return;
   }
+
+  // A class that handles login language picking
+  let loginLang = new LoginLanguage();
 
   // Add a listener for the login success animation ending
   animHandler.onAnimationComplete = () => {
@@ -55,7 +58,7 @@ function redirectTo(route) {
           animHandler.playLoginSuccess();
         }
       } catch (err) {
-        redirectTo(LOGIN_PATH);
+        redirectTo(loginLang.currentRoute);
       }
     }
     // The content is html so probably the login credentials were not correct
@@ -73,7 +76,7 @@ function redirectTo(route) {
           insertAnimation();
         };
       } catch (err) {
-        redirectTo(LOGIN_PATH);
+        redirectTo(loginLang.currentRoute);
       }
     }
   };

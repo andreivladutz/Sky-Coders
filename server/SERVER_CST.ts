@@ -18,6 +18,7 @@ export default {
   SESSION_COOKIE: {
     ID: "sessId"
   },
+  LANGUAGE_COOKIE: "langCookie",
   EVENTS: {
     GAME: {
       INITED: "gameinited"
@@ -29,10 +30,13 @@ export default {
       // User gets kicked if he tries to connect on
       // multiple pages / devices
       KICK: "kick"
+    },
+    LOGIN_PARAM: {
+      LANG_CODE: "lang"
     }
   },
   GAME_CONFIG: {
-    INITIAL_COINS: 90000000
+    INITIAL_COINS: 100
   },
   GAME_INSTANCE: {
     // Update the game instance and save to db every 20s
