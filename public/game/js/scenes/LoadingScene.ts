@@ -4,6 +4,7 @@ import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js
 
 // kick the load subscribing of these Managers
 // TODO: find a neater way
+import "../managers/AudioManager";
 import "../managers/ActorsManager";
 import "../managers/MapManager";
 import "../managers/EnvironmentManager";
@@ -42,7 +43,7 @@ export default class LoadingScene extends Phaser.Scene {
   }
 
   preload() {
-    this.load.setBaseURL("./game/assets/");
+    this.load.setBaseURL(CST.BASE_URL);
 
     this.load.rexAwait(async (succesCb: () => void) => {
       this.load.setPrefix();

@@ -1,15 +1,22 @@
 import UIScene from "../../scenes/UIScene";
 import CST from "../../CST";
 import UIComponents from "../UIComponentsFactory";
+import BuildMenuUI from "../BuildMenuUI";
+import IsoScene from "../../IsoPlugin/IsoScene";
 
+// TODO: Adapt fontsize to the screen
+// TODO: hide coins that appear over the toast
 // A pop-up message class
 export default class Toast {
   private toast: any;
   private uiScene: UIScene;
+  private gameScene: IsoScene;
   private lastShown = 0;
 
-  constructor(uiScene: UIScene) {
+  constructor(uiScene: UIScene, gameScene: IsoScene) {
     this.uiScene = uiScene;
+    this.gameScene = gameScene;
+
     this.toast = this.uiScene.rexUI.add.toast({
       anchor: {
         left: "center",
@@ -56,18 +63,30 @@ export default class Toast {
     this.repositionToast();
   }
 
+  // Reposition the toast on each message show
   private repositionToast() {
-    let uiComps = UIComponents.getInstance();
-    let cancelBtnFrame = uiComps.buttonsFrames[CST.BUTTONS.TYPES.CANCEL];
-    let texture = uiComps.getTextureKey();
-    // get the the height of the cancel button
-    let { width, height } = this.uiScene.textures.get(texture).frames[
-      cancelBtnFrame
-    ];
+    let buildMenuUi = UIComponents.getUIComponents(
+      BuildMenuUI,
+      this.uiScene,
+      this.gameScene
+    )[0];
+
+    let offsetWidth = 0,
+      offsetHeight = 0;
+    // If the build menu is enabled, offset the toast messages so they don't overlap the cancel / ok buttons
+    if (buildMenuUi.isEnabled) {
+      let uiComps = UIComponents.getInstance();
+      let cancelBtnFrame = uiComps.buttonsFrames[CST.BUTTONS.TYPES.CANCEL];
+      let texture = uiComps.getTextureKey();
+      // get the the height of the cancel button
+      ({ width: offsetWidth, height: offsetHeight } = this.uiScene.textures.get(
+        texture
+      ).frames[cancelBtnFrame]);
+    }
+
     let { width: gameWidth } = this.uiScene.game.scale.gameSize;
 
-    console.log(this.toast);
-    this.toast._y = height * 1.2;
-    this.toast._x = gameWidth / 2 + width;
+    this.toast._y = offsetHeight / 2 + this.toast.childrenHeight;
+    this.toast._x = gameWidth / 2 + offsetWidth;
   }
 }

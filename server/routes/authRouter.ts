@@ -68,17 +68,25 @@ async function logoutMw(req: express.Request, res: express.Response) {
     req.logout();
   }
 
-  let lang = (
-    await LangManager.getInstance().get(
-      String(req.cookies[CST.LANGUAGE_COOKIE])
-    )
-  ).loginMessages;
+  let lang = await LangManager.getInstance().get(
+    String(req.cookies[CST.LANGUAGE_COOKIE])
+  );
+  let loginMsgs = lang.loginMessages,
+    logoutMsgs = lang.logout;
 
-  let logoutMessage = lang.logoutMessage,
+  let logoutMessage = loginMsgs.logoutMessage,
     reason: any;
 
   if ((reason = req.query[CST.ROUTES.LOGOUT_PARAM.REASON])) {
-    logoutMessage += ` ${lang.reason}: ${reason}`;
+    switch (reason) {
+      case CST.ROUTES.LOGOUT_REASONS.OTHER_DEVICE:
+        reason = logoutMsgs.anotherDeviceReason;
+        break;
+      default:
+        reason = "";
+    }
+
+    if (reason) logoutMessage += ` ${loginMsgs.reason}: ${reason}`;
   }
 
   // Tell the redirection function the user is being kicked if there's a query param

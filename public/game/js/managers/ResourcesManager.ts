@@ -30,6 +30,10 @@ export default class ResourcesManager extends Manager {
     this.mainUi.resources.updateCoinsValue(this.currentResources.coins);
   }
 
+  public resetResources() {
+    this.setResources(this.currentResources);
+  }
+
   // Updates coming from the server => resourcesAfterPlacement or resourcesAfterCollect
   public setResources(resources: Resources) {
     this.setCoins(resources.coins);

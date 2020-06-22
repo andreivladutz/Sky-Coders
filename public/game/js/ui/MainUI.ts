@@ -12,6 +12,8 @@ import BlocklyManager from "../Blockly/BlocklyManager";
 import SVGObject from "./uiObjects/SVGObject";
 import RoundRectObject from "./uiObjects/RoundRectObject";
 import Toast from "./uiObjects/Toast";
+import GameManager from "../online/GameManager";
+import ResourcesManager from "../managers/ResourcesManager";
 
 type Image = Phaser.GameObjects.Image;
 const Image = Phaser.GameObjects.Image;
@@ -30,12 +32,14 @@ export default class MainUI extends UIComponent {
 
     this.blocklyManager = BlocklyManager.getInstance();
 
-    this.toast = new Toast(uiScene);
+    this.toast = new Toast(uiScene, gameScene);
   }
 
   // Enable the UI main buttons
   async enable(): Promise<void> {
-    return this.mainButtons.show();
+    // TODO: Hack to position coins correctly but it's visible at the begining of the game
+    ResourcesManager.getInstance().resetResources();
+    await this.mainButtons.show();
   }
 
   turnOff(): Promise<void> {
@@ -80,7 +84,9 @@ class MainUIButon extends ButtonImage<MainUI> {
         let selectedActor = ActorsManager.getInstance().selectedActor;
 
         if (!selectedActor) {
-          // TODO: TOAST "NO ACTOR IS SELECTED"
+          let langFile = GameManager.getInstance().langFile;
+          this.parentUI.toast.showMsg(langFile.actors.cannotOpenWorkspace);
+
           return;
         }
 
@@ -135,7 +141,8 @@ class ResourcesStatus {
       goldCoinKey
     )
       .setOrigin(1, 0.5)
-      .setWidth(coinSize);
+      .setWidth(coinSize)
+      .setDepth(CST.UI.HTML_LAYER.DECORATIONS);
 
     this.coinsBg = new RoundRectObject(
       this.uiScene,
@@ -161,10 +168,14 @@ class ResourcesStatus {
     let coinSize = height * COINS.RATIO;
 
     // Center the icon on the bottom bar
-    this.coinsIcon.y = gameScale.height - coinSize + (height - coinSize) * 0.5;
-    this.coinsBg.y = gameScale.height - this.paddingSize / 2;
+    this.coinsIcon.y =
+      gameScale.height -
+      coinSize +
+      (height - coinSize) * 0.5 +
+      this.paddingSize / 2;
+    this.coinsBg.y = gameScale.height - this.paddingSize / 4;
 
-    this.coinsBg.x = gameScale.width - this.paddingSize * 2;
+    this.coinsBg.x = gameScale.width - this.paddingSize * 4;
     this.coinsIcon.x =
       this.coinsBg.x - this.coinsBg.displayWidth - this.paddingSize * 4;
   }

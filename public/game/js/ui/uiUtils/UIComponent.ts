@@ -6,8 +6,15 @@ export default abstract class UIComponent {
   uiScene: UIScene;
   gameScene: IsoScene;
 
-  abstract enable(...args: any[]): any;
-  abstract turnOff(...args: any[]): any;
+  // TO COUNT ON THIS PROPERTY super.enable() AND super.turnOff() SHOULD BE CALLED!
+  public isEnabled = false;
+
+  public enable(...args: any[]): any {
+    this.isEnabled = true;
+  }
+  public turnOff(...args: any[]): any {
+    this.isEnabled = false;
+  }
 
   constructor(uiScene: UIScene, gameScene: IsoScene) {
     this.uiScene = uiScene;

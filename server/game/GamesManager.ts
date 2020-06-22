@@ -93,17 +93,14 @@ export default class GamesManager {
       for (let otherDeviceGame of otherGames) {
         if (otherDeviceGame !== newGameInstance) {
           // Just a kick
-          otherDeviceGame.logout(
-            "This account connected on another device",
-            true
-          );
+          otherDeviceGame.logout(CST.ROUTES.LOGOUT_REASONS.OTHER_DEVICE, true);
         }
       }
     });
   }
 
   /**  Logout a specific user connected to @param socket
-   *  A @param reason for logging out can be provided, in which case,
+   *  A @param reason (a code from SERVER_CST) for logging out can be provided, in which case,
    *  a message will be shown to the user after logging out
    */
   public logoutUser(

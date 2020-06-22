@@ -33,6 +33,9 @@ export default {
     },
     LOGIN_PARAM: {
       LANG_CODE: "lang"
+    },
+    LOGOUT_REASONS: {
+      OTHER_DEVICE: "od"
     }
   },
   GAME_CONFIG: {

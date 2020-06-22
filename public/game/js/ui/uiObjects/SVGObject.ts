@@ -1,4 +1,4 @@
-const TY = 5;
+import CST from "../../CST";
 
 export default class SVGObject extends Phaser.GameObjects.DOMElement {
   // Importing Illustrator SVGs needs classes' numbers changed
@@ -12,6 +12,7 @@ export default class SVGObject extends Phaser.GameObjects.DOMElement {
 
     this.createFromHTML(this.processSVGText(scene.cache.html.get(cacheKey)));
     this.scene.add.existing(this);
+    this.node.classList.add(CST.UI.SVG.DEFAULT_CLASS);
 
     SVGObject.instances++;
   }

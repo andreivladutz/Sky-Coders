@@ -1,4 +1,5 @@
 import LangFile from "./LangFileInterface";
+import { BuildNames } from "../BuildingTypes";
 
 const ro: LangFile = {
   login: {
@@ -23,6 +24,9 @@ const ro: LangFile = {
     placeholdPass: "Creați o Parolă",
     placeholdConfirmPass: "Confirmă Parola"
   },
+  logout: {
+    anotherDeviceReason: "Un alt device s-a conectat cu acest cont."
+  },
   // Messages displayed to the user on the login page
   loginMessages: {
     logoutMessage: "Ați fost delogat!",
@@ -32,7 +36,21 @@ const ro: LangFile = {
   },
   // Game toasts and such
   buildings: {
-    noFunds: "Nu aveți resurse suficiente!"
+    noFunds: "Nu aveți resurse suficiente!",
+    cannotPlace: "O clădire nu poate fi plasată aici!",
+    noActorSelected: "Selectați un caracter pentru a culege resursele!",
+    names: {
+      [BuildNames.residential]: "Clădire Rezidențială"
+    },
+    description: {
+      prodReady:
+        "Producția este gata. Trimiteți un caracter să colecteze resursele.",
+      prodNotReady: "Producția va fi gata în: "
+    }
+  },
+  actors: {
+    cannotOpenWorkspace:
+      "Selectați un caracter pentru a deschide editorul de cod!"
   }
 };
 

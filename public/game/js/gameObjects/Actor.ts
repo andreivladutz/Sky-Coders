@@ -17,6 +17,7 @@ import ActorCodeHandler from "./ActorCodeHandler";
 import CameraManager from "../managers/CameraManager";
 import CommonCST from "../../../common/CommonCST";
 import BlocklyManager from "../Blockly/BlocklyManager";
+import AudioManager from "../managers/AudioManager";
 
 // mapping event to directions
 const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
@@ -66,6 +67,7 @@ export interface ActorConfig {
 
 export default class Actor extends NavSpriteObject {
   private actorsManager: ActorsManager = ActorsManager.getInstance();
+  private audioManager: AudioManager = AudioManager.getInstance();
 
   private walking: boolean = false;
   private direction: ACTOR_DIRECTIONS = ACTOR_DIRECTIONS.SE;
@@ -101,6 +103,17 @@ export default class Actor extends NavSpriteObject {
     this.codeHandler.blocklyWorkspace = config.blocklyWorkspace;
 
     this.idleAnim();
+  }
+
+  // Override the trigger so we can play the footsteps sounds once this character gets going
+  protected async onStartedFollowingPath() {
+    this.audioManager.playFootsteps(this);
+
+    await this.destinationConclusion;
+
+    if (!this.pathFollowing || !this.pathFollowing.length) {
+      this.audioManager.stopFootsteps(this);
+    }
   }
 
   public focusCamera(): this {
@@ -165,14 +178,6 @@ export default class Actor extends NavSpriteObject {
   // Handle a navigation request from Blockly code.
   // While walking from code user walk commands are disabled
   public async navigationBlocklyHandler(x: number, y: number) {
-    // Promise that resolves once the character reached its destination
-    // let navigationEnded = new Promise(resolve => {
-    //   this.once(CST.NAV_OBJECT.EVENTS.IDLE, () => {
-
-    //     resolve();
-    //   });
-    // });
-
     this.walkingFromCode = true;
     await this.navigateTo(x, y, true);
     await this.destinationConclusion;

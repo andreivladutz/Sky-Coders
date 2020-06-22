@@ -9,6 +9,7 @@ import IsoScene from "../IsoPlugin/IsoScene";
 import BuildingTypes, { BuildNames } from "../../../common/BuildingTypes";
 import ActorsManager from "../managers/ActorsManager";
 import { SVGCoin } from "../ui/ResourcesUI";
+import GameManager from "../online/GameManager";
 
 interface Tile {
   x: number;
@@ -33,6 +34,10 @@ export default class BuildingObject extends IsoSpriteObject {
   // whether the building can be placed at current tile positions or not
   private canBePlacedHere: boolean = false;
   protected buildingsManager: BuildingsManager = BuildingsManager.getInstance();
+
+  // The PopoverObject will be imported dynamically the first time it is used
+  // The class is available as property on the BuildingsManager
+  private popoverObjInstance: import("../ui/uiObjects/bootstrapObjects/PopoverObject").default;
 
   /**
    * @param buildingType from CST.BUILDING.TYPES
@@ -90,12 +95,69 @@ export default class BuildingObject extends IsoSpriteObject {
 
       this.isProductionReady = false;
     }
+
+    // If a popover is visible, update the timer
+    if (this.popoverObjInstance) {
+      this.popoverObjInstance.updateContent(this.getCurrentDescription());
+    }
   }
 
   public makeInteractive(): this {
-    return this.makeSelectable().setSelectedTintColor(
-      CST.BUILDINGS.SELECTION_TINT
+    this.makeSelectable().setSelectedTintColor(CST.BUILDINGS.SELECTION_TINT);
+
+    this.on(CST.EVENTS.OBJECT.LONG_HOVER, this.handleLongHover, this);
+
+    this.on("pointerout", () => {
+      if (this.popoverObjInstance) {
+        this.popoverObjInstance.hidePopover();
+        this.popoverObjInstance = null;
+      }
+    });
+
+    return this;
+  }
+
+  // Show a popover with details about this building
+  protected async handleLongHover() {
+    if (!this.buildingsManager.PopoverObject) {
+      this.buildingsManager.PopoverObject = (
+        await import("../ui/uiObjects/bootstrapObjects/PopoverObject")
+      ).default;
+    }
+
+    let lang = GameManager.getInstance().langFile;
+    let pointer = this.scene.input.activePointer;
+
+    this.popoverObjInstance = this.buildingsManager.PopoverObject.getInstance(
+      this.scene as IsoScene,
+      pointer.worldX,
+      pointer.worldY
+    ).showPopover(
+      lang.buildings.names[this.buildingType],
+      this.getCurrentDescription()
     );
+  }
+
+  // If the production is not ready yet show a timer
+  // Otherwise show a finishedProd description
+  protected getCurrentDescription() {
+    let descr = GameManager.getInstance().langFile.buildings.description;
+
+    if (this.isProductionReady) {
+      return descr.prodReady;
+    } else {
+      let timeSinceLastProd = Date.now() - this.lastProdTime;
+      let remainingTime = Math.floor(
+        (BuildingTypes[this.buildingType].productionTime - timeSinceLastProd) /
+          1000
+      );
+      let remainingMins = Math.floor(remainingTime / 60);
+      let remainingSec = remainingTime % 60;
+
+      return `${descr.prodNotReady}${
+        remainingMins < 10 ? "0" + remainingMins : remainingMins
+      }:${remainingSec < 10 ? "0" + remainingSec : remainingSec}`;
+    }
   }
 
   // Handler function for "pointerup" event. Override the one in IsoSpriteObject
@@ -114,6 +176,10 @@ export default class BuildingObject extends IsoSpriteObject {
       if (reachedDest && this.isProductionReady) {
         this.buildingsManager.collectBuilding(this);
       }
+    } else {
+      let langFile = GameManager.getInstance().langFile;
+      let mainUi = this.buildingsManager.resourcesManager.mainUi;
+      mainUi.toast.showMsg(langFile.buildings.noActorSelected);
     }
   }
 

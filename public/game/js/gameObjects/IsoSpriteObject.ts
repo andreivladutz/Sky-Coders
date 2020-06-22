@@ -110,6 +110,9 @@ export default class IsoSpriteObject extends IsoSprite {
   private pressWasFired: boolean = false;
   private pressTimeout: any;
 
+  // Timeout used to determine if the user hovered a game object for long
+  private longHoverTimeout: any;
+
   // tile coords of this object
   // CAN BE FLOATING POINT NUMBERS!!!
   protected tileCoords: Phaser.Geom.Point = new Phaser.Geom.Point();
@@ -218,11 +221,16 @@ export default class IsoSpriteObject extends IsoSprite {
       .on("pointerover", () => {
         // prevent tilemove events propagating to the map
         this.mapManager.events.registerDefaultPrevention(this);
-
         this.setTint(this.selectedTintColor);
+
+        this.longHoverTimeout = setTimeout(() => {
+          this.emit(CST.EVENTS.OBJECT.LONG_HOVER);
+        }, CST.EVENTS.OBJECT.HOVER_TIME);
       })
       .on("pointerout", () => {
         this.mapManager.events.unregisterDefaultPrevention();
+
+        clearTimeout(this.longHoverTimeout);
 
         if (!this.selected) {
           this.clearTint();

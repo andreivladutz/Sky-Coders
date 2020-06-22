@@ -8,6 +8,8 @@ import { MoveUIUtility, MoveUIDirection } from "./uiUtils/UIMovement";
 import UIComponents from "./UIComponentsFactory";
 import BuildPlaceUI from "./BuildPlaceUI";
 import { BuildNames } from "../../../common/BuildingTypes";
+import GameManager from "../online/GameManager";
+import MainUI from "./MainUI";
 
 const BUILD_MENU = CST.UI.BUILD_MENU;
 
@@ -32,7 +34,13 @@ class SideMenuButton extends ButtonImage<BuildMenuUI> {
           // Place the building and transition to the build menu state
           stateMachine.transitionTo(CST.STATES.BUILD_MENU);
         } else {
-          // TODO: building not placeable. should show toast with msg: "CANNOT PLACE BUILDING HERE"
+          let langFile = GameManager.getInstance().langFile;
+          let mainUi = UIComponents.getUIComponents(
+            MainUI,
+            this.parentUI.uiScene,
+            this.parentUI.gameScene
+          )[0] as MainUI;
+          mainUi.toast.showMsg(langFile.buildings.cannotPlace);
         }
 
         break;
@@ -78,6 +86,7 @@ export default class BuildMenuUI extends UIComponent {
   }
 
   enable(): Promise<void> {
+    super.enable();
     // show the side menu
     this.scrollPanel.setVisible(true);
     // show the confirmation buttons
@@ -95,7 +104,7 @@ export default class BuildMenuUI extends UIComponent {
     });
 
     await this.moveLeft();
-
+    super.turnOff();
     this.scrollPanel.setVisible(false).layout();
   }
 

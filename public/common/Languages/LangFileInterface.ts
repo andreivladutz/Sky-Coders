@@ -22,6 +22,9 @@ export default interface LangFile {
     placeholdPass: string;
     placeholdConfirmPass: string;
   };
+  logout: {
+    anotherDeviceReason: string;
+  };
   // Messages displayed to the user on the login page
   loginMessages: {
     logoutMessage: string;
@@ -32,6 +35,19 @@ export default interface LangFile {
   // Game toasts and such
   buildings: {
     noFunds: string;
+    cannotPlace: string;
+    noActorSelected: string;
+    // Translations of the buildings names
+    names: {
+      [buildingName: string]: string;
+    };
+    description: {
+      prodReady: string;
+      prodNotReady: string;
+    };
+  };
+  actors: {
+    cannotOpenWorkspace: string;
   };
 }
 

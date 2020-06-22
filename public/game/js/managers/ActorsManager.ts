@@ -22,7 +22,7 @@ export default class ActorsManager extends Manager {
 
   // Init all characters coming from the server (all positioned)
   // And position the characters that have to be positioned
-  public initCharacters(gameScene: IsoScene) {
+  public initCharacters(gameScene: IsoScene): this {
     // Ack functions that take in the position of the new actor
     for (let [characterInfo, positionAck] of this.charaMsgr.positioningAcks) {
       let actor = new Actor({
@@ -51,6 +51,8 @@ export default class ActorsManager extends Manager {
 
     // After all characters have been inited, init the blockly manager
     BlocklyManager.getInstance().init(gameScene.cache);
+
+    return this;
   }
 
   // Place an actor on the INITED map

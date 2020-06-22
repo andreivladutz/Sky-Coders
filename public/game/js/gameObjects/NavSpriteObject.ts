@@ -87,6 +87,9 @@ export default class NavSpriteObject extends IsoSpriteObject {
     }
   }
 
+  // To be overriden in superclasses
+  protected async onStartedFollowingPath() {}
+
   protected get pathFollowing(): TileXY[] {
     return this._pathFollowing;
   }
@@ -108,6 +111,10 @@ export default class NavSpriteObject extends IsoSpriteObject {
     });
 
     this._pathFollowing = path;
+
+    if (path && path.length) {
+      this.onStartedFollowingPath();
+    }
   }
 
   // a way to cancel this object's movement
@@ -208,18 +215,27 @@ export default class NavSpriteObject extends IsoSpriteObject {
     const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING;
 
     // Angle between current tile and next tile
-    let angle =
+    let angle = Math.floor(
       (Phaser.Math.Angle.BetweenPoints({ x, y }, this.tileCoords) * 180) /
-      Math.PI;
+        Math.PI
+    );
+
+    let isCloseTo = function(angle: number, realAngle: number) {
+      if (Math.abs(angle - realAngle) <= CST.NAV_OBJECT.DIAGONAL_PROXIMITY) {
+        return true;
+      }
+
+      return false;
+    };
 
     // Diagonals first
-    if (angle === 45) {
+    if (isCloseTo(angle, 45)) {
       this.emit(WALK_EV.NW);
-    } else if (angle === 135) {
+    } else if (isCloseTo(angle, 135)) {
       this.emit(WALK_EV.NE);
-    } else if (angle === -135) {
+    } else if (isCloseTo(angle, -135)) {
       this.emit(WALK_EV.SE);
-    } else if (angle === -45) {
+    } else if (isCloseTo(angle, -45)) {
       this.emit(WALK_EV.SW);
     }
     // Walk left

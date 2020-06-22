@@ -42,6 +42,12 @@ export interface MultiatlasConfig {
   };
 }
 
+export interface AudioConfig {
+  PREFIX: string;
+  PATH: string;
+  FILES: { KEY: string; URLS: string[] }[];
+}
+
 export default {
   GAME: {
     WIDTH: 1920,
@@ -55,6 +61,8 @@ export default {
     GAME: "GAME",
     UI: "UISCENE"
   },
+  // Base url for the game assets
+  BASE_URL: "./game/assets/",
   // terrain generation parameters
   MAP: {
     WIDTH: 128,
@@ -208,6 +216,8 @@ export default {
   },
   NAV_OBJECT: {
     SPEED: 400,
+    // How far an angle from the real diagonal is considered a diagonal
+    DIAGONAL_PROXIMITY: 2,
     // Make the speed relative to this tilesize
     IDEAL_TILESIZE: 128,
     EVENTS: {
@@ -247,9 +257,11 @@ export default {
       SELECT: "object.select",
       DESELECT: "object.deselect",
       PRESS: "object.press",
+      LONG_HOVER: "object.longhover",
       // Time needed for the pointerdown event
       // to be considered a press event
-      PRESS_TIME: 300
+      PRESS_TIME: 300,
+      HOVER_TIME: 1000
     },
     ARROWS_UI: {
       TAP: "arrow.tapped"
@@ -297,10 +309,36 @@ export default {
     Z_EFFECT: 40
   },
   UI: {
+    HTML_LAYER: {
+      BG_UI: 0,
+      DECORATIONS: 1,
+      POPOVER: 2
+    },
+    POPOVER: {
+      HTML_ELEMENT: "a",
+      // Set these attributes to append content to the popover
+      TITLE_ATTRIB: "title",
+      CONTENT_ATTRIB: "data-content",
+      // The query used to get the popovers
+      QUERY: "#gamePopover",
+      DEFAULT_STYLE: {
+        visibility: "hidden"
+      },
+      // The attributes to set on the anchor element at first
+      INIT_ATTRIBS: {
+        tabindex: "0",
+        "data-toggle": "popover",
+        "data-trigger": "manual",
+        id: "gamePopover"
+      }
+    },
     // Toast display message
     TOAST: {
       TRANSITION_TIME: 200,
       DISPLAY_TIME: 2000
+    },
+    SVG: {
+      DEFAULT_CLASS: "SVGObject"
     },
     // The coins' svgs
     COINS: {
@@ -509,6 +547,55 @@ export default {
       START: "\x1B[1;3;",
       END: "\x1B[0m"
     }
+  },
+  LANGUAGE_CODES: {
+    ENGLISH: "en",
+    ROMANIAN: "ro"
+  },
+  AUDIO: {
+    FOOTSTEPS: {
+      PREFIX: "ENVIRONMENT.",
+      PATH: "audio/environment/footsteps/",
+      FILES: [
+        { KEY: "step1", URLS: ["stepdirt_1.wav"] },
+        { KEY: "step2", URLS: ["stepdirt_2.wav"] },
+        { KEY: "step3", URLS: ["stepdirt_3.wav"] },
+        { KEY: "step4", URLS: ["stepdirt_4.wav"] }
+      ]
+    },
+    SOUNDTRACK: {
+      PREFIX: "SOUNDTRACK.",
+      PATH: "audio/soundtrack/",
+      FILES: [
+        {
+          KEY: "mainTrack",
+          URLS: ["Winds Of Stories.mp3", "Winds Of Stories.ogg"]
+        }
+      ]
+    },
+    UI: {
+      PREFIX: "UI_AUDIO.",
+      PATH: "audio/ui/",
+      FILES: [
+        { KEY: "click", URLS: ["click.wav"] },
+        { KEY: "coin", URLS: ["coin.wav"] }
+      ]
+    },
+    // KEYS USED TO GET THE AUDIO
+    KEYS: {
+      FOOTSTEPS: [
+        "ENVIRONMENT.step1",
+        "ENVIRONMENT.step2",
+        "ENVIRONMENT.step3",
+        "ENVIRONMENT.step4"
+      ],
+      SOUNDTRACKS: ["SOUNDTRACK.mainTrack"],
+      CLICK: "UI_AUDIO.click",
+      COIN: "UI_AUDIO.coin"
+    },
+    SOUNDTRACK_VOLUME: 0.1,
+    FOOTSTEPS_VOLUME: 0.15,
+    FOOTSTEPS_RATE: 0.9
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST,

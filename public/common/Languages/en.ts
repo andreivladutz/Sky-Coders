@@ -1,4 +1,5 @@
 import LangFile from "./LangFileInterface";
+import { BuildNames } from "../BuildingTypes";
 
 const en: LangFile = {
   login: {
@@ -23,6 +24,9 @@ const en: LangFile = {
     placeholdPass: "Create a Password",
     placeholdConfirmPass: "Confirm Password"
   },
+  logout: {
+    anotherDeviceReason: "This account connected on another device"
+  },
   // Messages displayed to the user on the login page
   loginMessages: {
     logoutMessage: "You have been logged out!",
@@ -32,7 +36,20 @@ const en: LangFile = {
   },
   // Game toasts and such
   buildings: {
-    noFunds: "Insufficient funds!"
+    noFunds: "Insufficient funds!",
+    cannotPlace: "The building cannot be placed here!",
+    noActorSelected: "Select a character to collect the building!",
+    names: {
+      [BuildNames.residential]: "Residential Building"
+    },
+    description: {
+      prodReady:
+        "The production is ready. Send a character to collect the resources.",
+      prodNotReady: "The production will be ready in: "
+    }
+  },
+  actors: {
+    cannotOpenWorkspace: "Select a character to open the code editor!"
   }
 };
 

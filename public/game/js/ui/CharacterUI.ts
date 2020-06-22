@@ -14,8 +14,6 @@ export default class CharacterUI extends UIComponent {
   private commandsMenu: any;
   private commandsMenuClosed: boolean = true;
 
-  public isEnabled = false;
-
   public constructor(uiScene: UIScene, gameScene: IsoScene) {
     super(uiScene, gameScene);
 
@@ -53,14 +51,13 @@ export default class CharacterUI extends UIComponent {
       selectedActor.focusCamera();
     };
 
-    this.isEnabled = true;
+    super.enable();
   }
 
   public turnOff() {
+    super.turnOff();
+
     this.characterContainer.style.display = "none";
-
-    this.isEnabled = false;
-
     this.destroyCommandsMenu();
   }
 

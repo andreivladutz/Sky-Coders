@@ -8,6 +8,7 @@ import * as roLang from "blockly/msg/ro";
 import * as enLang from "blockly/msg/en";
 import ActorCodeHandler from "../gameObjects/ActorCodeHandler";
 import ActorsManager from "../managers/ActorsManager";
+import GameManager from "../online/GameManager";
 
 const JavaScript: Generator = (Blockly as any).JavaScript;
 
@@ -206,13 +207,21 @@ export default class BlocklyManager extends Manager {
       blockDefs = blockDefs.concat(cache.json.get(blockDefKey));
     }
 
+    // TODO: Change the custom block localization. No need to import all locales
     defineCustomBlocks(blockDefs, {
       RO: roLang,
       EN: enLang
     });
 
-    //Blockly.setLocale(enLang);
-    Blockly.setLocale(roLang);
+    let chosenLangCode = GameManager.getInstance().chosenLangCode;
+    switch (chosenLangCode) {
+      case CST.LANGUAGE_CODES.ROMANIAN:
+        Blockly.setLocale(roLang);
+        break;
+      case CST.LANGUAGE_CODES.ENGLISH:
+      default:
+        Blockly.setLocale(enLang);
+    }
   }
 
   // Load the toolbox xml

@@ -24,7 +24,11 @@ export default class BuildingsManager extends Manager
   loadResources: (load: Phaser.Loader.LoaderPlugin) => void;
   getTextureKey: () => string;
 
-  private resourcesManager: ResourcesManager;
+  // The PopoverObject will be imported dynamically the first time it is used
+  // This class is being used by the BuildingObject children
+  public PopoverObject: typeof import("../ui/uiObjects/bootstrapObjects/PopoverObject").default;
+
+  public resourcesManager: ResourcesManager;
   // Keep a reference to all the game building objects
   public sceneBuildings: Group;
 

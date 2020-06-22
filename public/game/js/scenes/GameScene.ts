@@ -6,6 +6,7 @@ import CameraManager from "../managers/CameraManager";
 import MapManager from "../managers/MapManager";
 import BuildingsManager from "../managers/BuildingsManager";
 import ActorsManager from "../managers/ActorsManager";
+import AudioManager from "../managers/AudioManager";
 
 export default class GameScene extends IsoScene {
   constructor() {
@@ -60,13 +61,12 @@ export default class GameScene extends IsoScene {
     // Place the buildings from the server
     BuildingsManager.getInstance().initBuildings(this);
 
-    let actorsManager = ActorsManager.getInstance();
     // Place the actors from the server
-    actorsManager.initCharacters(this);
-
+    let actorsManager = ActorsManager.getInstance().initCharacters(this);
     // Pick a random actor and focus the camera on him
     Phaser.Math.RND.pick(actorsManager.sceneActors).centerCameraOn();
 
+    AudioManager.getInstance().playSoundtrack(this);
     // actor.enableDebugging();
   }
 
