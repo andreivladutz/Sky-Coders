@@ -7,6 +7,7 @@ import CST from "../CST";
 import UIScene from "../scenes/UIScene";
 import MapManager from "../managers/MapManager";
 import BuildingsManager from "../managers/BuildingsManager";
+import AudioManager from "../managers/AudioManager";
 
 interface Tile {
   x: number;
@@ -30,6 +31,7 @@ export default class BuildPlaceUI extends UIComponent {
   // the building currently placing
   buildPlacing: BuildingObject = null;
 
+  public audioManager = AudioManager.getInstance();
   private movementArrows: IsoArrow[];
 
   // indexed by the direction constants above
@@ -228,6 +230,8 @@ export default class BuildPlaceUI extends UIComponent {
   }
 
   private buildingMovementCb(arrow: IsoArrow) {
+    this.audioManager.playUiSound(CST.AUDIO.KEYS.CLICK);
+
     let deltaX = 0,
       deltaY = 0;
 

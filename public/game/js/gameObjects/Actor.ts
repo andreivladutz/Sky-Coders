@@ -107,6 +107,15 @@ export default class Actor extends NavSpriteObject {
 
   // Override the trigger so we can play the footsteps sounds once this character gets going
   protected async onStartedFollowingPath() {
+    // Corner case
+    if (
+      this.pathFollowing.length === 1 &&
+      this.pathFollowing[0].x === this.tileX &&
+      this.pathFollowing[0].y === this.tileY
+    ) {
+      return;
+    }
+
     this.audioManager.playFootsteps(this);
 
     await this.destinationConclusion;
@@ -117,6 +126,7 @@ export default class Actor extends NavSpriteObject {
   }
 
   public focusCamera(): this {
+    AudioManager.getInstance().playUiSound(CST.AUDIO.KEYS.CENTER_CAMERA);
     CameraManager.getInstance().flyToObject(this);
 
     return this;

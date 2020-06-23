@@ -2,6 +2,7 @@ import CST from "../CST";
 
 import Phaser from "phaser";
 import EventEmitter = Phaser.Events.EventEmitter;
+import AudioManager from "../managers/AudioManager";
 
 /**
  * Events emitting in this order on window open:
@@ -39,6 +40,7 @@ export default class GameWindow extends EventEmitter {
   }
 
   public openWindow(): this {
+    AudioManager.getInstance().playUiSound(CST.AUDIO.KEYS.MENU_TRANSITION);
     // Start open css animaton
     this.windowOverlay.classList.add(CST.BLOCKLY.ANIMATION.CLASS);
     this.windowOverlay.setAttribute(CST.BLOCKLY.ANIMATION.ATTRIB, "false");

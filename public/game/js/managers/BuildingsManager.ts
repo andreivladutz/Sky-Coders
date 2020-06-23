@@ -14,6 +14,7 @@ import GameManager from "../online/GameManager";
 import Group = Phaser.GameObjects.Group;
 import BuildingsMessenger from "../online/BuildingsMessenger";
 import ResourcesManager from "./ResourcesManager";
+import AudioManager from "./AudioManager";
 
 export default class BuildingsManager extends Manager
   implements LoadingInjectedManager {
@@ -29,6 +30,7 @@ export default class BuildingsManager extends Manager
   public PopoverObject: typeof import("../ui/uiObjects/bootstrapObjects/PopoverObject").default;
 
   public resourcesManager: ResourcesManager;
+  public audioManager = AudioManager.getInstance();
   // Keep a reference to all the game building objects
   public sceneBuildings: Group;
 
@@ -93,11 +95,14 @@ export default class BuildingsManager extends Manager
     this.resourcesManager.resourcesUi.showProductionReady(building);
   }
 
+  // This is being called by the collected building with itself as argument
   public onProductionCollected(building: BuildingObject) {
     // Hide the animated coin
     this.resourcesManager.resourcesUi.hideProductionReady(
       building.productionCoin
     );
+
+    this.audioManager.playUiSound(CST.AUDIO.KEYS.COIN);
   }
 
   /**
@@ -179,6 +184,8 @@ export default class BuildingsManager extends Manager
    * Let the server know and await its aknowledgement
    */
   public onBuildingPlaced(building: BuildingObject) {
+    this.audioManager.playUiSound(CST.AUDIO.KEYS.BUILD);
+
     if (!this.buildsAwaitingSv[building.tileY]) {
       this.buildsAwaitingSv[building.tileY] = {};
     }

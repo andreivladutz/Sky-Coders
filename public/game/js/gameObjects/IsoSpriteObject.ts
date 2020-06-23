@@ -4,6 +4,7 @@ import MapManager from "../managers/MapManager";
 import CST from "../CST";
 import { TileXY } from "../map/IsoBoard";
 import LayersManager from "../managers/LayersManager";
+import AudioComponent from "../audio/AudioComponent";
 
 interface IsoSpriteConfig {
   scene: Phaser.Scene;
@@ -84,6 +85,9 @@ export default class IsoSpriteObject extends IsoSprite {
   // added to the object by the rex board plugin;
   public rexChess: RexChess;
 
+  // Keep a reference to the audio component
+  public audioComponent: AudioComponent;
+
   tileWidthX: number;
   tileWidthY: number;
 
@@ -139,6 +143,7 @@ export default class IsoSpriteObject extends IsoSprite {
       config.frame
     );
     this.objectId = config.objectId;
+    this.audioComponent = new AudioComponent(this);
 
     this.addToGridAt(config.tileX, config.tileY, config.tileZ);
 

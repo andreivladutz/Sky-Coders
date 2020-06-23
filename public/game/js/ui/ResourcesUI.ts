@@ -133,7 +133,7 @@ export default class ResourcesUI extends UIComponent {
     )
       .setWidth(this.coinSize)
       .setOrigin(0, 0)
-      .setDepth(CST.LAYER_DEPTH.UI)
+      .setDepth(CST.LAYER_DEPTH.HTML_UI)
       .setAlpha(0.9) as SVGCoin;
 
     this.coins.add(coin);

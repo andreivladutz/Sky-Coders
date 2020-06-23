@@ -1,5 +1,7 @@
 import WORKER_CST from "./utils/astar/WORKER_CST";
 import COMMON_CST from "../../common/CommonCST";
+import Phaser from "phaser";
+import SoundConfig = Phaser.Types.Sound.SoundConfig;
 
 import SYSTEM from "./system/system";
 
@@ -45,7 +47,7 @@ export interface MultiatlasConfig {
 export interface AudioConfig {
   PREFIX: string;
   PATH: string;
-  FILES: { KEY: string; URLS: string[] }[];
+  FILES: { KEY: string; URLS: string[]; OPTIONS?: SoundConfig }[];
 }
 
 export default {
@@ -97,7 +99,11 @@ export default {
     // how much zoom do you get when you scroll your mouse
     ZOOM_FACTOR: 0.8,
     MOVE_EVENT: "camera.moved",
+    // For performance reasons, also emiting a debounced move event
+    DEBOUNCED_MOVE_EVENT: "camera.debouncemoved",
     ZOOM_EVENT: "camera.zoomed",
+    // How long a debounce lasts
+    MOVE_DEBOUNCE: 250,
     // how many tiles around the view area to add when computing which tiles are visible
     VIEWRECT_TILE_PAD: 6,
     // don t let the user scroll outside of the map
@@ -276,7 +282,8 @@ export default {
     TILES: 1,
     WORLD_GRID: 2,
     OBJECT_GRID: 3,
-    UI: 4
+    HTML_UI: 4,
+    UI: Infinity
   },
   // CONSTANTS FOR THE LAYER MANAGER
   LAYERS: {
@@ -313,6 +320,11 @@ export default {
       BG_UI: 0,
       DECORATIONS: 1,
       POPOVER: 2
+    },
+    VOLUME_SLIDER: {
+      // Width ratio
+      MAIN_BUTTONS_RATIO_WIDTH: 0.75,
+      MAIN_BUTTONS_RATIO_HEIGHT: 0.2
     },
     POPOVER: {
       HTML_ELEMENT: "a",
@@ -577,8 +589,38 @@ export default {
       PREFIX: "UI_AUDIO.",
       PATH: "audio/ui/",
       FILES: [
-        { KEY: "click", URLS: ["click.wav"] },
-        { KEY: "coin", URLS: ["coin.wav"] }
+        {
+          KEY: "click",
+          URLS: ["click.wav"],
+          OPTIONS: {
+            volume: 0.95
+          }
+        },
+        { KEY: "coin", URLS: ["coin.wav"] },
+        {
+          KEY: "menu_transition",
+          URLS: ["menu_transition.wav"],
+          OPTIONS: {
+            volume: 0.9,
+            rate: 0.2
+          }
+        },
+        {
+          KEY: "center_camera",
+          URLS: ["center_camera.wav"],
+          OPTIONS: {
+            volume: 0.9,
+            rate: 0.4,
+            delay: 100
+          }
+        },
+        {
+          KEY: "build",
+          URLS: ["build.ogg"],
+          OPTIONS: {
+            volume: 0.8
+          }
+        }
       ]
     },
     // KEYS USED TO GET THE AUDIO
@@ -591,11 +633,27 @@ export default {
       ],
       SOUNDTRACKS: ["SOUNDTRACK.mainTrack"],
       CLICK: "UI_AUDIO.click",
-      COIN: "UI_AUDIO.coin"
+      COIN: "UI_AUDIO.coin",
+      MENU_TRANSITION: "UI_AUDIO.menu_transition",
+      CENTER_CAMERA: "UI_AUDIO.center_camera",
+      BUILD: "UI_AUDIO.build"
     },
     SOUNDTRACK_VOLUME: 0.1,
-    FOOTSTEPS_VOLUME: 0.15,
-    FOOTSTEPS_RATE: 0.9
+    // Play the footsteps' sound a little slower to match the actor animation
+    FOOTSTEPS_RATE: 0.9,
+    // Multiply the environment sounds' volume with a value inside this interval
+    // To mimick the distancing from the sound when the user zooms in / out
+    ENVIRONMENT_VOL_MIN: 0.2,
+    ENVIRONMENT_VOL_MAX: 0.65,
+    // The maximum volume for an object out of the audible area
+    ENVIRONMENT_VOL_OUTOF_AREA: 0.1,
+    // Lower the volume with this rate until it becomes 0
+    LOWER_VOLUME_RATE: 0.005,
+    AUDIBLE_AREA_RADIUS: {
+      MIN: 0.3,
+      MAX: 1
+    },
+    DEFAULT_VOLUME: 0.5
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST,

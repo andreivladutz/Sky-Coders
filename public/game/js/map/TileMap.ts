@@ -95,6 +95,8 @@ export default class TileMap {
   originPoint: Phaser.Math.Vector2 = new Phaser.Math.Vector2();
   // A repositioning is waiting for the next render cycle
   willReposition: boolean = false;
+  // When the device's browser resizes recompute the positions on the next render cycle
+  willRecomputePositions: boolean = false;
 
   constructor(config: TileMapConfig) {
     this.scene = config.scene;
@@ -469,7 +471,7 @@ export default class TileMap {
     tile.destroy();
 
     CameraManager.EVENTS.on(CST.CAMERA.MOVE_EVENT, () => this.repositionMap());
-    CameraManager.EVENTS.on(CST.CAMERA.ZOOM_EVENT, this.repositionMap);
+    // CameraManager.EVENTS.on(CST.CAMERA.ZOOM_EVENT, this.repositionMap);
   }
 
   // Reposition the map on zoom and map move (the canvas chunks)
@@ -477,6 +479,8 @@ export default class TileMap {
     zoomFactor: number = 1,
     actualZoom: number = this.isoBoard.camera.zoom
   ) => {
+    if (this.willReposition) return;
+
     this.willReposition = true;
     this.scene.events.once("render", () =>
       this.immediateMapReposition(actualZoom)
@@ -683,12 +687,18 @@ export default class TileMap {
 
   registerToEvents() {
     // when the game resizes, we should reposition all the tiles
-    this.scene.scale.on("resize", () =>
+    this.scene.scale.on("resize", () => {
+      if (this.willRecomputePositions) {
+        return;
+      }
+      this.willRecomputePositions = true;
+
       this.scene.events.once("render", () => {
         this.recomputeChunkPixelPositions();
-        this.repositionMap(1, this.isoBoard.camera.zoom);
-      })
-    );
+        this.willRecomputePositions = false;
+        this.repositionMap();
+      });
+    });
     //{
     // for (let x = 0; x < this.mapWidth; x++) {
     //   for (let y = 0; y < this.mapHeight; y++) {

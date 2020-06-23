@@ -14,31 +14,41 @@ import RoundRectObject from "./uiObjects/RoundRectObject";
 import Toast from "./uiObjects/Toast";
 import GameManager from "../online/GameManager";
 import ResourcesManager from "../managers/ResourcesManager";
+import { runInThisContext } from "vm";
+import AudioManager from "../managers/AudioManager";
 
 type Image = Phaser.GameObjects.Image;
 const Image = Phaser.GameObjects.Image;
 
 export default class MainUI extends UIComponent {
+  // A slider object from rexPlugins
+  public volumeSlider: any;
   public mainButtons: MainGameButtons;
   public resources: ResourcesStatus;
   public toast: Toast;
   public blocklyManager: BlocklyManager;
+  public audioManager = AudioManager.getInstance();
 
   constructor(uiScene: UIScene, gameScene: IsoScene) {
     super(uiScene, gameScene);
 
     this.mainButtons = new MainGameButtons(uiScene, this);
     this.resources = new ResourcesStatus(uiScene, this);
-
     this.blocklyManager = BlocklyManager.getInstance();
-
     this.toast = new Toast(uiScene, gameScene);
+
+    this.initVolumeSlider();
   }
 
   // Enable the UI main buttons
   async enable(): Promise<void> {
     // TODO: Hack to position coins correctly but it's visible at the begining of the game
     ResourcesManager.getInstance().resetResources();
+    if (!this.audioManager.isInited) {
+      this.audioManager.init();
+    }
+    this.audioManager.playUiSound(CST.AUDIO.KEYS.MENU_TRANSITION);
+
     await this.mainButtons.show();
   }
 
@@ -52,6 +62,75 @@ export default class MainUI extends UIComponent {
   // pass the control to the build ui
   handleBuildButton() {
     UIComponents.getUIStateMachine().transitionTo(CST.STATES.BUILD_MENU);
+  }
+
+  public toggleVolumeSlider() {
+    if (this.volumeSlider.visible) {
+      return this.hideVolumeSlider();
+    }
+
+    this.showVolumeSlider();
+  }
+
+  public showVolumeSlider() {
+    this.volumeSlider.setVisible(true);
+    this.positionVolumeSlider();
+    this.volumeSlider.layout();
+  }
+
+  public hideVolumeSlider() {
+    this.volumeSlider.visible = false;
+  }
+
+  private initVolumeSlider() {
+    let darkBrown = CST.COLORS.DARK_MAROON,
+      brown = CST.COLORS.LIGHT_MAROON;
+
+    let mainBtns = this.mainButtons.mainButtonsBounds;
+    let sliderWidth =
+      mainBtns.width * CST.UI.VOLUME_SLIDER.MAIN_BUTTONS_RATIO_WIDTH;
+    let sliderHeight =
+      mainBtns.height * CST.UI.VOLUME_SLIDER.MAIN_BUTTONS_RATIO_HEIGHT;
+
+    this.uiScene.input.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      if (!this.volumeSlider.isInTouching(pointer)) {
+        this.hideVolumeSlider();
+      }
+    });
+
+    this.volumeSlider = this.uiScene.rexUI.add
+      .slider({
+        x: 0,
+        y: 0,
+        width: sliderWidth,
+        height: sliderHeight,
+        orientation: "y",
+
+        track: this.uiScene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, darkBrown),
+        indicator: this.uiScene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, brown),
+        thumb: this.uiScene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, brown),
+
+        input: "click", // 'drag'|'click'
+        space: {
+          top: 4,
+          bottom: 4
+        },
+        value: CST.AUDIO.DEFAULT_VOLUME,
+        valuechangeCallback: (value: number) => {
+          this.audioManager.setVolume(value);
+        }
+      })
+      .layout()
+      .setVisible(false);
+  }
+
+  private positionVolumeSlider() {
+    let mainBtns = this.mainButtons.mainButtonsBounds;
+    let sliderHeight =
+      mainBtns.height * CST.UI.VOLUME_SLIDER.MAIN_BUTTONS_RATIO_HEIGHT;
+
+    this.volumeSlider._x = mainBtns.x + mainBtns.width / 2;
+    this.volumeSlider._y = mainBtns.y - sliderHeight;
   }
 }
 
@@ -69,6 +148,12 @@ class MainUIButon extends ButtonImage<MainUI> {
 
   // define the logic for button clicking
   onTap = async () => {
+    if (this.btnName !== BUTTON_TYPES.SOUND) {
+      this.parentUI.hideVolumeSlider();
+    }
+
+    this.parentUI.audioManager.playUiSound(CST.AUDIO.KEYS.CLICK);
+
     switch (this.btnName) {
       case BUTTON_TYPES.BUILD:
         this.parentUI.handleBuildButton();
@@ -93,6 +178,9 @@ class MainUIButon extends ButtonImage<MainUI> {
         let blocklyManager = this.parentUI.blocklyManager;
         blocklyManager.showWorkspace(selectedActor.codeHandler);
 
+        break;
+      case BUTTON_TYPES.SOUND:
+        this.parentUI.toggleVolumeSlider();
         break;
     }
   };

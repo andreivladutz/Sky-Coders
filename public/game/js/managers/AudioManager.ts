@@ -1,8 +1,14 @@
 import Manager from "./Manager";
 import CST, { AudioConfig } from "../CST";
+import Actor from "../gameObjects/Actor";
+import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
+import CameraManager from "./CameraManager";
+
+import Phaser from "phaser";
 import Scene = Phaser.Scene;
 import BaseSound = Phaser.Sound.BaseSound;
-import Actor from "../gameObjects/Actor";
+import SoundConfig = Phaser.Types.Sound.SoundConfig;
+import Circle = Phaser.Geom.Circle;
 
 const { AUDIO } = CST;
 
@@ -12,17 +18,79 @@ type ActorFootsteps = {
   active: boolean;
   // The current footstep sound playing
   currIndex?: number;
+  // Number of functions playing these sounds at this moment in time
+  // This is needed to prevent the same sounds from playing multiple times
+  // (This race condition happens when the sounds become inactive but
+  // before the functions playing these sounds stop,
+  // they become active again and a new set of functions start playing the exact same sounds)
+  functionsPlayingSounds?: number;
 };
 
 export default class AudioManager extends Manager {
+  public isInited = false;
+
+  private scene: Scene;
   private soundTrack: BaseSound;
+  // Keep a dictionary of ui sounds
+  private uiSounds: { [soundKey: string]: BaseSound } = {};
   // Multiple actors can play the footsteps sound at the same time
   private actorsFootsteps: ActorFootsteps[] = [];
+  // Keep a reference to each object currently playing a sound
+  private objectsPlayingSounds: Set<IsoSpriteObject> = new Set<
+    IsoSpriteObject
+  >();
+
+  // Reuse the same cameraArea
+  private cameraArea: Circle = new Circle();
+  private cameraManager: CameraManager;
+
+  // Make sure we init only once
+  public init() {
+    if (this.isInited) {
+      return;
+    }
+
+    this.isInited = true;
+
+    this.cameraManager = CameraManager.getInstance();
+    let scene = this.cameraManager.scene;
+
+    scene.events.on("render", this.adjustObjectsSounds, this);
+    this.scene = scene;
+
+    this.setVolume(CST.AUDIO.DEFAULT_VOLUME);
+    this.playSoundtrack();
+  }
+
+  // The environment sound created by game objects should be adjusted
+  // depending on the current camera position and zoom
+  public adjustObjectsSounds() {
+    let cameraMgr = CameraManager.getInstance();
+    let { x, y } = cameraMgr.getWorldPointAtCenter();
+    let viewRadius = cameraMgr.camera.worldView.width / 2;
+
+    this.cameraArea.setTo(x, y, viewRadius);
+
+    for (let object of this.objectsPlayingSounds) {
+      object.audioComponent.adjustVolume(
+        this.cameraArea,
+        this.cameraManager.camera.zoom
+      );
+    }
+  }
+
+  public setVolume(volume: number) {
+    if (!this.scene) {
+      return;
+    }
+
+    this.scene.sound.volume = volume;
+  }
 
   // TODO: If in the future we'll have more soundtracks, change the hardcoded 0
-  public playSoundtrack(scene: Scene): this {
+  public playSoundtrack(): this {
     if (!this.soundTrack) {
-      this.soundTrack = scene.sound.add(AUDIO.KEYS.SOUNDTRACKS[0], {
+      this.soundTrack = this.scene.sound.add(AUDIO.KEYS.SOUNDTRACKS[0], {
         volume: AUDIO.SOUNDTRACK_VOLUME,
         loop: true
       });
@@ -30,14 +98,38 @@ export default class AudioManager extends Manager {
 
     this.soundTrack.play();
 
-    // TODO: remove
-    scene.sound.volume = 0.25;
+    return this;
+  }
+
+  public playUiSound(soundKey: string): this {
+    if (!this.scene) {
+      return;
+    }
+
+    if (!this.uiSounds[soundKey]) {
+      let options: SoundConfig;
+      // Remove the prefix to search for the key
+      let searchKey = soundKey.replace(AUDIO.UI.PREFIX, "");
+
+      for (let sound of AUDIO.UI.FILES) {
+        if (sound.KEY === searchKey) {
+          options = sound.OPTIONS;
+          break;
+        }
+      }
+
+      this.uiSounds[soundKey] = this.scene.sound.add(soundKey, options);
+    }
+
+    this.uiSounds[soundKey].play();
 
     return this;
   }
 
   // Play footsteps sounds in order for an actor
   public playFootsteps(actor: Actor): this {
+    this.objectsPlayingSounds.add(actor);
+
     // If there are any footstep sound already playing for this actor, get them
     let existingFootsteps = this.getActorsFootsteps(actor);
     if (existingFootsteps) {
@@ -49,6 +141,11 @@ export default class AudioManager extends Manager {
       // Otherwise activate the footsteps and reuse them
       else {
         existingFootsteps.active = true;
+
+        // If there is already a set of functions playing these sounds just return and let them play
+        if (existingFootsteps.functionsPlayingSounds) {
+          return;
+        }
       }
     }
 
@@ -57,6 +154,8 @@ export default class AudioManager extends Manager {
     // Play a footstep sound and once it ends go to the next one
     let playNextFootstep = (actorFootsteps: ActorFootsteps) => {
       if (!actorFootsteps.active) {
+        // This set of functions will stop playing the actor sounds
+        actorFootsteps.functionsPlayingSounds--;
         return;
       }
 
@@ -72,16 +171,21 @@ export default class AudioManager extends Manager {
         "complete",
         playNextFootstep.bind(this, actorFootsteps)
       );
-      sounds[currIndex].play();
+
+      actor.audioComponent.playSound(sounds[currIndex]);
     };
 
     inactiveSound.currIndex = 0;
+    // A new set of functions will start playing these sounds
+    inactiveSound.functionsPlayingSounds = 1;
     playNextFootstep(inactiveSound);
 
     return this;
   }
 
   public stopFootsteps(actor: Actor): this {
+    this.objectsPlayingSounds.delete(actor);
+
     for (let actorFootsteps of this.actorsFootsteps) {
       if (actorFootsteps.actor === actor) {
         actorFootsteps.active = false;
@@ -122,7 +226,6 @@ export default class AudioManager extends Manager {
       for (let key of AUDIO.KEYS.FOOTSTEPS) {
         footstepsSounds.push(
           actor.scene.sound.add(key, {
-            volume: AUDIO.FOOTSTEPS_VOLUME,
             rate: AUDIO.FOOTSTEPS_RATE
           })
         );

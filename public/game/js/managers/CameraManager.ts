@@ -17,18 +17,20 @@ interface CameraControlConfig {
 }
 
 export default class CameraManager extends Manager {
-  camera: Camera;
+  public camera: Camera;
   // the scene this camera belongs to
-  scene: Phaser.Scene;
+  public scene: Phaser.Scene;
 
   // utility for camera panning
-  pan: Pan;
+  private pan: Pan;
   // utility for camera zooming
-  pinch: Pinch;
+  private pinch: Pinch;
 
   // When a zoom transition is happening prevent the user from zooming in and out
   // Just so we can prevent any artifacts
   private zoomPrevention: boolean = false;
+  // The last time a DEBOUNCE_MOVE_EVENT was fired
+  private lastDebouncedMove: number = 0;
 
   public static readonly EVENTS = new Phaser.Events.EventEmitter();
 
@@ -175,6 +177,12 @@ export default class CameraManager extends Manager {
           pan.dx,
           pan.dy
         );
+
+        if (Date.now() - this.lastDebouncedMove >= CST.CAMERA.MOVE_DEBOUNCE) {
+          this.lastDebouncedMove = Date.now();
+
+          CameraManager.EVENTS.emit(CST.CAMERA.DEBOUNCED_MOVE_EVENT);
+        }
       },
       this
     );

@@ -4,9 +4,9 @@ import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js
 
 // kick the load subscribing of these Managers
 // TODO: find a neater way
-import "../managers/AudioManager";
 import "../managers/ActorsManager";
 import "../managers/MapManager";
+import "../managers/AudioManager";
 import "../managers/EnvironmentManager";
 import "../Blockly/BlocklyManager";
 import Manager from "../managers/Manager";

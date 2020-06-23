@@ -66,7 +66,7 @@ export default class GameScene extends IsoScene {
     // Pick a random actor and focus the camera on him
     Phaser.Math.RND.pick(actorsManager.sceneActors).centerCameraOn();
 
-    AudioManager.getInstance().playSoundtrack(this);
+    AudioManager.getInstance().init();
     // actor.enableDebugging();
   }
 

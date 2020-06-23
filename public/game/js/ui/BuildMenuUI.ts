@@ -10,6 +10,7 @@ import BuildPlaceUI from "./BuildPlaceUI";
 import { BuildNames } from "../../../common/BuildingTypes";
 import GameManager from "../online/GameManager";
 import MainUI from "./MainUI";
+import AudioManager from "../managers/AudioManager";
 
 const BUILD_MENU = CST.UI.BUILD_MENU;
 
@@ -18,6 +19,8 @@ const BUILD_MENU = CST.UI.BUILD_MENU;
 class SideMenuButton extends ButtonImage<BuildMenuUI> {
   // define the logic for button clicking
   onTap = () => {
+    this.parentUI.audioManager.playUiSound(CST.AUDIO.KEYS.CLICK);
+
     let buildingNames = Object.values(BuildNames);
     let stateMachine = UIComponents.getUIStateMachine();
 
@@ -65,6 +68,8 @@ export default class BuildMenuUI extends UIComponent {
 
   buildPlaceUI: BuildPlaceUI;
 
+  public audioManager = AudioManager.getInstance();
+
   constructor(uiScene: UIScene, gameScene: IsoScene) {
     super(uiScene, gameScene);
 
@@ -92,8 +97,9 @@ export default class BuildMenuUI extends UIComponent {
     // show the confirmation buttons
     this.confirmSizer.setVisible(true);
 
-    this.moveConfirmBtnsDown();
+    this.audioManager.playUiSound(CST.AUDIO.KEYS.MENU_TRANSITION);
 
+    this.moveConfirmBtnsDown();
     return this.moveRight();
   }
 
