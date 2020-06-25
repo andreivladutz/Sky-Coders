@@ -143,6 +143,14 @@ let Worker = new (class AstarWorker {
       return false;
     }
 
+    // All end tiles and all configurations tried have failed
+    // That means that all endTile are inaccesible (i.e. all callbacks calls are with null as param)
+    if (!pathFound) {
+      this.onPathFound(null, requestId);
+
+      return false;
+    }
+
     return true;
   }
 

@@ -3,6 +3,7 @@ import Blockly, { Generator } from "blockly";
 import CST from "../CST";
 import GameWindow from "../ui/GameWindow";
 import SYSTEM from "../system/system";
+import CODE_CST from "./CODE_CST";
 
 import defineCustomBlocks from "./Workspace/blockDefs/customBlocks";
 import * as roLang from "blockly/msg/ro";
@@ -181,6 +182,12 @@ export default class BlocklyManager extends Manager {
     };
   }
 
+  // Internal inter
+  private addReservedWords() {
+    // Don't let the user use __chara__, self and others in his code anywhere
+    JavaScript.addReservedWords(CODE_CST.RESERVED_WORDS);
+  }
+
   private initWorkspace(toolboxXml: HTMLDocument) {
     let startScale = SYSTEM.TOUCH_ENABLED
       ? CST.BLOCKLY.MOBILE_INITIAL_SCALE
@@ -203,6 +210,7 @@ export default class BlocklyManager extends Manager {
     });
 
     this.workspace.addChangeListener(Blockly.Events.disableOrphans);
+    this.addReservedWords();
   }
 
   // Init the custom Blockly blocks from the loaded json defs (already parsed)

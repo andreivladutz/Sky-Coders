@@ -1,5 +1,9 @@
 import { Block } from "blockly";
 import { BlocklyJS } from "../codeUtils";
+import CODE_CST from "../../../CODE_CST";
+
+const API = CODE_CST.API_FUNCS;
+const { SELF } = CODE_CST;
 
 // Possible neighbour directions of a tile coordinate
 // in get_neighbour block function
@@ -69,14 +73,14 @@ export default function(Blockly: BlocklyJS) {
       Blockly.JavaScript.ORDER_MEMBER
     );
 
-    var code = `isCoordReachable(${value_coord}.x, ${value_coord}.y)`;
+    var code = `${SELF}.${API.REACHABLE}(${value_coord}.x, ${value_coord}.y)`;
 
     // This function call can be used safely with a logical not operator
     return [code, Blockly.JavaScript.ORDER_LOGICAL_NOT];
   };
 
   Blockly.JavaScript["environment_position"] = function() {
-    var code = "({ x: getXCoord(), y: getYCoord() })";
+    var code = `({ x: ${SELF}.${API.POS_X}(), y: ${SELF}.${API.POS_Y}() })`;
 
     return [code, Blockly.JavaScript.ORDER_MEMBER];
   };

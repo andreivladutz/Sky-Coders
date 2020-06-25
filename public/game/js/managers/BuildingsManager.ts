@@ -15,6 +15,8 @@ import Group = Phaser.GameObjects.Group;
 import BuildingsMessenger from "../online/BuildingsMessenger";
 import ResourcesManager from "./ResourcesManager";
 import AudioManager from "./AudioManager";
+import ActorsManager from "./ActorsManager";
+import { runInThisContext } from "vm";
 
 export default class BuildingsManager extends Manager
   implements LoadingInjectedManager {
@@ -125,6 +127,16 @@ export default class BuildingsManager extends Manager
     }
   }
 
+  // When the scene Actors have been initialised, this handler function gets called
+  public onActorsInterpretersInited(actorsManagerInstance: ActorsManager) {
+    this.sceneBuildings.children.iterate((buildingObject: BuildingObject) => {
+      // Place the building inside the interpreter also
+      actorsManagerInstance.onBuildingPlaced(
+        buildingObject.getInterpreterRepresentation()
+      );
+    });
+  }
+
   // Collect the resources produced by a building
   public collectBuilding(building: BuildingObject) {
     // Hide the coin. The coin is being hidden by the building
@@ -215,7 +227,13 @@ export default class BuildingsManager extends Manager
 
     // Save the db id on the building for easier retrieval at a later time
     let { x, y } = buildingInfo.buildingPosition;
-    this.buildsAwaitingSv[y][x].dbId = buildingInfo._id;
+    let mapBuilding = this.buildsAwaitingSv[y][x];
+    mapBuilding.dbId = buildingInfo._id;
+
+    // Send the building to the actors' interpreters
+    ActorsManager.getInstance().onBuildingPlaced(
+      mapBuilding.getInterpreterRepresentation()
+    );
 
     this.onBuildingAcknowledged(buildingInfo);
   }

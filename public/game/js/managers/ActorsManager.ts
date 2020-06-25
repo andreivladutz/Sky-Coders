@@ -1,5 +1,5 @@
 import ACTORS_CST, { ACTOR_NAMES_ARR, ACTOR_NAMES } from "../ACTORS_CST";
-import Actor, { ActorConfig } from "../gameObjects/Actor";
+import Actor from "../gameObjects/Actor";
 import Manager from "./Manager";
 import CharacterUI from "../ui/CharacterUI";
 import CST from "../CST";
@@ -9,6 +9,8 @@ import GameManager from "../online/GameManager";
 import LayersManager from "./LayersManager";
 import MapManager from "./MapManager";
 import BlocklyManager from "../Blockly/BlocklyManager";
+import { InternalBuilding } from "../Blockly/CODE_CST";
+import BuildingsManager from "./BuildingsManager";
 
 // Singleton class handling the loading of the actor resources
 export default class ActorsManager extends Manager {
@@ -34,7 +36,7 @@ export default class ActorsManager extends Manager {
         blocklyWorkspace: characterInfo.workspaceBlockly
       });
 
-      this.placeActor(actor, this.sceneActors);
+      this.placeActor(actor);
       positionAck({ x: actor.tileX, y: actor.tileY });
     }
 
@@ -51,12 +53,27 @@ export default class ActorsManager extends Manager {
 
     // After all characters have been inited, init the blockly manager
     BlocklyManager.getInstance().init(gameScene.cache);
+    // Send all the permanent buildings to the internals of each interpreter
+    BuildingsManager.getInstance().onActorsInterpretersInited(this);
 
     return this;
   }
 
+  // When a building is permanently added to the map, send it to the characters' interpreters
+  public onBuildingPlaced(buildingInfo: InternalBuilding) {
+    for (let chara of this.sceneActors) {
+      chara.codeHandler.interpreter.addBuilding(buildingInfo);
+    }
+  }
+
+  public updateBuildings(buildingInfo: InternalBuilding) {
+    for (let chara of this.sceneActors) {
+      chara.codeHandler.interpreter.updateBuilding(buildingInfo);
+    }
+  }
+
   // Place an actor on the INITED map
-  private placeActor(actor: Actor, actorsArray: Actor[]) {
+  private placeActor(actor: Actor) {
     // TODO: in the future let the user place the actors manually
     // do not risk not finding a good positioning
     let foundPosition: boolean;

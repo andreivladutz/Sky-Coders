@@ -10,6 +10,7 @@ import BuildingTypes, { BuildNames } from "../../../common/BuildingTypes";
 import ActorsManager from "../managers/ActorsManager";
 import { SVGCoin } from "../ui/ResourcesUI";
 import GameManager from "../online/GameManager";
+import { InternalBuilding } from "../Blockly/CODE_CST";
 
 interface Tile {
   x: number;
@@ -100,6 +101,15 @@ export default class BuildingObject extends IsoSpriteObject {
     if (this.popoverObjInstance) {
       this.popoverObjInstance.updateContent(this.getCurrentDescription());
     }
+  }
+
+  // Get the internal Interpreter representation for this building
+  public getInterpreterRepresentation(): InternalBuilding {
+    return {
+      buildingType: this.buildingType,
+      isReady: this.isProductionReady,
+      id: this.dbId
+    };
   }
 
   public makeInteractive(): this {
