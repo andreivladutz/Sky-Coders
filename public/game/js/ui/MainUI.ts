@@ -232,13 +232,17 @@ class ResourcesStatus {
       .setWidth(coinSize)
       .setDepth(CST.UI.HTML_LAYER.DECORATIONS);
 
+    let fontSize = Math.floor(
+      (height / COINS.RELATIVE_BTMBAR_HEIGHT) * COINS.FONT_SIZE
+    );
+
     this.coinsBg = new RoundRectObject(
       this.uiScene,
       gameScale.width,
       gameScale.height
     )
       .setOrigin(1, 1)
-      .setTextWithStyle(`0 ${COINS.COINS_SUFFIX}`, COINS.FONT_SIZE, "Odibee");
+      .setTextWithStyle(`0 ${COINS.COINS_SUFFIX}`, fontSize, "Odibee");
 
     // Fill the whole bottom bar
     this.paddingSize = (height - this.coinsBg.displayHeight) / 2;

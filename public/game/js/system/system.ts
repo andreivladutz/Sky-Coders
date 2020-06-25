@@ -1,9 +1,11 @@
 // Static values determined at runtime
 const SYSTEM = {
-  VARIANT: `-${getVariant()}`,
+  get VARIANT() {
+    return `-${getVariant()}`;
+  },
   SCREEN_WIDTH: screenPixelWidth(),
   SCREEN_HEIGHT: screenPixelHeight(),
-  // TOUCH_ENABLED, WORKER_SUPPORT added when a phaser game is inited
+  // TOUCH_ENABLED, WORKER_SUPPORT added when a phaser game is inited in the loading scene
   TOUCH_ENABLED: false,
   WORKER_SUPPORT: false
 };
@@ -11,6 +13,12 @@ const SYSTEM = {
 export default SYSTEM;
 
 function getVariant() {
+  // Just hardcode the lowest resolution settings for touch enabled devices which
+  // We interpret as being mobile
+  if (SYSTEM.TOUCH_ENABLED) {
+    return "sd";
+  }
+
   // Watch out for mobile devices in portrait mode
   let screenHeight = Math.min(screenPixelHeight(), screenPixelWidth());
 

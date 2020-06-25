@@ -4,6 +4,7 @@ import Actor from "../gameObjects/Actor";
 import UIScene from "../scenes/UIScene";
 import IsoScene from "../IsoPlugin/IsoScene";
 import { CodeCommand } from "../gameObjects/ActorCodeHandler";
+import CameraManager from "../managers/CameraManager";
 
 export default class CharacterUI extends UIComponent {
   private characterContainer: HTMLDivElement;
@@ -37,6 +38,22 @@ export default class CharacterUI extends UIComponent {
       if (!this.commandsMenu.isInTouching(pointer)) {
         this.closeCommandMenu();
       }
+    });
+
+    CameraManager.EVENTS.on(CST.CAMERA.DEBOUNCED_MOVE_EVENT, () => {
+      if (!this.commandsMenu || this.commandsMenuClosed) {
+        return;
+      }
+
+      this.closeCommandMenu();
+    });
+
+    CameraManager.EVENTS.on(CST.CAMERA.ZOOM_EVENT, () => {
+      if (!this.commandsMenu || this.commandsMenuClosed) {
+        return;
+      }
+
+      this.closeCommandMenu();
     });
   }
 

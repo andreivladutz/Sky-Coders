@@ -5,16 +5,6 @@ import SoundConfig = Phaser.Types.Sound.SoundConfig;
 
 import SYSTEM from "./system/system";
 
-const VARIANT = SYSTEM.VARIANT;
-
-let BUTTONS_VARIANT: string;
-
-if (VARIANT === "-hd" || VARIANT === "-md") {
-  BUTTONS_VARIANT = "-hd";
-} else {
-  BUTTONS_VARIANT = "-md";
-}
-
 const BUTTON_TYPES = {
   BUILD: "Build",
   LEADERBOARD: "Leaderboard",
@@ -145,7 +135,9 @@ export default {
     ATLAS_KEY: "ENVIRONMENT.ATLAS_KEY",
     // path to multiatlas
     MULTIATLAS_PATH: "sprite/environment/",
-    MULTIATLAS: `environment${VARIANT}.json`,
+    get MULTIATLAS() {
+      return `environment${SYSTEM.VARIANT}.json`;
+    },
     GRASS: {
       PREFIX: "Tiles/grass",
       BASE_PREFIX: "Tiles/base",
@@ -183,7 +175,9 @@ export default {
     ATLAS_KEY: "BUILDINGS.ATLAS_KEY",
     // path to multiatlas
     MULTIATLAS_PATH: "sprite/buildings/",
-    MULTIATLAS: `buildings${VARIANT}.json`,
+    get MULTIATLAS() {
+      return `buildings${SYSTEM.VARIANT}.json`;
+    },
     // the prefix of all buildings' frames
     PREFIX: "Buildings/",
     TYPES: {
@@ -196,7 +190,16 @@ export default {
     ATLAS_KEY: "BUTTONS.ATLAS_KEY",
     // path to multiatlas
     MULTIATLAS_PATH: "sprite/ui/",
-    MULTIATLAS: `main_buttons${BUTTONS_VARIANT}.json`,
+    get MULTIATLAS() {
+      let BUTTONS_VARIANT: string;
+
+      if (SYSTEM.VARIANT === "-hd" || SYSTEM.VARIANT === "-md") {
+        BUTTONS_VARIANT = "-hd";
+      } else {
+        BUTTONS_VARIANT = "-md";
+      }
+      return `main_buttons${BUTTONS_VARIANT}.json`;
+    },
     // the prefix of all buttons' frames
     PREFIX: "Buttons/",
     // the types of the buttons
@@ -375,6 +378,8 @@ export default {
       // Append CiBo coins suffix
       COINS_SUFFIX: "CB",
       FONT_SIZE: 24,
+      // The font size is relative to this bar heightc
+      RELATIVE_BTMBAR_HEIGHT: 53,
       BOUNCE_DELTAY: 100,
       BOUNCE_TIME: 1500,
       // Time needed to go out of the screen
@@ -493,6 +498,8 @@ export default {
       ATTRIB: "aria-hidden",
       CLASS: "blocklyTransition"
     },
+    INITIAL_SCALE: 0.8,
+    MOBILE_INITIAL_SCALE: 0.5,
     // Path to the toolbox for loading
     RESOURCES: {
       PATH: "../js/Blockly/Workspace/",

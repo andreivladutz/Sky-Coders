@@ -3,8 +3,6 @@ import { ACTOR_NAMES, ACTOR_NAMES_ARR } from "../../common/CharacterTypes";
 
 export { ACTOR_NAMES, ACTOR_NAMES_ARR };
 
-const VARIANT = SYSTEM.VARIANT;
-
 export enum ACTOR_STATES {
   WALK = "WALK",
   IDLE = "IDLE"
@@ -70,7 +68,9 @@ let ACTORS_CST: ActorsCST = {
   frameRate: 30,
   // the actors configs indexed by name:
   [ACTOR_NAMES.MALLACK]: {
-    multiatlas: `mallack${VARIANT}.json`,
+    get multiatlas() {
+      return `mallack${SYSTEM.VARIANT}.json`;
+    },
     anims: {
       [ACTOR_STATES.WALK]: {
         animationKey: `${ACTOR_NAMES.MALLACK}.${ACTOR_STATES.WALK}`,

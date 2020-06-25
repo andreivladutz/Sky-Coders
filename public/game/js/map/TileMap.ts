@@ -471,20 +471,15 @@ export default class TileMap {
     tile.destroy();
 
     CameraManager.EVENTS.on(CST.CAMERA.MOVE_EVENT, () => this.repositionMap());
-    // CameraManager.EVENTS.on(CST.CAMERA.ZOOM_EVENT, this.repositionMap);
+    CameraManager.EVENTS.on(CST.CAMERA.ZOOM_EVENT, this.repositionMap);
   }
 
   // Reposition the map on zoom and map move (the canvas chunks)
-  private repositionMap = (
-    zoomFactor: number = 1,
-    actualZoom: number = this.isoBoard.camera.zoom
-  ) => {
+  private repositionMap = () => {
     if (this.willReposition) return;
 
     this.willReposition = true;
-    this.scene.events.once("render", () =>
-      this.immediateMapReposition(actualZoom)
-    );
+    this.scene.events.once("render", () => this.immediateMapReposition());
   };
 
   private immediateMapReposition(

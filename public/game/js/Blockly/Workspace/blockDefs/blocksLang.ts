@@ -71,9 +71,10 @@ export default {
       EVENTS_SELECTED_TITLE: "When selected",
       EVENTS_SELECTED_TOOLTIP:
         "All connected code runs when this character is selected.",
-      EVENTS_PRODREADY_TITLE: "When production ready",
+      EVENTS_PRODREADY_TITLE: "When  %1 is ready",
       EVENTS_PRODREADY_TOOLTIP:
-        "Runs connected code when one building has finished its production",
+        "Runs the code when one building has finished its production",
+      EVENTS_PRODREADY_BUILDING: "building",
       COMMAND_TITLE: "Define command %1",
       COMMAND_TOOLTIP: "Create a command for this character.",
       COMMAND_NAME: "Do Something"
@@ -82,9 +83,10 @@ export default {
       EVENTS_SELECTED_TITLE: "Când este selectat",
       EVENTS_SELECTED_TOOLTIP:
         "Codul conectat va rula când acest caracter este selectat.",
-      EVENTS_PRODREADY_TITLE: "Când producția este gata",
+      EVENTS_PRODREADY_TITLE: "Când %1 este gata",
       EVENTS_PRODREADY_TOOLTIP:
-        "Codul conectat va rula când una din clădiri și-a terminat producția.",
+        "Codul conectat va rula când o clădire și-a terminat producția.",
+      EVENTS_PRODREADY_BUILDING: "clădire",
       COMMAND_TITLE: "Definește comanda %1",
       COMMAND_TOOLTIP: "Creează o comandă pentru acest caracter.",
       COMMAND_NAME: "Fă Ceva"

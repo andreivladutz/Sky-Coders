@@ -5,6 +5,7 @@ import CST from "../CST";
 import { TileXY } from "../map/IsoBoard";
 import LayersManager from "../managers/LayersManager";
 import AudioComponent from "../audio/AudioComponent";
+import SYSTEM from "../system/system";
 
 interface IsoSpriteConfig {
   scene: Phaser.Scene;
@@ -228,9 +229,12 @@ export default class IsoSpriteObject extends IsoSprite {
         this.mapManager.events.registerDefaultPrevention(this);
         this.setTint(this.selectedTintColor);
 
-        this.longHoverTimeout = setTimeout(() => {
-          this.emit(CST.EVENTS.OBJECT.LONG_HOVER);
-        }, CST.EVENTS.OBJECT.HOVER_TIME);
+        // Don't emit long hover event on touch enabled devices
+        if (!SYSTEM.TOUCH_ENABLED) {
+          this.longHoverTimeout = setTimeout(() => {
+            this.emit(CST.EVENTS.OBJECT.LONG_HOVER);
+          }, CST.EVENTS.OBJECT.HOVER_TIME);
+        }
       })
       .on("pointerout", () => {
         this.mapManager.events.unregisterDefaultPrevention();

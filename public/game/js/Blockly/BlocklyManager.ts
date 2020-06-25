@@ -2,6 +2,7 @@ import Manager from "../managers/Manager";
 import Blockly, { Generator } from "blockly";
 import CST from "../CST";
 import GameWindow from "../ui/GameWindow";
+import SYSTEM from "../system/system";
 
 import defineCustomBlocks from "./Workspace/blockDefs/customBlocks";
 import * as roLang from "blockly/msg/ro";
@@ -181,12 +182,17 @@ export default class BlocklyManager extends Manager {
   }
 
   private initWorkspace(toolboxXml: HTMLDocument) {
+    let startScale = SYSTEM.TOUCH_ENABLED
+      ? CST.BLOCKLY.MOBILE_INITIAL_SCALE
+      : CST.BLOCKLY.INITIAL_SCALE;
+
     this.workspace = Blockly.inject(CST.BLOCKLY.AREA_ID, {
       toolbox: toolboxXml.getElementById(CST.BLOCKLY.TOOLBOX_ID),
       // horizontalLayout: true,
       theme: this.darkTheme,
       zoom: {
-        controls: true
+        controls: true,
+        startScale
       },
       move: {
         scrollbars: true,
