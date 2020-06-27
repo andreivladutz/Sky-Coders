@@ -2,6 +2,7 @@
 import actionsCategory from "./blocksStubs/actions_stubs";
 import environmentCategory from "./blocksStubs/environment_stubs";
 import eventsCategory from "./blocksStubs/events_stubs";
+import registerExtensions from "./blocksExtensions";
 
 import blocksLang from "./blocksLang";
 import Blockly from "blockly";
@@ -28,6 +29,7 @@ export default function defineCustomBlocks(
   eventsCategory(Blockly as BlocklyJS);
 
   Blockly.defineBlocksWithJsonArray(blockDefs);
+  registerExtensions();
 
   // Add block translations to the locales
   addLocaleBlockText(locales);

@@ -110,3 +110,7 @@ button#terminalButton:hover {
   -ms-user-select: none /* IE 10+ */;
   user-select: none /* Likely future */;
 }
+
+.blocklyLabels > .blocklyFlyoutLabelText {
+  font: bold 24pt "Roboto" !important;
+}

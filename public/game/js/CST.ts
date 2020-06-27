@@ -272,6 +272,10 @@ export default {
       PRESS_TIME: 300,
       HOVER_TIME: 1000
     },
+    // The building finished its production
+    BUILDING: {
+      PROD_READY: "building.prodready"
+    },
     ARROWS_UI: {
       TAP: "arrow.tapped"
     },
@@ -521,6 +525,11 @@ export default {
       FUNCTION: /^procedure/,
       COMMAND: /^command$/,
       EVENT: /^event/
+    },
+    // Text inside labels to be localized
+    LABELS: {
+      COORDS: "#coords#",
+      BUILDINGS: "#builds#"
     }
   },
   WINDOW: {
@@ -660,7 +669,7 @@ export default {
       MIN: 0.3,
       MAX: 1
     },
-    DEFAULT_VOLUME: 0.5
+    DEFAULT_VOLUME: 0
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST,

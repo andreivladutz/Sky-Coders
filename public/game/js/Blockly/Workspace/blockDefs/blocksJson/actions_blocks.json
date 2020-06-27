@@ -15,5 +15,21 @@
     "colour": 165,
     "tooltip": "%{BKY_ACTIONS_WALK_TOOLTIP}",
     "helpUrl": ""
+  },
+  {
+    "type": "actions_collect",
+    "message0": "%{BKY_ACTIONS_COLLECT_TITLE}",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "BUILDING",
+        "check": "Building"
+      }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 165,
+    "tooltip": "%{BKY_ACTIONS_COLLECT_TOOLTIP}",
+    "helpUrl": ""
   }
 ]

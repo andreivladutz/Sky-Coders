@@ -51,6 +51,12 @@ const ro: LangFile = {
   actors: {
     cannotOpenWorkspace:
       "Selectați un caracter pentru a deschide editorul de cod!"
+  },
+  Blockly: {
+    labels: {
+      coords: "Coordonate:",
+      builds: "Clădiri:"
+    }
   }
 };
 

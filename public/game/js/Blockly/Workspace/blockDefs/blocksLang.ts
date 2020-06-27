@@ -1,3 +1,7 @@
+import { BuildNames } from "../../../../../common/BuildingTypes";
+import CST from "../../CODE_CST";
+const BLOCKS = CST.BLOCKS;
+
 export default {
   // Blocks localizations by category
   ENVIRONMENT: {
@@ -25,7 +29,16 @@ export default {
       ENV_NEIGHBOUR_UPLEFT: "up-left",
       ENV_NEIGHBOUR_UPRIGHT: "up-right",
       ENV_NEIGHBOUR_DOWNLEFT: "down-left",
-      ENV_NEIGHBOUR_DOWNRIGHT: "down-right"
+      ENV_NEIGHBOUR_DOWNRIGHT: "down-right",
+      ENV_BUILDING_TITLE: "building %1",
+      [BuildNames.residential]: "residential",
+      ENV_BUILDING_TOOLTIP: "Choose one of the buildings you own.",
+      [BLOCKS.PROD_READY.ANY_BKY_MSG_ID]: "any",
+      ENV_BUILDINGS_LIST_TITLE: "buildings list",
+      ENV_BUILDINGS_LIST_TOOLTIP:
+        "The list containing all the buildings on the map.",
+      ENV_READY_TITLE: "%1 is ready?",
+      ENV_READY_TOOLTIP: "Check if a building finished its production."
     },
     RO: {
       ENV_COORDINATE_PAIR_TOOLTIP: "O pereche de coordonate",
@@ -51,19 +64,34 @@ export default {
       ENV_NEIGHBOUR_UPLEFT: "sus-stânga",
       ENV_NEIGHBOUR_UPRIGHT: "sus-dreapta",
       ENV_NEIGHBOUR_DOWNLEFT: "jos-stânga",
-      ENV_NEIGHBOUR_DOWNRIGHT: "jos-dreapta"
+      ENV_NEIGHBOUR_DOWNRIGHT: "jos-dreapta",
+      ENV_BUILDING_TITLE: "clădire %1",
+      [BuildNames.residential]: "rezidențială",
+      ENV_BUILDING_TOOLTIP: "Alegeți una dintre clădirile pe care le dețineți.",
+      [BLOCKS.PROD_READY.ANY_BKY_MSG_ID]: "oricare",
+      ENV_BUILDINGS_LIST_TITLE: "lista clădirior",
+      ENV_BUILDINGS_LIST_TOOLTIP:
+        "Lista care conține toate clădirile de pe hartă.",
+      ENV_READY_TITLE: "%1 este gata?",
+      ENV_READY_TOOLTIP: "Verifică dacă o clădire și-a terminat producția."
     }
   },
   ACTIONS: {
     EN: {
       ACTIONS_WALK_TITLE: "walk to grid coordinate %1",
       ACTIONS_WALK_TOOLTIP:
-        "Tell the character to walk to the inserted coordinate."
+        "Tell the character to walk to the inserted coordinate.",
+      ACTIONS_COLLECT_TITLE: "Collect %1",
+      ACTIONS_COLLECT_TOOLTIP:
+        "Tell the character to walk to a building and collect its resources."
     },
     RO: {
       ACTIONS_WALK_TITLE: "mergi pe hartă la coordonata %1",
       ACTIONS_WALK_TOOLTIP:
-        "Spune caracterului să meargă la coordonata inserată."
+        "Spune caracterului să meargă la coordonata inserată.",
+      ACTIONS_COLLECT_TITLE: "Colectează %1",
+      ACTIONS_COLLECT_TOOLTIP:
+        "Spune caracterului să meargă la o clădire pentru a colecta resursele."
     }
   },
   EVENTS: {
@@ -71,10 +99,10 @@ export default {
       EVENTS_SELECTED_TITLE: "When selected",
       EVENTS_SELECTED_TOOLTIP:
         "All connected code runs when this character is selected.",
-      EVENTS_PRODREADY_TITLE: "When  %1 is ready",
+      EVENTS_PRODREADY_TITLE: "When %1 %2 is ready",
       EVENTS_PRODREADY_TOOLTIP:
         "Runs the code when one building has finished its production",
-      EVENTS_PRODREADY_BUILDING: "building",
+      EVENTS_PRODREADY_VAR: "building",
       COMMAND_TITLE: "Define command %1",
       COMMAND_TOOLTIP: "Create a command for this character.",
       COMMAND_NAME: "Do Something"
@@ -83,10 +111,10 @@ export default {
       EVENTS_SELECTED_TITLE: "Când este selectat",
       EVENTS_SELECTED_TOOLTIP:
         "Codul conectat va rula când acest caracter este selectat.",
-      EVENTS_PRODREADY_TITLE: "Când %1 este gata",
+      EVENTS_PRODREADY_TITLE: "Când %1 %2 este gata",
       EVENTS_PRODREADY_TOOLTIP:
         "Codul conectat va rula când o clădire și-a terminat producția.",
-      EVENTS_PRODREADY_BUILDING: "clădire",
+      EVENTS_PRODREADY_VAR: "clădire",
       COMMAND_TITLE: "Definește comanda %1",
       COMMAND_TOOLTIP: "Creează o comandă pentru acest caracter.",
       COMMAND_NAME: "Fă Ceva"

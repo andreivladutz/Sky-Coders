@@ -11,6 +11,7 @@ import * as enLang from "blockly/msg/en";
 import ActorCodeHandler from "../gameObjects/ActorCodeHandler";
 import ActorsManager from "../managers/ActorsManager";
 import GameManager from "../online/GameManager";
+import AudioManager from "../managers/AudioManager";
 
 const JavaScript: Generator = (Blockly as any).JavaScript;
 
@@ -39,7 +40,6 @@ export default class BlocklyManager extends Manager {
   // "download" the current state of the workspace in text
   public getWorkspaceTextState() {
     let domRepresentation = Blockly.Xml.workspaceToDom(this.workspace);
-
     return Blockly.Xml.domToText(domRepresentation);
   }
 
@@ -48,6 +48,7 @@ export default class BlocklyManager extends Manager {
     let domRepresentation = Blockly.Xml.textToDom(textState);
 
     Blockly.Xml.clearWorkspaceAndLoadFromXml(domRepresentation, this.workspace);
+    this.workspace.clearUndo();
   }
 
   public getCode(): string {
@@ -188,10 +189,37 @@ export default class BlocklyManager extends Manager {
     JavaScript.addReservedWords(CODE_CST.RESERVED_WORDS);
   }
 
+  // Translate the label tags' text in the Blockly toolbox
+  private localizeLabels(toolboxXml: HTMLDocument) {
+    let langFile = GameManager.getInstance().langFile;
+    let textAttribToLocalized = [
+      [CST.BLOCKLY.LABELS.COORDS, langFile.Blockly.labels.coords],
+      [CST.BLOCKLY.LABELS.BUILDINGS, langFile.Blockly.labels.builds]
+    ];
+
+    for (let [textAttrib, localizedText] of textAttribToLocalized) {
+      toolboxXml
+        .querySelectorAll(`label[text="${textAttrib}"`)[0]
+        .setAttribute("text", localizedText);
+    }
+  }
+
+  // Synchronize the volume with the audio manager volume
+  private synchronizeVolume() {
+    let wksAudio = this.workspace.getAudioManager();
+
+    let oldPlay = wksAudio.play;
+    wksAudio.play = (name: string) => {
+      oldPlay.call(wksAudio, name, AudioManager.getInstance().volume);
+    };
+  }
+
   private initWorkspace(toolboxXml: HTMLDocument) {
     let startScale = SYSTEM.TOUCH_ENABLED
       ? CST.BLOCKLY.MOBILE_INITIAL_SCALE
       : CST.BLOCKLY.INITIAL_SCALE;
+
+    this.localizeLabels(toolboxXml);
 
     this.workspace = Blockly.inject(CST.BLOCKLY.AREA_ID, {
       toolbox: toolboxXml.getElementById(CST.BLOCKLY.TOOLBOX_ID),
@@ -205,9 +233,11 @@ export default class BlocklyManager extends Manager {
         scrollbars: true,
         drag: true
       },
-      trashcan: true,
+      trashcan: false,
       renderer: "zelos"
     });
+
+    this.synchronizeVolume();
 
     this.workspace.addChangeListener(Blockly.Events.disableOrphans);
     this.addReservedWords();

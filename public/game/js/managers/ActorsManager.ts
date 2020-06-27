@@ -66,7 +66,7 @@ export default class ActorsManager extends Manager {
     }
   }
 
-  public updateBuildings(buildingInfo: InternalBuilding) {
+  public updateBuilding(buildingInfo: InternalBuilding) {
     for (let chara of this.sceneActors) {
       chara.codeHandler.interpreter.updateBuilding(buildingInfo);
     }

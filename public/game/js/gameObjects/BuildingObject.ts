@@ -78,23 +78,25 @@ export default class BuildingObject extends IsoSpriteObject {
   }
 
   public update() {
+    let oldProdReady = this.isProductionReady;
+
     if (
       Date.now() - this.lastProdTime >=
       BuildingTypes[this.buildingType].productionTime
     ) {
+      this.isProductionReady = true;
+
       // Was false and became true. Show the coin animation
-      if (this.isProductionReady === false) {
+      if (oldProdReady === false) {
         this.buildingsManager.onProductionReady(this);
       }
-
-      this.isProductionReady = true;
     } else {
+      this.isProductionReady = false;
+
       // The building was collected, hide the coin
-      if (this.isProductionReady === true) {
+      if (oldProdReady === true) {
         this.buildingsManager.onProductionCollected(this);
       }
-
-      this.isProductionReady = false;
     }
 
     // If a popover is visible, update the timer
@@ -172,6 +174,10 @@ export default class BuildingObject extends IsoSpriteObject {
 
   // Handler function for "pointerup" event. Override the one in IsoSpriteObject
   protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
+    if (!this.gameCanvasIsTarget(pointer.event)) {
+      return;
+    }
+
     this.actorWalkToBuilding();
   };
 

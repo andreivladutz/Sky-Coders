@@ -50,6 +50,12 @@ const en: LangFile = {
   },
   actors: {
     cannotOpenWorkspace: "Select a character to open the code editor!"
+  },
+  Blockly: {
+    labels: {
+      coords: "Coordinates:",
+      builds: "Buildings:"
+    }
   }
 };
 

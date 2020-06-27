@@ -4,6 +4,11 @@ import CharacterTerminal from "../Blockly/CharacterTerminal";
 import CodeInterpreter from "../Blockly/CodeInterpreter";
 import Actor from "./Actor";
 import CST from "../CST";
+import CODE_CST from "../Blockly/CODE_CST";
+import BuildingsManager from "../managers/BuildingsManager";
+import BuildingObject from "./BuildingObject";
+
+let BLOCKS = CODE_CST.BLOCKS;
 
 // The types of the top level blocks => commands and events
 export enum TopLevelBlocks {
@@ -27,7 +32,7 @@ export default class ActorCodeHandler {
   public codeCommands: CodeCommand[];
   // An array of registered events that have to be unregistered at some point
   private registeredEvents: {
-    [EventType: string]: () => void;
+    [EventType: string]: (...args: any[]) => void;
   }[] = [];
   // A functions map of pairs (functionName, functionCode)
   private functionsMap: Map<string, string>;
@@ -86,42 +91,101 @@ export default class ActorCodeHandler {
 
     // The top level blocks can be procedures!
     if (TOPBLOCK_REGEX.FUNCTION.test(blockType)) {
-      // Get the callable name of the function. It will be used to identify the function call inside the code
-      let functionName = JavaScript.variableDB_.getDistinctName(
-        topBlock.getFieldValue("NAME"),
-        Blockly.Procedures.NAME_TYPE
-      );
-
-      this.functionsMap.set(functionName, blockCode);
-      // Define the functions inside the scope of the interpreter so they can be run
-      this.interpreter.appendCode(blockCode);
+      this.handleFunction(JavaScript, topBlock, blockCode);
     }
     // The top level blocks can be events
     else if (TOPBLOCK_REGEX.EVENT.test(blockType)) {
-      this.registerCodeEvent(blockType, blockCode);
+      this.registerCodeEvent(topBlock, blockType, blockCode);
     }
     // Or command blocks
     else if (TOPBLOCK_REGEX.COMMAND.test(blockType)) {
-      this.codeCommands.push({
-        name: topBlock.getFieldValue("NAME"),
-        code: blockCode
-      });
+      this.handleCommand(topBlock, blockCode);
     }
   }
 
+  // Handle the "procedure_*" blocks
+  private handleFunction(
+    JavaScript: Generator,
+    topBlock: Block,
+    blockCode: string
+  ) {
+    // Get the callable name of the function. It will be used to identify the function call inside the code
+    let functionName = JavaScript.variableDB_.getDistinctName(
+      topBlock.getFieldValue("NAME"),
+      Blockly.Procedures.NAME_TYPE
+    );
+
+    this.functionsMap.set(functionName, blockCode);
+    // Define the functions inside the scope of the interpreter so they can be run
+    this.interpreter.appendCode(blockCode);
+  }
+
+  // Handle the "command" block
+  private handleCommand(topBlock: Block, blockCode: string) {
+    this.codeCommands.push({
+      name: topBlock.getFieldValue("NAME"),
+      code: blockCode
+    });
+  }
+
+  // Handle the "production ready" event block
+  private handleProdReadyEvent(
+    block: Block,
+    blockType: TopLevelBlocks,
+    blockCode: string
+  ) {
+    // Get the building id from the dropdown
+    let chosenBuildingId = block.getFieldValue(
+      BLOCKS.PROD_READY.BUILDS_DROPDOWN
+    );
+
+    let prodReadyHandler = (building: BuildingObject) => {
+      if (building.dbId === chosenBuildingId) {
+        this.runBlocklyCode(blockCode);
+      }
+      // The user chose building "any" so any building that finishes its production fires the event
+      else if (chosenBuildingId === BLOCKS.PROD_READY.ANY_OPTION_ID) {
+        this.runBlocklyCode(
+          blockCode.replace(BLOCKS.PROD_READY.ANY_OPTION_ID, building.dbId)
+        );
+      }
+    };
+
+    BuildingsManager.getInstance().EVENTS.on(
+      CST.EVENTS.BUILDING.PROD_READY,
+      prodReadyHandler
+    );
+
+    // Save the registered handler so we can unregister it later
+    this.registeredEvents.push({
+      [blockType]: prodReadyHandler
+    });
+  }
+
+  private handleOnSelectedEvent(blockType: TopLevelBlocks, blockCode: string) {
+    let selectHandler = () => {
+      this.runBlocklyCode(blockCode);
+    };
+
+    this.parentActor.on(CST.EVENTS.OBJECT.SELECT, selectHandler);
+    // Save the registered handler so we can unregister it later
+    this.registeredEvents.push({
+      [blockType]: selectHandler
+    });
+  }
+
   // Register an event that will run some code
-  private registerCodeEvent(blockType: TopLevelBlocks, blockCode: string) {
+  private registerCodeEvent(
+    topBlock: Block,
+    blockType: TopLevelBlocks,
+    blockCode: string
+  ) {
     switch (blockType) {
       case TopLevelBlocks.EVENT_SELECTED:
-        let selectHandler = () => {
-          this.runBlocklyCode(blockCode);
-        };
-
-        this.parentActor.on(CST.EVENTS.OBJECT.SELECT, selectHandler);
-        // Save the registered handler so we can unregister it later
-        this.registeredEvents.push({
-          [blockType]: selectHandler
-        });
+        this.handleOnSelectedEvent(blockType, blockCode);
+        break;
+      case TopLevelBlocks.EVENT_PRODREADY:
+        this.handleProdReadyEvent(topBlock, blockType, blockCode);
         break;
     }
   }
@@ -132,6 +196,12 @@ export default class ActorCodeHandler {
         switch (blockType) {
           case TopLevelBlocks.EVENT_SELECTED:
             this.parentActor.off(CST.EVENTS.OBJECT.SELECT, registeredHandler);
+            break;
+          case TopLevelBlocks.EVENT_PRODREADY:
+            BuildingsManager.getInstance().EVENTS.off(
+              CST.EVENTS.BUILDING.PROD_READY,
+              registeredHandler
+            );
             break;
         }
       }

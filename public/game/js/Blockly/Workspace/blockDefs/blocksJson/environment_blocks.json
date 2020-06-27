@@ -106,5 +106,44 @@
     "colour": 65,
     "tooltip": "%{BKY_ENV_NEIGHBOUR_DIR_TOOTLTIP}",
     "helpUrl": ""
+  },
+  {
+    "type": "environment_building",
+    "message0": "%{BKY_ENV_BUILDING_TITLE}",
+    "args0": [
+      {
+        "type": "input_dummy",
+        "name": "BUILD"
+      }
+    ],
+    "extensions": ["generate_buildings_dropdown"],
+    "output": "Building",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_BUILDING_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_buildings_list",
+    "message0": "%{BKY_ENV_BUILDINGS_LIST_TITLE}",
+    "output": "Array",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_BUILDINGS_LIST_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_ready",
+    "message0": "%{BKY_ENV_READY_TITLE}",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "BUILDING",
+        "check": "Building"
+      }
+    ],
+    "inputsInline": true,
+    "output": "Boolean",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_READY_TOOLTIP}",
+    "helpUrl": ""
   }
 ]

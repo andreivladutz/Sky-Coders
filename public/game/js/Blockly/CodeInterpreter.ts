@@ -58,15 +58,6 @@ export default class CodeInterpreter {
   // * if the production is ready
   public updateBuilding(buildingCfg: InternalBuilding) {
     this.wrapInternalCode(INTERNS.UPDATE_BUILD(buildingCfg));
-    // this.appendCode(`
-    // {
-    //   var __buildsIds__ = Object.getOwnPropertyNames(__chara__.builds);
-    //   for (var i = 0; i < __buildsIds__.length; i++) {
-    //     var key = __buildsIds__[i];
-    //     print(key);
-    //   }
-    // }
-    // `);
   }
 
   // Wrap the internal code that can be run all at once in synchronous manner
@@ -123,12 +114,10 @@ export default class CodeInterpreter {
   ) {
     let startOfInternalCode = () => {
       this.isRunningInternalCode = true;
-      console.log("RUNNING INTERNAL CODE");
     };
 
     let endOfInternalCode = () => {
       this.isRunningInternalCode = false;
-      console.log("STOPPED INTERNAL CODE");
     };
 
     this.setSyncFunc(
@@ -154,7 +143,8 @@ export default class CodeInterpreter {
       walkToWrapper,
       isCoordReachableWrapper,
       getXCoordWrapper,
-      getYCoordWrapper
+      getYCoordWrapper,
+      collectWrapper
     ] = this.getApiWrappers();
 
     // Create a "self" reserved-named object to hold all the native functions for a character
@@ -170,7 +160,8 @@ export default class CodeInterpreter {
         isCoordReachableWrapper
       )
       .setSyncFunc(interpreter, selfObject, API.POS_X, getXCoordWrapper)
-      .setSyncFunc(interpreter, selfObject, API.POS_Y, getYCoordWrapper);
+      .setSyncFunc(interpreter, selfObject, API.POS_Y, getYCoordWrapper)
+      .setAsyncFunc(interpreter, selfObject, API.COLLECT, collectWrapper);
 
     this.createInternalWrappers(interpreter, globalObject);
   };
@@ -217,12 +208,22 @@ export default class CodeInterpreter {
       return this.actor.tileY;
     };
 
+    let collectWrapper = async (buildingId: string, finishedCb: () => void) => {
+      this.awaitingAsyncOp = true;
+      await this.actor.navigationBlocklyHandler(buildingId);
+      setTimeout(() => {
+        this.awaitingAsyncOp = false;
+        finishedCb();
+      }, CODE_CST.NAVIGATION.IDLE_TIME);
+    };
+
     return [
       alertWrapper,
       walkToWrapper,
       isCoordReachableWrapper,
       getXCoordWrapper,
-      getYCoordWrapper
+      getYCoordWrapper,
+      collectWrapper
     ];
   }
 }

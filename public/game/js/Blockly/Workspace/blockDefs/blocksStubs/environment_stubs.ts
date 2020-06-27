@@ -1,8 +1,12 @@
 import { Block } from "blockly";
 import { BlocklyJS } from "../codeUtils";
 import CODE_CST from "../../../CODE_CST";
+import BuildingsManager from "../../../../managers/BuildingsManager";
+import Phaser from "phaser";
+import BuildingObject from "../../../../gameObjects/BuildingObject";
 
 const API = CODE_CST.API_FUNCS;
+const INTERN = CODE_CST.INTERNALS;
 const { SELF } = CODE_CST;
 
 // Possible neighbour directions of a tile coordinate
@@ -152,8 +156,50 @@ export default function(Blockly: BlocklyJS) {
     );
 
     // Call the get neighbour function
-    var code = `${functionName}(${value_coord})`;
+    let code = `${functionName}(${value_coord})`;
 
     return [code, Blockly.JavaScript.ORDER_MEMBER];
+  };
+
+  Blockly.JavaScript["environment_building"] = function(block: Block) {
+    let buildingId = block.getFieldValue(
+      CODE_CST.BLOCKS.PROD_READY.BUILDS_DROPDOWN
+    );
+
+    if (buildingId === CODE_CST.BLOCKS.PROD_READY.ANY_OPTION_ID) {
+      // If the user chose "#any#" get a random building id
+      let randBuild = Phaser.Math.RND.pick(
+        BuildingsManager.getInstance().sceneBuildings.getChildren()
+      ) as BuildingObject;
+
+      if (randBuild) {
+        buildingId = randBuild.dbId;
+      } else {
+        buildingId = "";
+      }
+    }
+
+    let code = buildingId
+      ? `${INTERN.INTERNAL_OBJ}.${INTERN.BUILDINGS_DICT}["${buildingId}"]`
+      : "{}";
+    return [code, Blockly.JavaScript.ORDER_MEMBER];
+  };
+
+  Blockly.JavaScript["environment_buildings_list"] = function(block: Block) {
+    let code = `${SELF}.${API.GET_BUILDINGS_LIST}()`;
+
+    return [code, Blockly.JavaScript.ORDER_MEMBER];
+  };
+
+  Blockly.JavaScript["environment_ready"] = function(block: Block) {
+    let value_building =
+      Blockly.JavaScript.valueToCode(
+        block,
+        "BUILDING",
+        Blockly.JavaScript.ORDER_MEMBER
+      ) || "{}";
+
+    let code = `${value_building}.isReady`;
+    return [code, Blockly.JavaScript.ORDER_LOGICAL_NOT];
   };
 }

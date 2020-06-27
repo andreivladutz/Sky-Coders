@@ -40,4 +40,15 @@ export default function(Blockly: BlocklyJS) {
       ) || "''";
     return `${SELF}.${API.PRINT}((${msg}).toString());\n`;
   };
+
+  Blockly.JavaScript["actions_collect"] = function(block: Block) {
+    let value_building = Blockly.JavaScript.valueToCode(
+      block,
+      "BUILDING",
+      Blockly.JavaScript.ORDER_MEMBER
+    );
+
+    let code = `${SELF}.${API.COLLECT}(${value_building}.id);\n`;
+    return code;
+  };
 }

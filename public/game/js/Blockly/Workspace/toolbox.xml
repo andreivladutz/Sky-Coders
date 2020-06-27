@@ -224,6 +224,7 @@
     <block type="events_prod_ready"></block>
   </category>
   <category name="Environment" colour="#9fa55b">
+    <label text="#coords#" web-class="blocklyLabels"></label>
     <block type="environment_coordinate_pair">
       <value name="X_COORD">
         <shadow type="math_number">
@@ -269,6 +270,14 @@
         <shadow type="environment_position"></shadow>
       </value>
     </block>
+    <label text="#builds#" web-class="blocklyLabels"></label>
+    <block type="environment_building"></block>
+    <block type="environment_buildings_list"></block>
+    <block type="environment_ready">
+      <value name="BUILDING">
+        <shadow type="environment_building"></shadow>
+      </value>
+    </block>
   </category>
   <category name="Actions" colour="#5ba58c">
     <block type="text_print">
@@ -292,6 +301,11 @@
             </shadow>
           </value>
         </shadow>
+      </value>
+    </block>
+    <block type="actions_collect">
+      <value name="BUILDING">
+        <shadow type="environment_building"></shadow>
       </value>
     </block>
   </category>

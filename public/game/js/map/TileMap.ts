@@ -98,6 +98,9 @@ export default class TileMap {
   // When the device's browser resizes recompute the positions on the next render cycle
   willRecomputePositions: boolean = false;
 
+  // The size of the tallest cliff's frame
+  tallestCliff: number = 0;
+
   constructor(config: TileMapConfig) {
     this.scene = config.scene;
 
@@ -146,6 +149,7 @@ export default class TileMap {
     let cliffsSparseMatrix: CliffsMatrix = {};
     this.generateCliffs(cliffsSparseMatrix);
 
+    this.getTallestCliffFrame();
     this.bufferMapPieces(cliffsSparseMatrix);
     this.redrawMap();
 
@@ -176,6 +180,18 @@ export default class TileMap {
     //     }
     //   }
     // };
+  }
+
+  private getTallestCliffFrame() {
+    let textureKey = this.envManager.getTextureKey(),
+      cliffFrames = this.envManager.cliffFrames;
+
+    for (let frame of cliffFrames) {
+      this.tallestCliff = Math.max(
+        this.tallestCliff,
+        this.scene.textures.get(textureKey).frames[frame].realHeight
+      );
+    }
   }
 
   // Initialize a map canvas and add it to the DOM
@@ -300,7 +316,9 @@ export default class TileMap {
     );
 
     chunkExtremes.topY = topY;
-    chunkExtremes.bottomY = bottomY;
+    // Just extend the height of the canvas buffers with the height of a cliff
+    // So we make sure that drawn cliffs won't be cut away
+    chunkExtremes.bottomY = bottomY + this.tallestCliff;
     chunkExtremes.leftX = leftX;
     chunkExtremes.rightX = rightX;
   }

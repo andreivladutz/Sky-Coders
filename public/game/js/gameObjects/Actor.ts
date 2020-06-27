@@ -18,6 +18,7 @@ import CameraManager from "../managers/CameraManager";
 import CommonCST from "../../../common/CommonCST";
 import BlocklyManager from "../Blockly/BlocklyManager";
 import AudioManager from "../managers/AudioManager";
+import BuildingsManager from "../managers/BuildingsManager";
 
 // mapping event to directions
 const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
@@ -187,10 +188,23 @@ export default class Actor extends NavSpriteObject {
 
   // Handle a navigation request from Blockly code.
   // While walking from code user walk commands are disabled
-  public async navigationBlocklyHandler(x: number, y: number) {
+  // *ALSO* handle building collection with the same function
+  public async navigationBlocklyHandler(x: number | string, y?: number) {
     this.walkingFromCode = true;
-    await this.navigateTo(x, y, true);
-    await this.destinationConclusion;
+
+    // The parameters are coordinates
+    if (typeof x === "number" && typeof y === "number") {
+      await this.navigateTo(x, y, true);
+      await this.destinationConclusion;
+    }
+    // The first parameter is a building id
+    else if (typeof x === "string") {
+      let dbId = x;
+      let building = BuildingsManager.getInstance().getBuildingWithId(dbId);
+
+      await building.actorWalkToBuilding(this);
+    }
+
     this.walkingFromCode = false;
   }
 

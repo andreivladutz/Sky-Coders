@@ -251,8 +251,16 @@ export default class IsoSpriteObject extends IsoSprite {
     return this;
   }
 
+  protected gameCanvasIsTarget(ev: MouseEvent | TouchEvent) {
+    return ev.target === this.scene.game.canvas;
+  }
+
   // Handler function for "pointerdown" event -> checking PRESS
   private checkPressLogic = (pointer: Phaser.Input.Pointer) => {
+    if (!this.gameCanvasIsTarget(pointer.event)) {
+      return;
+    }
+
     // Consider the right mouse button as being a press action
     if (pointer.rightButtonDown()) {
       this.pressWasFired = true;
@@ -272,6 +280,10 @@ export default class IsoSpriteObject extends IsoSprite {
 
   // Handler function for "pointerup" event
   protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
+    if (!this.gameCanvasIsTarget(pointer.event)) {
+      return;
+    }
+
     // If the press event fired and it should cancel selection / deselection
     if (this.pressWasFired && this.pressCancelsSelection) {
       this.pressWasFired = false;

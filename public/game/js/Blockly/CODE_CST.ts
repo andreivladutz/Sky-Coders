@@ -16,26 +16,38 @@ const SELF = "self",
   START_INTERNAL_CODE = "__startInternal__",
   END_INTERNAL_CODE = "__endInternal__";
 
+const STRINGIFIED_TOKEN = "#str#";
+
 const CST = {
   // The object that hold all "native" functions
   SELF,
   // The "list" of reserved words
-  RESERVED_WORDS: [SELF, INTERNAL_OBJ].join(","),
+  RESERVED_WORDS: [
+    SELF,
+    INTERNAL_OBJ,
+    START_INTERNAL_CODE,
+    END_INTERNAL_CODE
+  ].join(","),
   // The names of the functions used to mark internal specialized code
   // START marks that internal code follows in the interpreter
   // and END marks the end of the internal code that can be run in one go
   START_INTERNAL_CODE,
+  END_INTERNAL_CODE,
   // Run 2000 steps in interpreter code at a time
   ALLOWED_STEPS: 2000,
-  END_INTERNAL_CODE,
   // Name of the api functions
   API_FUNCS: {
     PRINT: "print",
     WALK_TO: "walkTo",
+    COLLECT: "collect",
     // Character's current position
     POS_X: "getXCoord",
     POS_Y: "getYCoord",
-    REACHABLE: "isCoordReachable"
+    REACHABLE: "isCoordReachable",
+    /* Added utilities internally: (i.e. defined by string code, not inside the game code on the global object) */
+
+    // Get the list containing all map buildings
+    GET_BUILDINGS_LIST: "getAllBuildings"
   },
   INTERNALS: {
     INIT_CODE: internalsInit,
@@ -50,21 +62,55 @@ const CST = {
     // Returns the code that updates an internal building
     UPDATE_BUILD: updateBuilding
   },
+  // Extensions for dynamic blocks
+  BLOCKS_EXTENSIONS: {
+    // The extension that generates the buildings dropdown
+    GEN_BUILDS_DROPDOWN: "generate_buildings_dropdown"
+  },
+  // Blocks constants, names and such
+  BLOCKS: {
+    PROD_READY: {
+      // THE NAME OF THE buildings dropdown
+      BUILDS_DROPDOWN: "BUILDS_DROPDOWN",
+      // Provide an "any" option
+      ANY_BKY_MSG_ID: "ENV_BUILD_ANY",
+      // A token that doesn't exist in normal code
+      ANY_OPTION_ID: "#any#"
+    }
+  },
   NAVIGATION: {
     // How much time the actor should stay idle before walking again
     // This is useful for stopping immediate walks
     // starting after other walks end and making it look funny
     IDLE_TIME: 250
+  },
+  /// The toString methods of the internal objects
+  STRING_CONVERSIONS: {
+    METHOD_DEF: `toString: function() {
+      return ${STRINGIFIED_TOKEN};
+    }`,
+    BUILDINGS: "this.buildingType + '_building(' + this.id + ')'"
   }
 };
 
 export default CST;
 
 const INTERN = CST.INTERNALS;
+const STRING = CST.STRING_CONVERSIONS;
 
-// Get the code for the function that constructs an object with properties props
-// And adds it to its dedicated dictionary objectsDict
-function getObjectConstructor(props: string[], objectsDict: string) {
+//
+/**
+ * Get the code for the function that constructs an object with properties props
+ * And adds it to its dedicated dictionary objectsDict
+ * @param props the string array of property names of the object
+ * @param objectsDict the name of the objects' dictionary
+ * @param stringConversion the code that stringifies an object of this type
+ */
+function getObjectConstructor(
+  props: string[],
+  objectsDict: string,
+  stringConversion: string
+) {
   let constructorHead = "function( ";
   let constructedObj = "{ ";
 
@@ -73,8 +119,13 @@ function getObjectConstructor(props: string[], objectsDict: string) {
     constructedObj += `${prop}: ${prop},`;
   }
 
+  let toStringMet = STRING.METHOD_DEF.replace(
+    STRINGIFIED_TOKEN,
+    stringConversion
+  );
+
   constructorHead = constructorHead.slice(0, constructorHead.length - 1) + " )";
-  constructedObj = constructedObj.slice(0, constructedObj.length - 1) + " }";
+  constructedObj += ` ${toStringMet} }`;
 
   return `${constructorHead} {
     ${INTERN.INTERNAL_OBJ}.${objectsDict}[id] = ${constructedObj};
@@ -123,7 +174,25 @@ function internalsInit() {
     var ${INTERN.INTERNAL_OBJ} = {
       ${INTERN.BUILDINGS_DICT}: {},
       ${BuildsConstructor}: 
-        ${getObjectConstructor(InternalBuildingProps, INTERN.BUILDINGS_DICT)}
+        ${getObjectConstructor(
+          InternalBuildingProps,
+          INTERN.BUILDINGS_DICT,
+          STRING.BUILDINGS
+        )}
     };\n
+
+    ${SELF}.${CST.API_FUNCS.GET_BUILDINGS_LIST} = function() {
+      var __buildsIds__ = Object.getOwnPropertyNames(${INTERN.INTERNAL_OBJ}.${
+    INTERN.BUILDINGS_DICT
+  });
+      var builds = [];
+
+      for (var i = 0; i < __buildsIds__.length; i++) {
+        var key = __buildsIds__[i];
+        builds.push(${INTERN.INTERNAL_OBJ}.${INTERN.BUILDINGS_DICT}[key]);
+      }
+
+      return builds;
+    }
   `;
 }

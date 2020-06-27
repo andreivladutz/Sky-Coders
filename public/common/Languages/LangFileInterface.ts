@@ -49,6 +49,12 @@ export default interface LangFile {
   actors: {
     cannotOpenWorkspace: string;
   };
+  Blockly: {
+    labels: {
+      coords: string;
+      builds: string;
+    };
+  };
 }
 
 export const LanguageIds: {

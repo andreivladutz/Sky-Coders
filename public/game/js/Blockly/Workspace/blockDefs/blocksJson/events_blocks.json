@@ -13,10 +13,17 @@
     "args0": [
       {
         "type": "field_variable",
-        "name": "BUILD",
-        "variable": "%{BKY_EVENTS_PRODREADY_BUILDING}"
+        "name": "BUILDING",
+        "variable": "%{BKY_EVENTS_PRODREADY_VAR}",
+        "check": "Building"
+      },
+      {
+        "type": "input_dummy",
+        "name": "BUILD"
       }
     ],
+    "extensions": ["generate_buildings_dropdown"],
+    "inputsInline": true,
     "nextStatement": null,
     "colour": 30,
     "tooltip": "%{BKY_EVENTS_PRODREADY_TOOLTIP}",

@@ -28,6 +28,7 @@ type ActorFootsteps = {
 
 export default class AudioManager extends Manager {
   public isInited = false;
+  public volume: number;
 
   private scene: Scene;
   private soundTrack: BaseSound;
@@ -84,6 +85,7 @@ export default class AudioManager extends Manager {
       return;
     }
 
+    this.volume = volume;
     this.scene.sound.volume = volume;
   }
 

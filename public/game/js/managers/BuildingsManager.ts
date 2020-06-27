@@ -16,12 +16,14 @@ import BuildingsMessenger from "../online/BuildingsMessenger";
 import ResourcesManager from "./ResourcesManager";
 import AudioManager from "./AudioManager";
 import ActorsManager from "./ActorsManager";
-import { runInThisContext } from "vm";
 
 export default class BuildingsManager extends Manager
   implements LoadingInjectedManager {
   // the frames of the buildings indexed by their identifier i.e. "residential", etcetera..
   public buildingFrames: FramesMap = {};
+
+  // * ProdReady event
+  public EVENTS = new Phaser.Events.EventEmitter();
 
   // Will be injected by the LoaderInjector class
   loadResources: (load: Phaser.Loader.LoaderPlugin) => void;
@@ -75,6 +77,21 @@ export default class BuildingsManager extends Manager
     return building;
   }
 
+  /**
+   * Return the building with id = @param dbId or @null if nothing is found
+   */
+  public getBuildingWithId(dbId: string): BuildingObject {
+    let foundBuilding: BuildingObject = null;
+
+    this.sceneBuildings.children.iterate((building: BuildingObject) => {
+      if (building.dbId === dbId) {
+        foundBuilding = building;
+      }
+    });
+
+    return foundBuilding;
+  }
+
   private initComponents(gameScene: IsoScene) {
     this.resourcesManager = ResourcesManager.getInstance();
     this.resourcesManager.initResourcesUi(gameScene);
@@ -93,12 +110,25 @@ export default class BuildingsManager extends Manager
     });
   }
 
+  // When the production has finished or has been collected update
+  // the interpreters with the new isReady flag state:
   public onProductionReady(building: BuildingObject) {
+    ActorsManager.getInstance().updateBuilding(
+      building.getInterpreterRepresentation()
+    );
     this.resourcesManager.resourcesUi.showProductionReady(building);
+
+    // Emit the production ready event and send the building along with it
+    this.EVENTS.emit(CST.EVENTS.BUILDING.PROD_READY, building);
   }
 
   // This is being called by the collected building with itself as argument
   public onProductionCollected(building: BuildingObject) {
+    // When the production has finished or has been collected update
+    // the interpreters with the new isReady flag state:
+    ActorsManager.getInstance().updateBuilding(
+      building.getInterpreterRepresentation()
+    );
     // Hide the animated coin
     this.resourcesManager.resourcesUi.hideProductionReady(
       building.productionCoin
