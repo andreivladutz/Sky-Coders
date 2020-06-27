@@ -1,4 +1,4 @@
-import UIComponent from "./UIComponent";
+import UIComponent from "./uiUtils/UIComponent";
 import IsoScene from "../IsoPlugin/IsoScene";
 import UIScene from "../scenes/UIScene";
 
@@ -9,6 +9,8 @@ import LoaderInjector, {
   LoadingInjectedManager,
   FramesMap
 } from "../managers/LoaderInjector";
+
+import UIStateMachine from "./uiUtils/UIStateMachine";
 
 type UIComponentConstructor = new (
   uiScene: UIScene,
@@ -23,6 +25,8 @@ export default class UIComponents extends Manager
   implements LoadingInjectedManager {
   // Instances of all the different components, indexed by their class name
   private static UIInstances: UIComponentsMap = {};
+
+  public static uiStateMachine: UIStateMachine;
 
   /**
    * Provide the desired UIComponent(s) class(es) and this factory function will return its(their) singleton instance
@@ -60,6 +64,20 @@ export default class UIComponents extends Manager
     return uiInstances;
   }
 
+  // init the global ui state machine
+  public static initUIStateMachine(
+    uiScene: UIScene,
+    gameScene: IsoScene
+  ): UIStateMachine {
+    this.uiStateMachine = new UIStateMachine(uiScene, gameScene);
+
+    return this.uiStateMachine;
+  }
+
+  public static getUIStateMachine(): UIStateMachine {
+    return this.uiStateMachine;
+  }
+
   // the frames of the buttons indexed by their identifier i.e. "Settings", etcetera..
   buttonsFrames: FramesMap = {};
 
@@ -69,6 +87,17 @@ export default class UIComponents extends Manager
 
   public async preload(load: Loader.LoaderPlugin) {
     LoaderInjector.Inject(this, this.buttonsFrames, CST.BUTTONS)(load);
+
+    // Load the coins SVGs
+    load.setPath(CST.UI.COINS.PATH);
+    load.setPrefix(CST.UI.COINS.PREFIX);
+
+    for (let coinCfg of Object.values(CST.UI.COINS.TYPES)) {
+      load.html(coinCfg.KEY, coinCfg.FILENAME);
+    }
+
+    load.setPath();
+    load.setPrefix();
   }
 
   public static getInstance(): UIComponents {

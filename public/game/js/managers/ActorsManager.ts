@@ -1,35 +1,180 @@
-import ACTORS_CST from "../ACTORS_CST";
-import Actor, { ActorConfig } from "../gameObjects/Actor";
-
+import ACTORS_CST, { ACTOR_NAMES_ARR, ACTOR_NAMES } from "../ACTORS_CST";
+import Actor from "../gameObjects/Actor";
 import Manager from "./Manager";
+import CharacterUI from "../ui/CharacterUI";
+import CST from "../CST";
+import UIScene from "../scenes/UIScene";
+import IsoScene from "../IsoPlugin/IsoScene";
+import GameManager from "../online/GameManager";
+import LayersManager from "./LayersManager";
+import MapManager from "./MapManager";
+import BlocklyManager from "../Blockly/BlocklyManager";
+import { InternalBuilding } from "../Blockly/CODE_CST";
+import BuildingsManager from "./BuildingsManager";
 
 // Singleton class handling the loading of the actor resources
 export default class ActorsManager extends Manager {
   // all actors in this scene
-  sceneActors: Actor[] = [];
+  public sceneActors: Actor[] = [];
   // currently selected Actor
-  selectedActor: Actor = null;
+  public selectedActor: Actor = null;
+  public charaUI: CharacterUI;
+  // The messenger used to talk to the server "about" the game charas
+  public charaMsgr = GameManager.getInstance().messengers.characters;
+
+  // Init all characters coming from the server (all positioned)
+  // And position the characters that have to be positioned
+  public initCharacters(gameScene: IsoScene): this {
+    // Ack functions that take in the position of the new actor
+    for (let [characterInfo, positionAck] of this.charaMsgr.positioningAcks) {
+      let actor = new Actor({
+        tileX: 0,
+        tileY: 0,
+        scene: gameScene,
+        actorKey: characterInfo.actorKey,
+        dbId: characterInfo._id,
+        blocklyWorkspace: characterInfo.workspaceBlockly
+      });
+
+      this.placeActor(actor);
+      positionAck({ x: actor.tileX, y: actor.tileY });
+    }
+
+    for (let existingActor of this.charaMsgr.existingCharas) {
+      new Actor({
+        scene: gameScene,
+        actorKey: existingActor.actorKey,
+        tileX: existingActor.position.x,
+        tileY: existingActor.position.y,
+        dbId: existingActor._id,
+        blocklyWorkspace: existingActor.workspaceBlockly
+      });
+    }
+
+    // After all characters have been inited, init the blockly manager
+    BlocklyManager.getInstance().init(gameScene.cache);
+    // Send all the permanent buildings to the internals of each interpreter
+    BuildingsManager.getInstance().onActorsInterpretersInited(this);
+
+    return this;
+  }
+
+  // When a building is permanently added to the map, send it to the characters' interpreters
+  public onBuildingPlaced(buildingInfo: InternalBuilding) {
+    for (let chara of this.sceneActors) {
+      chara.codeHandler.interpreter.addBuilding(buildingInfo);
+    }
+  }
+
+  public updateBuilding(buildingInfo: InternalBuilding) {
+    for (let chara of this.sceneActors) {
+      chara.codeHandler.interpreter.updateBuilding(buildingInfo);
+    }
+  }
+
+  // Place an actor on the INITED map
+  private placeActor(actor: Actor) {
+    // TODO: in the future let the user place the actors manually
+    // do not risk not finding a good positioning
+    let foundPosition: boolean;
+    let layerManager = LayersManager.getInstance();
+    let mapManager = MapManager.getInstance();
+
+    let RND = Phaser.Math.RND;
+
+    do {
+      foundPosition = true;
+
+      let tileX = RND.integerInRange(0, mapManager.mapWidth - 1);
+      let tileY = RND.integerInRange(0, mapManager.mapHeight - 1);
+
+      actor.setTilePosition(tileX, tileY);
+
+      if (layerManager.isColliding(actor, true)) {
+        foundPosition = false;
+      }
+    } while (!foundPosition);
+  }
+
+  // Send updates to the server about the actor
+  public sendActorUpdates(actor: Actor, dbId: string) {
+    this.charaMsgr.updateCharacter({
+      actorKey: actor.actorKey as ACTOR_NAMES,
+      _id: dbId,
+      position: {
+        x: actor.tileX,
+        y: actor.tileY
+      },
+      workspaceBlockly: actor.codeHandler.blocklyWorkspace
+    });
+  }
 
   // when an actor gets selected, the actorsManager should be informed
   public onActorSelected(actor: Actor) {
     // there is another actor selected, deselect him
     if (this.selectedActor && this.selectedActor !== actor) {
-      this.selectedActor.toggleSelected();
+      this.selectedActor.deselect();
     }
 
     this.selectedActor = actor;
+    this.toggleCharaSelectionUI(true);
   }
 
-  public onActorDeselected(actor: Actor) {
-    if (this.selectedActor === actor) {
-      this.selectedActor = null;
+  public onActorDeselected() {
+    this.toggleCharaSelectionUI(false);
+    this.selectedActor = null;
+  }
+
+  // Cancels the movement of all actors
+  public cancelAllMovement() {
+    for (let actor of this.sceneActors) {
+      actor.cancelMovement();
     }
+  }
+
+  public static getAllActorsNames() {
+    return ACTOR_NAMES_ARR;
   }
 
   // called in the preload() method of LoadingScene
   // loads all the resources needed for the actors
   async preload(load: Phaser.Loader.LoaderPlugin) {
     this.loadResources(load);
+  }
+
+  // Init charaUI internally or init will come from an actor
+  public async initCharaUI(actor: Actor) {
+    let UIComponents = (await import("../ui/UIComponentsFactory")).default;
+    let CharacterUI = (await import("../ui/CharacterUI")).default;
+
+    let gameScene = actor.scene as IsoScene;
+    let uiScene = gameScene.scene.get(CST.SCENES.UI) as UIScene;
+
+    // Ignore the ui scene and game scene
+    return (this.charaUI = UIComponents.getUIComponents(
+      CharacterUI,
+      uiScene,
+      gameScene
+    )[0] as CharacterUI);
+  }
+
+  // Turn on or off the chara selection UI
+  private async toggleCharaSelectionUI(turnOn: boolean) {
+    if (!this.charaUI) {
+      // The character is only needed to get the game and the ui scenes
+      await this.initCharaUI(this.selectedActor);
+    }
+
+    if (turnOn) {
+      if (this.charaUI.isEnabled) {
+        this.charaUI.turnOff();
+        this.charaUI.enable(this.selectedActor);
+      } else {
+        this.charaUI.enable(this.selectedActor);
+      }
+    } else {
+      this.charaUI.turnOff();
+    }
   }
 
   private loadResources(load: Phaser.Loader.LoaderPlugin) {

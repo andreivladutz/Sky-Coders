@@ -1,0 +1,60 @@
+<div class="row justify-content-end" style="position:relative;top:1rem;">
+  <div class="dropdown col-3">
+    <button
+      class="btn btn-secondary dropdown-toggle"
+      type="button"
+      id="dropdownMenuButton"
+      data-toggle="dropdown"
+      aria-haspopup="true"
+      aria-expanded="false"
+    >
+      <span class="flag-icon flag-icon-<%= flagCode %>"></span> 
+      <%= langName %>   
+    </button>
+
+    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+      <% langs.forEach(lang => { %>
+        <a id="<%= lang.langCode %>" class="dropdown-item" href="#">
+          <span class="flag-icon flag-icon-<%= lang.flagCode %>"></span> 
+          <%= lang.langName %> 
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <div class="card card-body">
+      <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i>  <%= title %> </h1>
+      <!-- Display temporary messages -->
+      <%- include('./partials/messages.ejs') %>
+      <form id="login-form" action="/users/login" method="POST">
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            class="form-control"
+            placeholder="<%= placeholdEmail %> "
+          />
+        </div>
+        <div class="form-group">
+          <label for="password"><%= pass %> </label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            class="form-control"
+            placeholder="<%= placeholdPass %> "
+          />
+        </div>
+        <button type="submit" id="login-btn" class="btn btn-primary btn-block"><%= btn %> </button>
+      </form>
+      <p class="lead mt-4">
+        <%= registerRedirect %>  <a href="/users/register"><%= register %> </a>
+      </p>
+    </div>
+  </div>
+</div></h1>

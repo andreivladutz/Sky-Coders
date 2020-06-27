@@ -1,3 +1,6 @@
+const EMPTY_OBJECT_TILE = 0,
+  OCCUPIED_OBJECT_TILE = 1;
+
 globalThis.NavObjectHelpers = class {
   // correspondants of the properties in the NavSpriteObjects:
   // tile position of the object relative to the local grid
@@ -10,21 +13,74 @@ globalThis.NavObjectHelpers = class {
   mapWidth;
   mapHeight;
   mapGrid;
-  // the tile objects cannot walk on (it probably is 0)
+
+  // we also have a separate grid of objects
+  objectLayer = [];
+
+  // the tile objects actors cannot walk on (it probably is 0)
   unwalkableTile;
 
-  constructor(config) {
+  // first, the worker will be inited with the configuration of the map
+  constructor(mapConfig) {
+    this.mapWidth = mapConfig.mapWidth;
+    this.mapHeight = mapConfig.mapHeight;
+
+    this.mapGrid = mapConfig.mapGrid;
+
+    this.unwalkableTile = mapConfig.unwalkableTile;
+
+    this.initObjectLayer();
+  }
+
+  // after the worker is inited with map details, a message with the actor
+  // configuration is expected
+  configureActor(config) {
     this.localTileX = config.localTileX;
     this.localTileY = config.localTileY;
     this.tileWidthX = config.tileWidthX;
     this.tileWidthY = config.tileWidthY;
+  }
 
-    this.mapWidth = config.mapWidth;
-    this.mapHeight = config.mapHeight;
+  // make the object layer the same size as the map grid
+  // at first this layer is empty
+  initObjectLayer(worldWidth = this.mapWidth, worldHeight = this.mapHeight) {
+    for (let y = 0; y < worldHeight; y++) {
+      this.objectLayer.push([]);
 
-    this.mapGrid = config.mapGrid;
+      for (let x = 0; x < worldWidth; x++) {
+        this.objectLayer[y][x] = EMPTY_OBJECT_TILE;
+      }
+    }
+  }
 
-    this.unwalkableTile = config.unwalkableTile;
+  /*
+   *  gets an array of tiles {x, y} coords and applies them to the object layer
+   */
+  applyLayer(layer) {
+    for (let tile of layer) {
+      let { x, y } = tile;
+
+      if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
+        continue;
+      }
+
+      this.objectLayer[y][x] = OCCUPIED_OBJECT_TILE;
+    }
+  }
+
+  /*
+   *  gets an array of tiles {x, y} coords and remove them from the object layer
+   */
+  removeLayer(layer) {
+    for (let tile of layer) {
+      let { x, y } = tile;
+
+      if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
+        continue;
+      }
+
+      this.objectLayer[y][x] = EMPTY_OBJECT_TILE;
+    }
   }
 
   // smoothen the path walked by this game object
@@ -105,12 +161,50 @@ globalThis.NavObjectHelpers = class {
         return false;
       }
 
-      if (this.mapGrid[tile.y][tile.x] === this.unwalkableTile) {
+      // if the tile is unwalkable or is occupied by an object
+      if (
+        this.mapGrid[tile.y][tile.x] === this.unwalkableTile ||
+        this.objectLayer[tile.y][tile.x] === OCCUPIED_OBJECT_TILE
+      ) {
         return false;
       }
     }
 
     // this tile is safe to walk on
     return true;
+  }
+
+  // Custom cb to check if a navObject reached a tile
+  reachedTileCb(currTile, destinationTile) {
+    // tiles ocuppied by this object
+    let gridTiles = this.getGridTiles(currTile.x, currTile.y);
+
+    // check if any of the tiles of this object's grid overlaps the destinationTile
+    for (let tile of gridTiles) {
+      if (tile.x === destinationTile.x && tile.y === destinationTile.y) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  // Returns a callback for the easystar that has closure over the acceptable tiles
+  getReachedObjectCb(acceptableTiles) {
+    return function(currTile) {
+      // tiles ocuppied by this object
+      let gridTiles = this.getGridTiles(currTile.x, currTile.y);
+
+      // check if any of the tiles of this object's grid overlaps the destinationTile
+      for (let tile of gridTiles) {
+        for (let destinationTile of acceptableTiles) {
+          if (tile.x === destinationTile.x && tile.y === destinationTile.y) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    };
   }
 };

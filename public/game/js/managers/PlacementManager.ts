@@ -174,6 +174,11 @@ export default class PlacementManager extends Manager {
     for (let region of this.regions) {
       region.extendRegion(this.mapGrid);
     }
+
+    // filter out all empty regions
+    this.regions = this.regions.filter(region => {
+      return region.regionTiles.length !== 0;
+    });
   }
 
   private _placeResources(scene: IsoScene) {
@@ -260,29 +265,27 @@ export default class PlacementManager extends Manager {
 
         if (cfgObj.tree) {
           this.treesObjects.push(
-            new IsoSpriteObject(
+            new IsoSpriteObject({
               scene,
-              pos.x,
-              pos.y,
-              0,
-              TREE_ID,
-              this.envTexture,
-              treeFrame
-            )
+              tileX: pos.x,
+              tileY: pos.y,
+              objectId: TREE_ID,
+              texture: this.envTexture,
+              frame: treeFrame
+            })
           );
         }
 
         if (cfgObj.ore) {
           this.oreObjects.push(
-            new IsoSpriteObject(
+            new IsoSpriteObject({
               scene,
-              pos.x,
-              pos.y,
-              0,
-              ORE_ID,
-              this.envTexture,
-              cfgObj.ore
-            )
+              tileX: pos.x,
+              tileY: pos.y,
+              objectId: ORE_ID,
+              texture: this.envTexture,
+              frame: cfgObj.ore
+            })
           );
         }
       }
@@ -298,7 +301,8 @@ export default class PlacementManager extends Manager {
     scene: IsoScene,
     mapGrid: number[][],
     mapW: number,
-    mapH: number
+    mapH: number,
+    seed: string
   ): this {
     this.mapGrid = mapGrid;
     this.mapW = mapW;
@@ -307,9 +311,7 @@ export default class PlacementManager extends Manager {
     this.envTexture = EnvironmentManager.getInstance().getTextureKey();
 
     this.RND = Phaser.Math.RND;
-
-    // TODO: generate this seed on the serverside and keep it the same on next logins
-    this.RND.init(["fooS33d"]);
+    this.RND.init([seed]);
 
     this.generateRegions();
     this._placeResources(scene);
@@ -319,6 +321,11 @@ export default class PlacementManager extends Manager {
 
   public static getInstance() {
     return super.getInstance() as PlacementManager;
+  }
+
+  // Destroy the instance and free up memory once this manager is not used anymore
+  public static destroyInstance() {
+    this._instance = null;
   }
 }
 

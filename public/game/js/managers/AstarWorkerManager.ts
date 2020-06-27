@@ -1,33 +1,37 @@
 import Manager from "./Manager";
-import MapManager from "./MapManager";
 
 import CST from "../CST";
-import { TileXY } from "../IsoPlugin/IsoBoard";
+import { TileXY } from "../map/IsoBoard";
 
 const WK_CST = CST.WORKER;
 
 // TODO: check browser worker compatibility
-const Worker = globalThis.Worker;
 
-interface WorkerInitConfig {
-  localTileX: number;
-  localTileY: number;
-
-  tileWidthX: number;
-  tileWidthY: number;
-
+interface WorkerMapConfig {
   mapWidth: number;
   mapHeight: number;
   mapGrid: number[][];
   unwalkableTile: number;
 }
 
+interface WorkerActorConfig {
+  localTileX: number;
+  localTileY: number;
+
+  tileWidthX: number;
+  tileWidthY: number;
+}
 export default class AstarWorkerManager extends Manager {
   // the workers that handle the astar
   // TODO: each type of actor will have its own worker
   astarWorkers: {
     // the key is the actor key, the value is the worker handling the astar for this object
-    [key: string]: any;
+    [key: string]: Worker;
+  } = {};
+
+  // whether the workers have been inited by the actors with their particular details
+  workersActorInited: {
+    [key: string]: boolean;
   } = {};
 
   // for any path finding request a promise is created
@@ -42,18 +46,32 @@ export default class AstarWorkerManager extends Manager {
     super();
   }
 
+  // global initialisation of all the workers for each type of actor
+  // it inits the map for the helper objects of the workers
+  initWorkersWithMap(actorKeys: string[], mapConfig: WorkerMapConfig) {
+    for (let actorKey of actorKeys) {
+      this.astarWorkers[actorKey] = new Worker(
+        "./game/js/utils/astar/astarWebWorker.js"
+      );
+
+      this.workersActorInited[actorKey] = false;
+      this.sendMessage(actorKey, WK_CST.MSG.INIT_MAP, mapConfig);
+    }
+  }
+
   getWorker(actorKey: string) {
     return this.astarWorkers[actorKey];
   }
 
-  initWorker(actorKey: string, config: WorkerInitConfig) {
-    this.astarWorkers[actorKey] = new Worker(
-      "./game/js/utils/astar/astarWebWorker.js"
-    );
+  isWorkerActorInited(actorKey: string) {
+    return this.workersActorInited[actorKey];
+  }
 
+  // initialisation done by each actor
+  initWorkerWithActor(actorKey: string, config: WorkerActorConfig) {
     // initialize the internal logic of the worker
     // send a config object for the navObjectHelpers
-    this.sendMessage(actorKey, WK_CST.MSG.INIT, config);
+    this.sendMessage(actorKey, WK_CST.MSG.INIT_ACTOR, config);
 
     this.astarWorkers[actorKey].onmessage = e => {
       this.handleMessage(e.data);
@@ -68,6 +86,7 @@ export default class AstarWorkerManager extends Manager {
    * @param actorKey the unique key of this type of object
    * @param startTile the starting point of the path
    * @param endTile the ending point of the path
+   * @param strictPath should go strictly to endTile or being near it is ok
    *
    * @returns {Promise<TileXY[]>} a promise that will be fullfilled as soon as the path is calculated
    *  if no path is found null will be the fullfilled value of the promise
@@ -75,19 +94,62 @@ export default class AstarWorkerManager extends Manager {
   findPath(
     actorKey: string,
     startTile: TileXY,
-    endTile: TileXY
+    endTile: TileXY,
+    strictPath: boolean
   ): Promise<TileXY[]> {
     let requestId = this.requestId++;
 
     this.sendMessage(actorKey, WK_CST.MSG.FIND_PATH, {
       startTile,
       endTile,
+      requestId,
+      strictPath
+    });
+
+    return new Promise((resolve, reject) => {
+      this.pathFindingPromiseResolvers[requestId] = resolve;
+    });
+  }
+
+  /**
+   * Find a path to an object instead of a tile
+   * @param actorKey the unique key of this type of object
+   * @param startTile the starting point of the path
+   * @param acceptableTiles the row of tiles around the object
+   *
+   * @returns {Promise<TileXY[]>} a promise that will be fullfilled as soon as the path is calculated
+   *  if no path is found null will be the fullfilled value of the promise
+   */
+  findPathToObject(
+    actorKey: string,
+    startTile: TileXY,
+    acceptableTiles: TileXY[]
+  ): Promise<TileXY[]> {
+    let requestId = this.requestId++;
+
+    this.sendMessage(actorKey, WK_CST.MSG.FIND_PATH_TO_OBJECT, {
+      startTile,
+      acceptableTiles,
       requestId
     });
 
     return new Promise((resolve, reject) => {
       this.pathFindingPromiseResolvers[requestId] = resolve;
     });
+  }
+
+  // all workers should apply this layer
+  applyLayer(layer: TileXY[]) {
+    for (let actorKey in this.astarWorkers) {
+      this.sendMessage(actorKey, WK_CST.MSG.APPLY_LAYER, layer);
+    }
+  }
+
+  // all workers should apply this layer
+  removeLayer(layer: TileXY[]) {
+    for (let actorKey in this.astarWorkers) {
+      this.sendMessage(actorKey, WK_CST.MSG.REMOVE_LAYER, layer);
+    }
   }
 
   resolveFoundPath(path: TileXY[], requestId: number) {

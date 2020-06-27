@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es6",
+    "target": "es2018",
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
-    "lib": ["ES2019", "ES2015.Promise"]
+    "lib": ["ESNext", "ES2015.Promise", "DOM"]
   }
 }

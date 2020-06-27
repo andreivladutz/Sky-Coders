@@ -4,6 +4,8 @@ import MapManager from "./MapManager";
 import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 import IsoScene from "../IsoPlugin/IsoScene";
 import ActorsManager from "./ActorsManager";
+import AstarWorkerManager from "./AstarWorkerManager";
+import { TileXY } from "../map/IsoBoard";
 
 interface Tile {
   x: number;
@@ -44,11 +46,13 @@ export default class LayersManager extends Manager {
     this.initObjectLayer(mapGrid[0].length, mapGrid.length);
 
     MapManager.getInstance().events.on(CST.EVENTS.MAP.MOVE, (tile: Tile) => {
-      console.log(
-        MapManager.getInstance()
-          .getIsoBoard()
-          .board.tileXYToChessArray(tile.x, tile.y)
-      );
+      // console.log(
+      //   MapManager.getInstance()
+      //     .getIsoBoard()
+      //     .board.tileXYToChessArray(tile.x, tile.y)
+      // );
+      // console.log(this.getTileConfig(tile.x, tile.y).id);
+      // console.log(MapManager.getInstance().mapMatrix[tile.y][tile.x]);
     });
   }
 
@@ -64,7 +68,18 @@ export default class LayersManager extends Manager {
     };
   }
 
-  // Apply the object's id on the objectLayer
+  /*
+   * Notify the astar worker to also apply this layer
+   */
+  public notifyAstarWorker(layer: Tile[], removeLayer: boolean = false) {
+    if (removeLayer) {
+      AstarWorkerManager.getInstance().removeLayer(layer);
+    } else {
+      AstarWorkerManager.getInstance().applyLayer(layer);
+    }
+  }
+
+  // Apply the object's id on the objectLayer ONLY IF there isn't another object there already
   public applyObjectOnLayer(obj: IsoSpriteObject): this {
     // the id is the id of the object's type
     let id = obj.objectId,
@@ -76,15 +91,34 @@ export default class LayersManager extends Manager {
       return;
     }
 
-    for (let tile of obj.getGridTiles()) {
+    let objLayerTiles = obj.getGridTiles();
+    for (let tile of objLayerTiles) {
       let { x, y } = tile;
 
       if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
         continue;
       }
 
+      if (this.objectUidsGrid[y][x] !== CST.ENVIRONMENT.EMPTY_TILE) {
+        continue;
+      }
+
       this.objectLayer[y][x] = id;
       this.objectUidsGrid[y][x] = uid;
+    }
+
+    // notify astar worker to apply the layer but apply only buildings
+    if (id === CST.LAYERS.OBJ_ID.BUILDING || id === CST.LAYERS.OBJ_ID.ORE) {
+      this.notifyAstarWorker(objLayerTiles);
+    }
+    // for trees, add only the origin tile to the grid
+    else if (id === CST.LAYERS.OBJ_ID.TREE) {
+      this.notifyAstarWorker([
+        {
+          x: obj.tileX,
+          y: obj.tileY
+        }
+      ]);
     }
 
     // also index the object by its uid
@@ -93,6 +127,7 @@ export default class LayersManager extends Manager {
     return this;
   }
 
+  // removes itself from the layer ONLY if its uid is there
   public removeObjectFromLayer(obj: IsoSpriteObject): this {
     if (!this.isObjectAppliedToLayer(obj)) {
       return;
@@ -100,16 +135,39 @@ export default class LayersManager extends Manager {
 
     // the uid is unique to each object
     let uid = obj.getObjectUID();
+    let id = obj.objectId;
 
-    for (let tile of obj.getGridTiles()) {
+    let gridTiles = obj.getGridTiles();
+    for (let tile of gridTiles) {
       let { x, y } = tile;
 
       if (x < 0 || x >= this.mapWidth || y < 0 || y >= this.mapHeight) {
         continue;
       }
 
+      if (this.objectUidsGrid[y][x] !== uid) {
+        return this;
+      }
+
       this.objectLayer[y][x] = CST.ENVIRONMENT.EMPTY_TILE;
       this.objectUidsGrid[y][x] = CST.ENVIRONMENT.EMPTY_TILE;
+    }
+
+    // notify astar worker to remove the layer but remove only buildings
+    if (id === CST.LAYERS.OBJ_ID.BUILDING || id === CST.LAYERS.OBJ_ID.ORE) {
+      this.notifyAstarWorker(gridTiles, true);
+    }
+    // for trees, remove only the origin tile from the grid
+    else if (id === CST.LAYERS.OBJ_ID.TREE) {
+      this.notifyAstarWorker(
+        [
+          {
+            x: obj.tileX,
+            y: obj.tileY
+          }
+        ],
+        true
+      );
     }
 
     delete this.uidsToObjects[uid];
@@ -140,25 +198,18 @@ export default class LayersManager extends Manager {
     // check if any of the tiles of this object's grid overlaps an empty tile or another object
     for (let tile of gridTiles) {
       // also check if any of the object's grid tile ended up being out of world bounds
-      if (
-        tile.x < 0 ||
-        tile.x >= this.mapWidth ||
-        tile.y < 0 ||
-        tile.y >= this.mapHeight
-      ) {
-        return true;
-      }
-
-      if (
-        this.getTileConfig(tile.x, tile.y).id === CST.ENVIRONMENT.EMPTY_TILE ||
-        this.objectLayer[tile.y][tile.x] !== CST.ENVIRONMENT.EMPTY_TILE
-      ) {
+      if (this.isTileColliding(tile)) {
         return true;
       }
 
       if (checkAgainstActors === true) {
         // take each grid tile of each actor and check it against each tile of this building
         for (let actor of ActorsManager.getInstance().sceneActors) {
+          // In the case we are checking an actor against the other actors
+          if (object === actor) {
+            continue;
+          }
+
           for (let actorTile of actor.getGridTiles()) {
             if (tile.x === actorTile.x && tile.y === actorTile.y) {
               return true;
@@ -169,6 +220,27 @@ export default class LayersManager extends Manager {
     }
 
     // this tile is safe to walk on
+    return false;
+  }
+
+  // Check if tile is outside the map bounds or colliding with an object
+  public isTileColliding(tile: TileXY): boolean {
+    if (
+      tile.x < 0 ||
+      tile.x >= this.mapWidth ||
+      tile.y < 0 ||
+      tile.y >= this.mapHeight
+    ) {
+      return true;
+    }
+
+    if (
+      this.getTileConfig(tile.x, tile.y).id === CST.ENVIRONMENT.EMPTY_TILE ||
+      this.objectLayer[tile.y][tile.x] !== CST.ENVIRONMENT.EMPTY_TILE
+    ) {
+      return true;
+    }
+
     return false;
   }
 

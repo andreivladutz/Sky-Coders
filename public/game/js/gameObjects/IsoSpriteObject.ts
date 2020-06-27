@@ -2,13 +2,62 @@ import IsoSprite from "../IsoPlugin/IsoSprite";
 import EnvironmentManager from "../managers/EnvironmentManager";
 import MapManager from "../managers/MapManager";
 import CST from "../CST";
-import { TileXY } from "../IsoPlugin/IsoBoard";
+import { TileXY } from "../map/IsoBoard";
 import LayersManager from "../managers/LayersManager";
+import AudioComponent from "../audio/AudioComponent";
+import SYSTEM from "../system/system";
+
+interface IsoSpriteConfig {
+  scene: Phaser.Scene;
+  tileX: number;
+  tileY: number;
+  z?: number;
+  objectId: number;
+  texture: string;
+  frame?: string | number;
+  // pass false to this argument to skip applying object to the grid layers
+  shouldBeAppliedToLayer?: boolean;
+  // override local compute tiles
+  localTileX?: number;
+  localTileY?: number;
+  // optional Tile layering
+  tileZ?: number;
+}
+
+function isDefinedOrDefault<T>(value: T, typeCheck: string, defaultValue: T) {
+  if (typeof value === typeCheck) {
+    return value;
+  }
+
+  return defaultValue;
+}
+
+function applyDefaultValues(config: IsoSpriteConfig) {
+  config.shouldBeAppliedToLayer = isDefinedOrDefault(
+    config.shouldBeAppliedToLayer,
+    "boolean",
+    true
+  );
+  config.localTileY = isDefinedOrDefault(
+    config.localTileY,
+    "number",
+    config.localTileX
+  );
+  config.tileZ = isDefinedOrDefault(config.tileZ, "number", 0);
+  config.z = isDefinedOrDefault(config.z, "number", 0);
+}
 
 export enum GridColor {
   DO_NOT_DRAW = -1,
   GREEN = CST.COLORS.GREEN,
-  RED = CST.COLORS.RED
+  RED = CST.COLORS.RED,
+  // Random colors for the actor grid
+  ORANGE = 0xff4f00,
+  YELLOW = 0xfce205,
+  BLUE = 0x51a0d5,
+  NEUTRAL_GREEN = 0x59c878,
+  PURPLE = 0x8d4585,
+  PINK = 0xe51a4c
 }
 
 // check if a tile is out of bounds
@@ -37,6 +86,9 @@ export default class IsoSpriteObject extends IsoSprite {
   // added to the object by the rex board plugin;
   public rexChess: RexChess;
 
+  // Keep a reference to the audio component
+  public audioComponent: AudioComponent;
+
   tileWidthX: number;
   tileWidthY: number;
 
@@ -44,16 +96,27 @@ export default class IsoSpriteObject extends IsoSprite {
   localTileX: number;
   localTileY: number;
 
+  // tells us whether this object has been applied to the layer or not
+  isAppliedToLayer: boolean = false;
+
   // the graphics used to draw this object's grid
   protected gridGraphics: Phaser.GameObjects.Graphics;
   // should we draw the grid? if so this property is a valid number
-  // TODO: should default to DO_NOT_DRAW
-  protected drawingGridColor: GridColor = GridColor.RED;
+  protected drawingGridColor: GridColor = GridColor.DO_NOT_DRAW;
 
   // the tint color of this object when a pointer is over it or it is selected
   protected selectedTintColor: number = CST.ACTOR.SELECTION_TINT;
   // is this object selected?
   selected: boolean = false;
+
+  // This flag should be set if the press event should cancel the selection / deselection event
+  protected pressCancelsSelection: boolean = false;
+  // Flag to know if the press event has been fired
+  private pressWasFired: boolean = false;
+  private pressTimeout: any;
+
+  // Timeout used to determine if the user hovered a game object for long
+  private longHoverTimeout: any;
 
   // tile coords of this object
   // CAN BE FLOATING POINT NUMBERS!!!
@@ -68,47 +131,41 @@ export default class IsoSpriteObject extends IsoSprite {
   // the size of this tile in 3D (unprojected it is a rectangle)
   readonly TILE_SIZE3D = EnvironmentManager.getInstance().TILE_HEIGHT;
 
-  constructor(
-    scene: Phaser.Scene,
-    tileX: number,
-    tileY: number,
-    z: number,
-    objectId: number,
-    texture: string,
-    frame?: string | number,
-    // override local compute tiles
-    localTileX?: number,
-    localTileY: number = localTileX
-  ) {
+  //@ts-ignore
+  constructor(config: IsoSpriteConfig) {
+    applyDefaultValues(config);
+
     super(
-      scene,
-      tileX * EnvironmentManager.getInstance().TILE_HEIGHT,
-      tileY * EnvironmentManager.getInstance().TILE_HEIGHT,
-      z,
-      texture,
-      frame
+      config.scene,
+      config.tileX * EnvironmentManager.getInstance().TILE_HEIGHT,
+      config.tileY * EnvironmentManager.getInstance().TILE_HEIGHT,
+      config.z,
+      config.texture,
+      config.frame
     );
+    this.objectId = config.objectId;
+    this.audioComponent = new AudioComponent(this);
 
-    this.objectId = objectId;
+    this.addToGridAt(config.tileX, config.tileY, config.tileZ);
 
-    this.addToGridAt(tileX, tileY);
-
-    this.tileCoords.x = tileX;
-    this.tileCoords.y = tileY;
+    this.tileCoords.x = config.tileX;
+    this.tileCoords.y = config.tileY;
 
     // add myself to the scene
     // set the origin to default to the bottom right corner
     this.scene.add.existing(this.setOrigin(1, 1));
 
-    this.setOriginByFrame(frame);
+    this.setOriginByFrame(config.frame);
 
     this.computeTileArea();
     // override the computed local tiles
-    if (localTileX) {
-      this.overrideLocalTilePos(localTileX, localTileY);
+    if (typeof config.localTileX === "number") {
+      this.overrideLocalTilePos(config.localTileX, config.localTileY);
     }
 
-    this.layersManager.applyObjectOnLayer(this);
+    if (config.shouldBeAppliedToLayer) {
+      this.applyToLayer();
+    }
 
     this.gridGraphics = this.scene.add
       .graphics()
@@ -125,6 +182,13 @@ export default class IsoSpriteObject extends IsoSprite {
     this.scene.scale.on("resize", () => {
       this.lastDrewTileCoords.x = -1;
     });
+  }
+
+  public applyToLayer(): this {
+    this.layersManager.applyObjectOnLayer(this);
+
+    this.isAppliedToLayer = true;
+    return this;
   }
 
   // this is an uid of the object => generated automatically and is different for every other object
@@ -163,51 +227,112 @@ export default class IsoSpriteObject extends IsoSprite {
       .on("pointerover", () => {
         // prevent tilemove events propagating to the map
         this.mapManager.events.registerDefaultPrevention(this);
-
         this.setTint(this.selectedTintColor);
+
+        // Don't emit long hover event on touch enabled devices
+        if (!SYSTEM.TOUCH_ENABLED) {
+          this.longHoverTimeout = setTimeout(() => {
+            this.emit(CST.EVENTS.OBJECT.LONG_HOVER);
+          }, CST.EVENTS.OBJECT.HOVER_TIME);
+        }
       })
       .on("pointerout", () => {
         this.mapManager.events.unregisterDefaultPrevention();
+
+        clearTimeout(this.longHoverTimeout);
 
         if (!this.selected) {
           this.clearTint();
         }
       })
-      .on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-        this.toggleSelected(pointer);
-      });
+      .on("pointerdown", this.checkPressLogic)
+      .on("pointerup", this.handleSelectionToggle);
 
     return this;
   }
 
+  protected gameCanvasIsTarget(ev: MouseEvent | TouchEvent) {
+    return ev.target === this.scene.game.canvas;
+  }
+
+  // Handler function for "pointerdown" event -> checking PRESS
+  private checkPressLogic = (pointer: Phaser.Input.Pointer) => {
+    if (!this.gameCanvasIsTarget(pointer.event)) {
+      return;
+    }
+
+    // Consider the right mouse button as being a press action
+    if (pointer.rightButtonDown()) {
+      this.pressWasFired = true;
+      this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
+
+      return;
+    }
+
+    // Check for press event
+    this.pressTimeout = setTimeout(() => {
+      if (pointer.isDown) {
+        this.pressWasFired = true;
+        this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
+      }
+    }, CST.EVENTS.OBJECT.PRESS_TIME);
+  };
+
+  // Handler function for "pointerup" event
+  protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
+    if (!this.gameCanvasIsTarget(pointer.event)) {
+      return;
+    }
+
+    // If the press event fired and it should cancel selection / deselection
+    if (this.pressWasFired && this.pressCancelsSelection) {
+      this.pressWasFired = false;
+
+      return;
+    }
+
+    // Cancel the listening for press event as this was canceled by this up event
+    clearTimeout(this.pressTimeout);
+    this.pressWasFired = false;
+    this.toggleSelected(pointer);
+  };
+
   // select or deselect the actor
-  toggleSelected(pointer?: Phaser.Input.Pointer) {
-    // this object was just deselected, emit the event
+  private toggleSelected(pointer: Phaser.Input.Pointer) {
     if (this.selected) {
       this.deselect(pointer);
     } else {
-      // this object was just selected, emit the event
-      this.emit(CST.EVENTS.OBJECT.SELECT);
-
-      this.selected = true;
-      this.setTint(this.selectedTintColor);
+      this.select(pointer);
     }
   }
 
   // Provide it as a different function so deselection logic can be overriden in the subclasses
-  deselect(pointer?: Phaser.Input.Pointer) {
+  // The pointer can be omitted if a deselection is fired by the actors manager for example.
+  public deselect(pointer?: Phaser.Input.Pointer) {
     this.clearTint();
-    this.emit(CST.EVENTS.OBJECT.DESELECT);
     this.selected = false;
+
+    this.emit(CST.EVENTS.OBJECT.DESELECT, pointer);
   }
 
-  public setSelectedTintColor(color: number) {
+  public select(pointer: Phaser.Input.Pointer) {
+    this.selected = true;
+    this.setTint(this.selectedTintColor);
+
+    // this object was just selected, emit the event
+    this.emit(CST.EVENTS.OBJECT.SELECT, pointer);
+  }
+
+  public setSelectedTintColor(color: number): this {
     this.selectedTintColor = color;
+
+    return this;
   }
 
   // Add this object to the grid at the provided tile coords
-  public addToGridAt(tileX: number, tileY: number): this {
-    this.mapManager.addSpriteObjectToGrid(this, tileX, tileY);
+  // Added an optional tileZ coord to support layering and prevent the actors from getting bugged
+  public addToGridAt(tileX: number, tileY: number, tileZ: number = 0): this {
+    this.mapManager.addSpriteObjectToGrid(this, tileX, tileY, tileZ);
     return this;
   }
 
@@ -254,6 +379,38 @@ export default class IsoSpriteObject extends IsoSprite {
     return gridMatrix;
   }
 
+  // Get a padding of tiles around the grid matrix
+  public getGridTilePadding(): TileXY[] {
+    let padding = [];
+
+    let checkAndPushPadTile = (x: number, y: number) => {
+      let dX = x - this.localTileX,
+        dy = y - this.localTileY;
+
+      let paddingTile = { x: this.tileX + dX, y: this.tileY + dy };
+
+      if (!this.layersManager.isTileColliding(paddingTile)) {
+        padding.push(paddingTile);
+      }
+    };
+
+    // Pad left and right
+    for (let x of [-1, this.tileWidthX]) {
+      for (let y = -1; y <= this.tileWidthY; y++) {
+        checkAndPushPadTile(x, y);
+      }
+    }
+
+    // Pad top and bottom
+    for (let y of [-1, this.tileWidthY]) {
+      for (let x = 0; x < this.tileWidthX; x++) {
+        checkAndPushPadTile(x, y);
+      }
+    }
+
+    return padding;
+  }
+
   // function called on each scene update event
   public onSceneUpdate() {
     this.drawGrid();
@@ -297,10 +454,15 @@ export default class IsoSpriteObject extends IsoSprite {
   // acceptable values for color param are red or green hexa color
   enableGridDrawing(color: GridColor) {
     this.drawingGridColor = color;
+
+    // Force grid redraw
+    this.lastDrewTileCoords.x = -1;
   }
 
   disableGridDrawing() {
     this.drawingGridColor = GridColor.DO_NOT_DRAW;
+
+    this.gridGraphics.clear();
   }
 
   // compute the tile area occupied by this game object
@@ -349,6 +511,11 @@ export default class IsoSpriteObject extends IsoSprite {
     return this.tileCoords.y;
   }
 
+  // Get this game's object world coords
+  public get worldPosition() {
+    return this.mapManager.tileToWorldCoords(this.tileX, this.tileY);
+  }
+
   public setTilePosition(tileX: number, tileY: number): this {
     this.tileCoords.x = tileX;
     this.tileCoords.y = tileY;
@@ -377,8 +544,10 @@ export default class IsoSpriteObject extends IsoSprite {
   }
 
   // if body debugging is enabled, the body of this object will be drawn
-  public enableDebugging() {
+  public enableDebugging(): this {
     this.mapManager.addToDebuggingObjects(this);
+
+    return this;
   }
 
   private setOriginByFrame(frame?: string | number) {

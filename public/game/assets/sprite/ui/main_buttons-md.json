@@ -4,8 +4,8 @@
 			"image": "main_buttons-md-0.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 217,
-				"h": 110
+				"w": 266,
+				"h": 111
 			},
 			"scale": 0.175,
 			"frames": [
@@ -31,24 +31,24 @@
 					}
 				},
 				{
-					"filename": "Buttons/Logout",
+					"filename": "Buttons/Ok",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 38,
-						"h": 35
+						"w": 46,
+						"h": 47
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 38,
-						"h": 35
+						"w": 46,
+						"h": 47
 					},
 					"frame": {
 						"x": 178,
 						"y": 1,
-						"w": 38,
-						"h": 35
+						"w": 46,
+						"h": 47
 					}
 				},
 				{
@@ -56,20 +56,83 @@
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 38,
+						"w": 39,
+						"h": 36
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 39,
+						"h": 36
+					},
+					"frame": {
+						"x": 226,
+						"y": 1,
+						"w": 39,
+						"h": 36
+					}
+				},
+				{
+					"filename": "Buttons/Logout",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 39,
 						"h": 35
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 38,
+						"w": 39,
 						"h": 35
 					},
 					"frame": {
-						"x": 178,
-						"y": 38,
-						"w": 38,
+						"x": 226,
+						"y": 39,
+						"w": 39,
 						"h": 35
+					}
+				},
+				{
+					"filename": "Buttons/Cancel",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 45,
+						"h": 46
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 45,
+						"h": 46
+					},
+					"frame": {
+						"x": 178,
+						"y": 50,
+						"w": 45,
+						"h": 46
+					}
+				},
+				{
+					"filename": "Buttons/Build",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 40,
+						"h": 34
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 40,
+						"h": 34
+					},
+					"frame": {
+						"x": 225,
+						"y": 76,
+						"w": 40,
+						"h": 34
 					}
 				},
 				{
@@ -78,23 +141,23 @@
 					"trimmed": false,
 					"sourceSize": {
 						"w": 41,
-						"h": 34
+						"h": 35
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
 						"w": 41,
-						"h": 34
+						"h": 35
 					},
 					"frame": {
 						"x": 1,
 						"y": 75,
 						"w": 41,
-						"h": 34
+						"h": 35
 					}
 				},
 				{
-					"filename": "Buttons/Build",
+					"filename": "Buttons/Leaderboard",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -115,45 +178,45 @@
 					}
 				},
 				{
-					"filename": "Buttons/Leaderboard",
+					"filename": "Buttons/Script",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 40,
+						"w": 39,
 						"h": 34
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 40,
+						"w": 39,
 						"h": 34
 					},
 					"frame": {
 						"x": 86,
 						"y": 75,
-						"w": 40,
+						"w": 39,
 						"h": 34
 					}
 				},
 				{
-					"filename": "Buttons/Script",
+					"filename": "Buttons/wood_plank",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 38,
-						"h": 34
+						"w": 47,
+						"h": 26
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 38,
-						"h": 34
+						"w": 47,
+						"h": 26
 					},
 					"frame": {
-						"x": 128,
+						"x": 127,
 						"y": 75,
-						"w": 38,
-						"h": 34
+						"w": 47,
+						"h": 26
 					}
 				}
 			]
@@ -162,6 +225,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:c5dd7301416de927df1fd53bfc536687:f1fceea9721352e54c917446f05826d8:56c353b78932d635f9195fd488f280a9$"
+		"smartupdate": "$TexturePacker:SmartUpdate:49873b3b25be105a03e4a5373fa427aa:5a50c3ba8e2fd50cfe9533d77157d082:56c353b78932d635f9195fd488f280a9$"
 	}
 }

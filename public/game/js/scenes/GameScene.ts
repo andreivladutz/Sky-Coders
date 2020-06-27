@@ -4,16 +4,11 @@ import IsoScene from "../IsoPlugin/IsoScene";
 
 import CameraManager from "../managers/CameraManager";
 import MapManager from "../managers/MapManager";
-import Actor from "../gameObjects/Actor";
-import { ACTOR_NAMES, ACTOR_DIRECTIONS } from "../ACTORS_CST";
-import TileMap from "../IsoPlugin/TileMap";
-
-// TODO: remove global variables
-let actor: Actor;
+import BuildingsManager from "../managers/BuildingsManager";
+import ActorsManager from "../managers/ActorsManager";
+import AudioManager from "../managers/AudioManager";
 
 export default class GameScene extends IsoScene {
-  tileMap: TileMap;
-
   constructor() {
     const config = {
       key: CST.SCENES.GAME
@@ -52,7 +47,9 @@ export default class GameScene extends IsoScene {
     );
 
     // fire the map init
-    this.tileMap = MapManager.getInstance().initMap(this);
+    MapManager.getInstance().initMap(this);
+    // MapManager.getInstance().enableDebugging();
+
     // init the camera controller
     CameraManager.getInstance({
       camera: this.cameras.main,
@@ -61,28 +58,19 @@ export default class GameScene extends IsoScene {
       enableZoom: true
     });
 
-    actor = new Actor({
-      actorKey: ACTOR_NAMES.MALLACK,
-      tileX: 33,
-      tileY: 20,
-      z: 0,
-      scene: this
-    });
+    // Place the buildings from the server
+    BuildingsManager.getInstance().initBuildings(this);
 
-    actor.idleAnim();
+    // Place the actors from the server
+    let actorsManager = ActorsManager.getInstance().initCharacters(this);
+    // Pick a random actor and focus the camera on him
+    Phaser.Math.RND.pick(actorsManager.sceneActors).centerCameraOn();
 
-    MapManager.getInstance()
-      .enableDebugging()
-      .setScrollOverTiles(actor.tileX, actor.tileY);
-    actor.enableDebugging();
+    AudioManager.getInstance().init();
+    // actor.enableDebugging();
   }
 
   update() {
-    // console.log(this.children.sortByDepth(actor, obj));
-    // code to follow an actor
-    // MapManager.getInstance().setScrollOverTiles(
-    //   actor.gameObject.floatingTileX,
-    //   actor.gameObject.floatingTileY
-    // );
+    //
   }
 }

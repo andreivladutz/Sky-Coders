@@ -9,29 +9,114 @@
     />
     <meta name="author" content="Dinca Vlad-Andrei" />
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
     <meta name="theme-color" content="#716981" />
     <!--iOS specific-->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <!--Name should be changed-->
-    <meta name="apple-mobile-web-app-title" content="IsoGame" />
-    <link rel="apple-touch-icon" href="./image/icon/icon512.png" />
+    <meta name="apple-mobile-web-app-title" content="Sky Dwellers" />
+
+    <title>Sky Dwellers</title>
+
+    <link rel="apple-touch-icon" href="/no_auth/image/icon/icon512.png" />
     <link
       rel="apple-touch-icon"
       sizes="192x192"
-      href="./image/icon/icon192.png"
+      href="/no_auth/image/icon/icon192.png"
     />
 
-    <link rel="icon" type="image/png" href="./image/icon/icon192.png" />
+    <link rel="icon" type="image/png" href="/no_auth/image/icon/icon192.png" />
     <link rel="manifest" href="/manifest.webmanifest" />
-    <link rel="stylesheet" href="./game/css/game.css" />
+    <link rel="stylesheet" href="/game/css/game.css" />
+    <link rel="stylesheet" href="/game/css/blockly.css" />
+    <link rel="stylesheet" href="/game/css/modal.css" />
+    <link rel="stylesheet" href="/game/css/spin.css" />
+
     <!-- using Html Plugin for webpack inserts the scripts automatically
       <script src="./build/vendors~app.app.bundle.js"></script>
       <script src="./build/app.bundle.js"></script>
     -->
+
+    <style>
+      body {
+        overflow: hidden;
+      }
+    </style>
   </head>
   <body>
+    <!-- Dummy element -->
+    <p id="load-roboto">.</p>
+
     <div id="canvas-container"></div>
+    <!-- Bodymovin animations container -->
+    <div id="bm"></div>
+
+    <div id="characterContainer" style="display:none">
+      <!-- Character selected -->
+      <div id="selectedCharacter"></div>
+      <!-- Terminal Button -->
+      <button id="terminalButton"></button>
+    </div>
+
+    <!-- BLOCKLY CONTAINER :) -->
+    <div class="windowOverlay" id="blocklyContainer" style="display: none">
+      <div class="windowContainer">
+        <div id="blocklyArea"></div>
+      </div>
+    </div>
+
+    <!-- Dark Mode Button -->
+    <button class="nightModeButton" style="display: none">
+      <img class="button-image" src="/game/assets/image/UI/moon.png" />
+    </button>
+
+    <!-- Dummy tag -->
+    <a href="#" data-micromodal-trigger="modal-window"></a>
+
+    <!-- micromodal html -->
+    <div
+      class="modal micromodal-slide"
+      id="modal-window"
+      aria-hidden="true"
+      style="display:none"
+    >
+      <div class="modal__overlay" tabindex="-1" data-micromodal-close>
+        <div
+          class="modal__container"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-1-title"
+        >
+          <header class="modal__header" id="modal-window-header">
+            <h2 class="modal__title" id="modal-window-title">
+              Micromodal
+            </h2>
+            <button
+              class="modal__close"
+              aria-label="Close modal"
+              data-micromodal-close
+              id="x-button"
+            ></button>
+          </header>
+          <main class="modal__content" id="modal-window-content"></main>
+          <footer class="modal__footer" id="modal-window-footer">
+            <!--
+            <button class="modal__btn modal__btn-primary">Continue</button>
+
+            <button
+              class="modal__btn"
+              data-micromodal-close
+              aria-label="Close this dialog window"
+            >
+              Close
+            </button>
+            -->
+          </footer>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

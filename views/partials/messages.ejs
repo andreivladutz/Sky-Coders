@@ -1,0 +1,39 @@
+<% if (typeof errorMessages !== "undefined") { %> <%
+errorMessages.forEach(function(errMessage) { %>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong> <%= errMessage.message %> </strong>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<% }) %> <% } %>
+
+<!--Display any success temp messages-->
+<% if (success_msg.length) { %>
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+  <strong> <%= success_msg %> </strong>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<% } %>
+
+<!--Display any error temp messages-->
+<% if (error_msg.length) { %>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong> <%= error_msg %> </strong>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<% } %>
+
+<!--Display any error temp messages coming from failed logins-->
+<% if (error.length) { %>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+  <strong> <%= error %> </strong>
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<% } %>

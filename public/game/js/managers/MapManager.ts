@@ -1,5 +1,5 @@
 import TerrainGenerator from "../terrain/terrainGenerator";
-import TileMap from "../IsoPlugin/TileMap";
+import TileMap from "../map/TileMap";
 import { IsoScene } from "../IsoPlugin/IsoPlugin";
 
 import Manager from "./Manager";
@@ -7,12 +7,15 @@ import CST from "../CST";
 import EnvironmentManager from "./EnvironmentManager";
 import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 import { IsoDebugger } from "../utils/debug";
-import IsoBoard, { TileXY } from "../IsoPlugin/IsoBoard";
+import IsoBoard, { TileXY, ViewExtremes } from "../map/IsoBoard";
 import CameraManager from "./CameraManager";
 import LayersManager from "./LayersManager";
 
 // Specialised emitter
 import MapEventEmitter from "../utils/MapEventEmitter";
+import AstarWorkerManager from "./AstarWorkerManager";
+import ActorsManager from "./ActorsManager";
+import GameManager from "../online/GameManager";
 
 interface Point {
   x: number;
@@ -29,6 +32,8 @@ interface MapTileSize {
  *
  */
 export default class MapManager extends Manager {
+  private gameSeed: string;
+
   // tile map container class
   tileMap: TileMap;
   // the matrix of tiles where map data is held
@@ -59,14 +64,14 @@ export default class MapManager extends Manager {
 
         this.tileMap.onTileOver(tile);
       })
-      .on(CST.EVENTS.MAP.TAP, (pointer, tile: TileXY) => {
+      .on(CST.EVENTS.MAP.TAP, (tap: any, tile: TileXY) => {
         if (this.events.shouldPreventDefault(tile)) {
           return;
         }
 
         // TODO: IF ON MOBILE (DETECT) then on tile over should be called
         //this.tileMap.onTileOver(tile);
-        this.events.emit(CST.EVENTS.MAP.TAP, tile);
+        this.events.emit(CST.EVENTS.MAP.TAP, tile, tap.lastPointer);
       })
       .on(CST.EVENTS.MAP.PRESS, (pointer, tile: TileXY) => {
         this.events.emit(CST.EVENTS.MAP.PRESS, tile);
@@ -78,6 +83,11 @@ export default class MapManager extends Manager {
     });
   }
 
+  // Called by the underlying isoBoard
+  public emitDirtyViewRectEvent(viewRect: Phaser.Geom.Rectangle) {
+    this.events.emit(CST.EVENTS.MAP.IS_DIRTY, viewRect);
+  }
+
   public getMapTilesize(): MapTileSize {
     return {
       w: this.tileMap.mapWidth,
@@ -85,14 +95,17 @@ export default class MapManager extends Manager {
     };
   }
 
+  public get mapWidth(): number {
+    return this.getMapTilesize().w;
+  }
+
+  public get mapHeight(): number {
+    return this.getMapTilesize().h;
+  }
+
   // Get the exteme tile coordinates x, y for the current view
   // Get the extreme coordinates of the current view
-  public getExtremesTileCoords(): {
-    rightmostX: number;
-    leftmostX: number;
-    topmostY: number;
-    lowermostY: number;
-  } {
+  public getExtremesTileCoords(): ViewExtremes {
     // use the real viewport not the internal view rect to get accurate tile extremes
     return this.getIsoBoard().getExtremesTileCoords(true);
   }
@@ -127,21 +140,44 @@ export default class MapManager extends Manager {
   public addSpriteObjectToGrid(
     obj: IsoSpriteObject,
     tileX: number,
-    tileY: number
+    tileY: number,
+    tileZ: number = 0
   ) {
-    this.tileMap.isoBoard.board.addChess(obj, tileX, tileY);
+    this.tileMap.isoBoard.board.addChess(obj, tileX, tileY, tileZ);
   }
 
+  // Moves a spirte object on the underlying game board
   public moveSpriteObjectToTiles(
     obj: IsoSpriteObject,
     tileX: number,
-    tileY: number
+    tileY: number,
+    tileZ: number = 0
   ) {
-    this.tileMap.isoBoard.board.moveChess(obj, tileX, tileY, 0);
+    this.tileMap.isoBoard.board.moveChess(obj, tileX, tileY, tileZ);
+  }
+
+  // Removes and destroys the "chess object" of this sprite from the underlying board
+  public removeSpriteObjectFromBoard(obj: IsoSpriteObject) {
+    this.tileMap.isoBoard.board.removeChess(obj, null, null, null, true);
+  }
+
+  // Temporarily remove an object from the underlying board
+  public kickOutSpriteObjectFromBoard(obj: IsoSpriteObject) {
+    this.tileMap.isoBoard.board.removeChess(obj);
   }
 
   public getIsoBoard(): IsoBoard {
     return this.tileMap.isoBoard;
+  }
+
+  public showMapGrid(): this {
+    this.getIsoBoard().showGrid();
+    return this;
+  }
+
+  public hideMapGrid(): this {
+    this.getIsoBoard().hideGrid();
+    return this;
   }
 
   public onUpdate() {
@@ -193,26 +229,39 @@ export default class MapManager extends Manager {
     // generate environment frames
     this.envManager.generateFrames(gameScene);
 
+    // init the LayerManager
+    LayersManager.getInstance(this.mapMatrix);
+
     // init the tilemap
     this.tileMap = new TileMap({
       scene: this.gameScene,
       tileWidth: this.envManager.TILE_WIDTH,
       tileHeight: this.envManager.TILE_HEIGHT,
-      mapWidth: CST.MAP.WIDTH,
-      mapHeight: CST.MAP.HEIGHT,
+      mapWidth: this.mapMatrix[0].length,
+      mapHeight: this.mapMatrix.length,
       mapMatrix: this.mapMatrix
     });
 
-    // init the LayerManager
-    LayersManager.getInstance(this.mapMatrix);
+    let mapSize = this.getMapTilesize();
+
+    // Init the astar worker with map details
+    AstarWorkerManager.getInstance().initWorkersWithMap(
+      ActorsManager.getAllActorsNames(),
+      {
+        mapWidth: mapSize.w,
+        mapHeight: mapSize.h,
+        mapGrid: this.mapMatrix,
+        unwalkableTile: CST.ENVIRONMENT.EMPTY_TILE
+      }
+    );
 
     // Place the random resources on the map
-    let mapSize = this.getMapTilesize();
     this.envManager.placeRandomResources(
       gameScene,
       this.mapMatrix,
       mapSize.w,
-      mapSize.h
+      mapSize.h,
+      this.gameSeed
     );
 
     // for (let region of this.envManager.placementManager.regions) {
@@ -237,9 +286,10 @@ export default class MapManager extends Manager {
 
   // the simplex noise based terrain generator
   private generateIsland() {
-    // TODO: change the seed with a server-generated seed
+    this.gameSeed = GameManager.getInstance().seed;
+
     let terrainGen = TerrainGenerator.getInstance({
-      seed: "nice",
+      seed: this.gameSeed,
       width: CST.MAP.WIDTH,
       height: CST.MAP.HEIGHT,
       frequency: CST.MAP.DEFAULT_CFG.frequency
@@ -252,6 +302,15 @@ export default class MapManager extends Manager {
       emptyTileRatio: CST.ENVIRONMENT.EMPTY_TILE_RATIO,
       tileConfigs: this.envManager.getTilesIndicesConfigs()
     });
+
+    // Some tiles remain undefined. For those falsy values, just convert them to empty tiles
+    for (let y = 0; y < CST.MAP.HEIGHT; y++) {
+      for (let x = 0; x < CST.MAP.WIDTH; x++) {
+        if (this.mapMatrix[y] && !this.mapMatrix[y][x]) {
+          this.mapMatrix[y][x] = CST.ENVIRONMENT.EMPTY_TILE;
+        }
+      }
+    }
   }
 
   // terrain generation happens in the loading stage of the game

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="2.5D building, survival browser game" />
+    <meta
+      name="keywords"
+      content="scripting,game,browser-game,web-game,isometric,2.5D,survival,building"
+    />
+    <meta name="author" content="Dinca Vlad-Andrei" />
+
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
+    />
+    <meta name="theme-color" content="#716981" />
+    <!--iOS specific-->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Sky Dwellers" />
+
+    <title>Sky Dwellers</title>
+
+    <link rel="apple-touch-icon" href="/no_auth/image/icon/icon512.png" />
+    <link
+      rel="apple-touch-icon"
+      sizes="192x192"
+      href="/no_auth/image/icon/icon192.png"
+    />
+
+    <link rel="icon" type="image/png" href="/no_auth/image/icon/icon192.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+
+    <!-- Multilingual flag icons -->
+    <link rel="stylesheet" href="/no_auth/users_route/css/flag-icon.min.css" />
+    <!-- bootswatch https://bootswatch.com/4/minty/bootstrap.min.css -->
+    <link rel="stylesheet" href="/no_auth/users_route/css/bootswatch.min.css" />
+    <!-- font awesome https://kit.fontawesome.com/f01e168c56.js -->
+    <script src="/no_auth/users_route/js/fontawesome.js"></script>
+  </head>
+  <body style="overflow:auto;">
+    <!-- Bodymovin animations container -->
+    <div id="bm"></div>
+    <script
+      type="module"
+      src="/no_auth/screen_anim/js/LoginAnimation.js"
+    ></script>
+
+    <div class="container">
+      <%- body %>
+    </div>
+
+    <!-- JQuery and Popper -->
+    <script src="/no_auth/users_route/js/jquery.min.js"></script>
+    <script src="/no_auth/users_route/js/popper.min.js"></script>
+
+    <!-- Bootstrap -->
+    <script src="/no_auth/users_route/js/bootstrap.min.js"></script>
+  </body>
+</html>

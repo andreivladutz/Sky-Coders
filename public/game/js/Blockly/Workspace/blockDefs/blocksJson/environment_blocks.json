@@ -1,0 +1,149 @@
+[
+  {
+    "type": "environment_coordinate_pair",
+    "message0": "(x : %1 , y : %2 )",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "X_COORD",
+        "check": "Number"
+      },
+      {
+        "type": "input_value",
+        "name": "Y_COORD",
+        "check": "Number"
+      }
+    ],
+    "inputsInline": true,
+    "output": "Coordinate",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_COORDINATE_PAIR_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_reachable",
+    "message0": "%{BKY_ENV_REACHABLE_TITLE}",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "COORD",
+        "check": "Coordinate"
+      }
+    ],
+    "inputsInline": true,
+    "output": "Boolean",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_REACHABLE_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_position",
+    "message0": "%{BKY_ENV_CURRPOS_TITLE}",
+    "inputsInline": true,
+    "output": "Coordinate",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_CURRPOS_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_get_x",
+    "message0": "%{BKY_ENV_X_COORD_TITLE}",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "COORD",
+        "check": "Coordinate"
+      }
+    ],
+    "inputsInline": true,
+    "output": "Number",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_X_COORD_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_get_y",
+    "message0": "%{BKY_ENV_Y_COORD_TITLE}",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "COORD",
+        "check": "Coordinate"
+      }
+    ],
+    "inputsInline": true,
+    "output": "Number",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_Y_COORD_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_get_neighbour",
+    "message0": "%{BKY_ENV_NEIGHBOUR_DIR_TITLE}",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "COORD",
+        "check": "Coordinate"
+      },
+      {
+        "type": "field_dropdown",
+        "name": "DIRECTION",
+        "options": [
+          ["%{BKY_ENV_NEIGHBOUR_UP}", "UP"],
+          ["%{BKY_ENV_NEIGHBOUR_DOWN}", "DOWN"],
+          ["%{BKY_ENV_NEIGHBOUR_LEFT}", "LEFT"],
+          ["%{BKY_ENV_NEIGHBOUR_RIGHT}", "RIGHT"],
+          ["%{BKY_ENV_NEIGHBOUR_UPLEFT}", "UPLEFT"],
+          ["%{BKY_ENV_NEIGHBOUR_UPRIGHT}", "UPRIGHT"],
+          ["%{BKY_ENV_NEIGHBOUR_DOWNLEFT}", "DOWNLEFT"],
+          ["%{BKY_ENV_NEIGHBOUR_DOWNRIGHT}", "DOWNRIGHT"]
+        ]
+      }
+    ],
+    "inputsInline": true,
+    "output": "Coordinate",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_NEIGHBOUR_DIR_TOOTLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_building",
+    "message0": "%{BKY_ENV_BUILDING_TITLE}",
+    "args0": [
+      {
+        "type": "input_dummy",
+        "name": "BUILD"
+      }
+    ],
+    "extensions": ["generate_buildings_dropdown"],
+    "output": "Building",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_BUILDING_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_buildings_list",
+    "message0": "%{BKY_ENV_BUILDINGS_LIST_TITLE}",
+    "output": "Array",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_BUILDINGS_LIST_TOOLTIP}",
+    "helpUrl": ""
+  },
+  {
+    "type": "environment_ready",
+    "message0": "%{BKY_ENV_READY_TITLE}",
+    "args0": [
+      {
+        "type": "input_value",
+        "name": "BUILDING",
+        "check": "Building"
+      }
+    ],
+    "inputsInline": true,
+    "output": "Boolean",
+    "colour": 65,
+    "tooltip": "%{BKY_ENV_READY_TOOLTIP}",
+    "helpUrl": ""
+  }
+]

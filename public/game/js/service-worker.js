@@ -1,6 +1,10 @@
 import { precacheAndRoute } from "workbox-precaching";
-import { setDefaultHandler, setCatchHandler } from "workbox-routing";
-import { StaleWhileRevalidate } from "workbox-strategies";
+import {
+  setDefaultHandler,
+  setCatchHandler,
+  registerRoute
+} from "workbox-routing";
+import { StaleWhileRevalidate, NetworkOnly } from "workbox-strategies";
 
 precacheAndRoute(self.__WB_MANIFEST);
 
@@ -12,9 +16,20 @@ addEventListener("message", event => {
 });
 
 // return the cache-stored assets while also updating the cache from the network in the background
-setDefaultHandler(new StaleWhileRevalidate());
+registerRoute(matchRequests, new StaleWhileRevalidate(), "GET");
 
-// If any route fails
+registerRoute(matchRequests, new NetworkOnly(), "POST");
+
+// Don't let the service worker interact with the users route
+function matchRequests({ url }) {
+  if (url.pathname.includes("/users")) {
+    return false;
+  }
+
+  return true;
+}
+
+// If any route fails -> this handler gets called if neither the cache, nor the network can handle a request
 // TODO: offline page logic
 setCatchHandler(({ event }) => {
   if (event.request.destination === "document") {

@@ -7,13 +7,13 @@
   "orientation": "landscape",
   "icons": [
     {
-      "src": "/image/icon/icon192.png",
+      "src": "/no_auth/image/icon/icon192.png",
       "type": "image/png",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "/image/icon/icon512.png",
+      "src": "/no_auth/image/icon/icon512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "any maskable"

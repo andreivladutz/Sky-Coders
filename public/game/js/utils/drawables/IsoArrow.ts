@@ -7,7 +7,6 @@ import {
   ISOMETRIC
 } from "../../IsoPlugin/IsoPlugin";
 import EnvironmentManager from "../../managers/EnvironmentManager";
-import CameraManager from "../../managers/CameraManager";
 
 export enum ArrowDirection {
   NORTH = CST.ARROW_SHAPE.NORTH,
@@ -17,6 +16,26 @@ export enum ArrowDirection {
 }
 
 let bounds = new Phaser.Geom.Rectangle();
+
+let makeSizesRelative = (function() {
+  let sizesAreRelative = false;
+
+  return function makeSizesRelative(CURR_TILEH: number) {
+    if (sizesAreRelative) {
+      return;
+    }
+
+    let AS = CST.ARROW_SHAPE;
+    let ratio = CURR_TILEH / AS.REFERENCE_TILEH;
+
+    AS.ARROWH *= ratio;
+    AS.BASEW *= ratio;
+    AS.BASEH *= ratio;
+    AS.HEADW *= ratio;
+
+    sizesAreRelative = true;
+  };
+})();
 
 /**
  * Draw an isometric arrow shape
@@ -86,11 +105,12 @@ export default class IsoArrow extends Phaser.GameObjects.Polygon {
           this.setTilePosition();
         }
       })
-      .on("pointerdown", () => {
+      .on("pointerdown", (ptr, lx, ly, event: Phaser.Types.Input.EventData) => {
         this.zEffect = -CST.ARROW_SHAPE.Z_EFFECT;
         this.setTilePosition();
 
         this.emit(CST.EVENTS.ARROWS_UI.TAP, this);
+        event.stopPropagation();
       })
       .on("pointerup", () => {
         this.zEffect = 0;
@@ -120,6 +140,22 @@ export default class IsoArrow extends Phaser.GameObjects.Polygon {
 
     return this;
   }
+
+  // show the arrow again and make it interactive
+  public show(): this {
+    this.setVisible(true);
+    this.bounds.setInteractive();
+
+    return this;
+  }
+
+  // hide the arrow and turn off interaction
+  public hide(): this {
+    this.setVisible(false);
+    this.bounds.disableInteractive();
+
+    return this;
+  }
 }
 
 // compute the points of the arrow in unprojected space then project it
@@ -128,6 +164,8 @@ function getIsoArrowPoints(
   direction: ArrowDirection,
   bounds: Phaser.Geom.Rectangle
 ) {
+  makeSizesRelative(EnvironmentManager.getInstance().TILE_HEIGHT);
+
   const AS = CST.ARROW_SHAPE,
     projector = new Projector(scene, ISOMETRIC);
 

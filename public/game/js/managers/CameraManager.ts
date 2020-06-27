@@ -4,6 +4,7 @@ import { Pan, Pinch } from "phaser3-rex-plugins/plugins/gestures";
 import Manager from "./Manager";
 import CST from "../CST";
 import MapManager from "./MapManager";
+import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 
 type Camera = Phaser.Cameras.Scene2D.Camera;
 
@@ -16,14 +17,20 @@ interface CameraControlConfig {
 }
 
 export default class CameraManager extends Manager {
-  camera: Camera;
+  public camera: Camera;
   // the scene this camera belongs to
-  scene: Phaser.Scene;
+  public scene: Phaser.Scene;
 
   // utility for camera panning
-  pan: Pan;
+  private pan: Pan;
   // utility for camera zooming
-  pinch: Pinch;
+  private pinch: Pinch;
+
+  // When a zoom transition is happening prevent the user from zooming in and out
+  // Just so we can prevent any artifacts
+  private zoomPrevention: boolean = false;
+  // The last time a DEBOUNCE_MOVE_EVENT was fired
+  private lastDebouncedMove: number = 0;
 
   public static readonly EVENTS = new Phaser.Events.EventEmitter();
 
@@ -57,6 +64,46 @@ export default class CameraManager extends Manager {
 
       this.camera.setScroll(scrollX - width / 2, scrollY - height / 2);
     }
+
+    setTimeout(() => CameraManager.EVENTS.emit(CST.CAMERA.MOVE_EVENT), 0);
+
+    return this;
+  }
+
+  // Transition nicely to focusing on a game object
+  flyToObject(object: IsoSpriteObject): this {
+    let { x, y } = object.worldPosition;
+
+    // Let the camera take over the controls
+    this.zoomPrevention = true;
+    this.camera.stopFollow();
+
+    this.camera.pan(x, y, CST.ACTOR.FOCUS_PAN_TIME);
+    this.camera.zoomTo(1, CST.ACTOR.FOCUS_ZOOM_TIME);
+
+    this.camera.on(Phaser.Cameras.Scene2D.Events.PAN_COMPLETE, () => {
+      this.window.x = x;
+      this.window.y = y;
+
+      // Restore the camera control to the user
+      this.followWindowObject();
+
+      setTimeout(
+        () => (this.zoomPrevention = false),
+        CST.CAMERA.EXTRA_ZOOM_PREVENTION
+      );
+    });
+
+    return this;
+  }
+
+  private followWindowObject(): this {
+    this.camera.startFollow(
+      this.window,
+      false,
+      CST.CAMERA.PAN_LERP,
+      CST.CAMERA.PAN_LERP
+    );
 
     return this;
   }
@@ -115,24 +162,32 @@ export default class CameraManager extends Manager {
           pan.dy = 0;
         }
 
+        let dx = pan.dx / this.camera.zoom;
+        let dy = pan.dy / this.camera.zoom;
+
         // using the inverse of the zoom so when the camera is zoomed out
         // the player can pan the camera faster
-        this.window.x -= pan.dx / this.camera.zoom;
-        this.window.y -= pan.dy / this.camera.zoom;
+        this.window.x -= dx;
+        this.window.y -= dy;
 
-        CameraManager.EVENTS.emit(CST.CAMERA.MOVE_EVENT);
+        CameraManager.EVENTS.emit(
+          CST.CAMERA.MOVE_EVENT,
+          dx,
+          dy,
+          pan.dx,
+          pan.dy
+        );
+
+        if (Date.now() - this.lastDebouncedMove >= CST.CAMERA.MOVE_DEBOUNCE) {
+          this.lastDebouncedMove = Date.now();
+
+          CameraManager.EVENTS.emit(CST.CAMERA.DEBOUNCED_MOVE_EVENT);
+        }
       },
       this
     );
 
-    this.camera.startFollow(
-      this.window,
-      false,
-      CST.CAMERA.PAN_LERP,
-      CST.CAMERA.PAN_LERP
-    );
-
-    return this;
+    return this.followWindowObject();
   }
 
   enableZoom(): this {
@@ -143,6 +198,10 @@ export default class CameraManager extends Manager {
 
     // made a function so code doesn't get dupplicated
     let zoomCamera = (zoomFactor: number) => {
+      if (this.zoomPrevention) {
+        return;
+      }
+
       let oldZoom = this.camera.zoom;
       this.camera.setZoom(this.camera.zoom * zoomFactor);
 
@@ -157,7 +216,11 @@ export default class CameraManager extends Manager {
 
       // emit the camera zoom event with the actual zoom factor the camera scaled
       let actualZoomFactor = this.camera.zoom / oldZoom;
-      CameraManager.EVENTS.emit(CST.CAMERA.ZOOM_EVENT, actualZoomFactor);
+      CameraManager.EVENTS.emit(
+        CST.CAMERA.ZOOM_EVENT,
+        actualZoomFactor,
+        this.camera.zoom
+      );
     };
 
     this.pinch.on(
