@@ -1,4 +1,4 @@
-import GameObjectsManager from "./GameObjectsManager";
+import GameObjectsManager from "./gameUtils/GameObjectsManager";
 import GameInstance from "./GameInstance";
 
 import { Characters } from "../../public/common/MessageTypes";
@@ -7,7 +7,7 @@ import CST from "../../public/common/CommonCST";
 
 import mongoose from "mongoose";
 import DocumentArray = mongoose.Types.DocumentArray;
-import Island, { CharacterType } from "../models/Island";
+import { CharacterType } from "../models/Island";
 
 // Handle the game characters for a user
 export default class CharactersManager extends GameObjectsManager {

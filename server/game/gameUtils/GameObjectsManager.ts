@@ -1,4 +1,4 @@
-import GameInstance from "./GameInstance";
+import GameInstance from "../GameInstance";
 
 // The common base class for all Managers: BuildingsManager, CharactersManager, etc.
 export default class GameObjectsManager {

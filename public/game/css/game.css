@@ -92,10 +92,10 @@ button#terminalButton:hover {
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 }
 
-.termDiv {
+/* .termDiv {
   width: 99%;
   height: 98%;
-}
+} */
 
 .xterm.terminal {
   z-index: 5;
@@ -113,4 +113,71 @@ button#terminalButton:hover {
 
 .blocklyLabels > .blocklyFlyoutLabelText {
   font: bold 24pt "Roboto" !important;
+}
+
+.modal-title {
+  font-family: "Roboto";
+  font-size: 2rem;
+  color: white;
+}
+
+.modal-content .modal-header,
+.modal-content .modal-body,
+.modal-content .modal-footer {
+  font-family: "Roboto";
+  background-color: #7b5e57;
+  border-color: #352518;
+}
+
+.modal-dialog .modal-content {
+  border-color: #352518;
+}
+
+.modal-content .modal-footer .btn {
+  background-color: #4e342e;
+  border-color: #352518;
+}
+
+.modal-content .modal-footer .btn:active {
+  border-color: white;
+}
+
+.modal-content .table.table-dark.table-striped thead th {
+  background-color: #4e342e;
+  border-color: #352518;
+}
+
+.modal-content .table.table-dark.table-striped tr:nth-of-type(odd) {
+  background-color: #7b5e57;
+  border-color: #352518;
+}
+
+.modal-content tr:nth-of-type(even) {
+  background-color: #4e342e;
+  border-color: #352518;
+}
+
+.modal-content tr:nth-of-type(even) td,
+.modal-content tr:nth-of-type(even) th {
+  border-color: #352518;
+}
+.modal-content tr:nth-of-type(odd) td,
+.modal-content tr:nth-of-type(odd) th {
+  border-color: #352518;
+}
+
+/* Move the pagination nav to the bottom of the modal */
+/* .modal-content nav {
+  position: relative;
+  bottom: 0%;
+} */
+
+ul.pagination > li.page-item > a.page-link {
+  color: #352518;
+  border-color: #352518;
+}
+
+ul.pagination > li.page-item.active > a.page-link {
+  background-color: #4e342e;
+  color: white;
 }

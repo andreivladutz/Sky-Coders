@@ -351,6 +351,15 @@ export default {
         id: "gamePopover"
       }
     },
+    BOOTSTRAP_MODAL: {
+      ID: "bsModal",
+      CONTENT_CLASS: "modal-content",
+      DIALOG_CLASS: "modal-dialog",
+      BACKDROP_CLASS: "modal-backdrop",
+      BACKDROP_SHOWN_CLASS: "show",
+      TITLE_SELECTOR: ".modal-title",
+      CONTENT_SELECTOR: ".modal-body"
+    },
     // Toast display message
     TOAST: {
       TRANSITION_TIME: 200,
@@ -537,6 +546,7 @@ export default {
     OPEN_EVENT: "window-open",
     CLOSE_ANIM_EVENT: "window-close-anim",
     OPEN_ANIM_EVENT: "window-open-anim",
+    DEBOUNCED_RESIZE_EVENT: "debounced_resize",
 
     CLASSES: {
       CONTAINER: "windowOverlay",
@@ -558,7 +568,11 @@ export default {
   },
   TERMINAL: {
     CLASS: "termDiv",
-    DEBOUNCE_TIME: 250,
+    TERMINAL_RATIO: {
+      WIDTH: 99,
+      HEIGHT: 98
+    },
+    DEBOUNCE_TIME: 100,
     // color codes to use in the terminal
     COLORS: {
       RED: "31m",
@@ -670,6 +684,32 @@ export default {
       MAX: 1
     },
     DEFAULT_VOLUME: 0
+  },
+  // Stuff related to the leaderboard dialog page
+  LEADERBOARD: {
+    PAGE_NAV: {
+      ARIA_LABEL: "Leaderboard pagination"
+    },
+    UL: {
+      CLASSES: ["pagination", "pagination-lg", "justify-content-center"],
+      LI: {
+        CLASS: "page-item",
+        ACTIVE: "active",
+        DISABLED: "disabled",
+        ANCHOR: {
+          CLASS: "page-link",
+          HREF: "#",
+          PREV: {
+            ARIA_LABEL: "Previous",
+            INNER_HTML: `<span aria-hidden="true">&laquo;</span>`
+          },
+          NEXT: {
+            ARIA_LABEL: "Next",
+            INNER_HTML: `<span aria-hidden="true">&raquo;</span>`
+          }
+        }
+      }
+    }
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST,

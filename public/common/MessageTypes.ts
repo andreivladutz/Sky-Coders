@@ -98,3 +98,27 @@ export namespace Characters {
   export type DbCharacter = CharacterDbInfo;
   export type CharaPosition = Position;
 }
+
+// Users-related db querying
+export namespace Users {
+  const PREFIX = "Users.";
+
+  // Get the first page of users for the leaderboard
+  // And the number of pages the leaderboard needs
+  // The message response has a LeaderboardInit object attached
+  export const LEADERB_FIRST = `${PREFIX}leaderb_first`;
+  export interface LeaderboardInit {
+    pagesCount: number;
+    page: LeaderboardPage;
+  }
+
+  // A page of the leaderboard is a list of entries
+  export type LeaderboardPage = LeaderboardEntry[];
+  // A user-details entry of the leaderboard page
+  export interface LeaderboardEntry {
+    name: string;
+    buildingsCount: number;
+    islandCount: number;
+    charasCount: number;
+  }
+}

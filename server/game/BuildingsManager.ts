@@ -12,7 +12,7 @@ import GameInstance from "./GameInstance";
 import CST from "../SERVER_CST";
 
 import { NamespaceDebugger } from "../utils/debug";
-import GameObjectsManager from "./GameObjectsManager";
+import GameObjectsManager from "./gameUtils/GameObjectsManager";
 const debug = new NamespaceDebugger("BuildingsManager");
 
 type DbInfo = Buildings.DbBuilding;

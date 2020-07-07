@@ -14,7 +14,6 @@ import RoundRectObject from "./uiObjects/RoundRectObject";
 import Toast from "./uiObjects/Toast";
 import GameManager from "../online/GameManager";
 import ResourcesManager from "../managers/ResourcesManager";
-import { runInThisContext } from "vm";
 import AudioManager from "../managers/AudioManager";
 
 type Image = Phaser.GameObjects.Image;
@@ -28,6 +27,9 @@ export default class MainUI extends UIComponent {
   public toast: Toast;
   public blocklyManager: BlocklyManager;
   public audioManager = AudioManager.getInstance();
+
+  // Dynamically imported module
+  public Leaderboard: typeof import("./uiObjects/Leaderboard").default;
 
   constructor(uiScene: UIScene, gameScene: IsoScene) {
     super(uiScene, gameScene);
@@ -181,6 +183,15 @@ class MainUIButon extends ButtonImage<MainUI> {
         break;
       case BUTTON_TYPES.SOUND:
         this.parentUI.toggleVolumeSlider();
+        break;
+      case BUTTON_TYPES.LEADERBOARD:
+        if (!this.parentUI.Leaderboard) {
+          this.parentUI.Leaderboard = (
+            await import("./uiObjects/Leaderboard")
+          ).default;
+        }
+
+        this.parentUI.Leaderboard.getInstance().show();
         break;
     }
   };

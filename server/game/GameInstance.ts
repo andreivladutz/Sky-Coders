@@ -15,6 +15,7 @@ import DocumentArray = mongoose.Types.DocumentArray;
 import { NamespaceDebugger } from "../utils/debug";
 import CharactersManager from "./CharactersManager";
 import { ResourcesType } from "../models/GameSchema";
+import UsersManager from "./gameUtils/UsersQuery";
 const debug = new NamespaceDebugger("GameInstance");
 
 // An instance of a game for a particular user
@@ -37,6 +38,8 @@ export default class GameInstance extends EventEmitter {
     buildingsManger?: BuildingsManager;
     // The character's manager
     charactersManager?: CharactersManager;
+    // The user querying component
+    usersManager?: UsersManager;
   } = {};
 
   private updateInterval: any;
@@ -68,6 +71,7 @@ export default class GameInstance extends EventEmitter {
 
     this.objectsManagers.buildingsManger = new BuildingsManager(this);
     this.objectsManagers.charactersManager = new CharactersManager(this);
+    this.objectsManagers.usersManager = new UsersManager(this);
 
     // If the user is just reconnecting, then the game is already
     // inited on the client side
