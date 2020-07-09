@@ -28,8 +28,9 @@ export default class MainUI extends UIComponent {
   public blocklyManager: BlocklyManager;
   public audioManager = AudioManager.getInstance();
 
-  // Dynamically imported module
+  // Dynamically imported modules
   public Leaderboard: typeof import("./uiObjects/Leaderboard").default;
+  public Settings: typeof import("./uiObjects/Settings").default;
 
   constructor(uiScene: UIScene, gameScene: IsoScene) {
     super(uiScene, gameScene);
@@ -192,6 +193,16 @@ class MainUIButon extends ButtonImage<MainUI> {
         }
 
         this.parentUI.Leaderboard.getInstance().show();
+        break;
+      case BUTTON_TYPES.SETTINGS:
+        if (!this.parentUI.Settings) {
+          this.parentUI.Settings = (
+            await import("./uiObjects/Settings")
+          ).default;
+        }
+
+        this.parentUI.Settings.getInstance().show();
+
         break;
     }
   };

@@ -709,6 +709,23 @@ export default {
           }
         }
       }
+    },
+    // The table holding all users
+    TABLE: {
+      INNER_HTML: `
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Islands Count</th>
+            <th scope="col">Buildings Count</th>
+            <th scope="col">Charas Count</th>
+          </tr>
+        </thead>`,
+      TABLE_CLASSES: ["table", "table-dark", "table-striped"],
+      BODY: {
+        GET_ROW_HEAD: (index: number) => `<th scope="row">${index}</th>`
+      }
     }
   },
   // constants imported from the worker cst

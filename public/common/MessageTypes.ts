@@ -103,14 +103,16 @@ export namespace Characters {
 export namespace Users {
   const PREFIX = "Users.";
 
-  // Get the first page of users for the leaderboard
+  // Get any page of users for the leaderboard
   // And the number of pages the leaderboard needs
   // The message response has a LeaderboardInit object attached
-  export const LEADERB_FIRST = `${PREFIX}leaderb_first`;
+  export const LEADERB_GET_PAGE = `${PREFIX}leaderb_first`;
   export interface LeaderboardInit {
     pagesCount: number;
     page: LeaderboardPage;
   }
+  // The ack page passed along the emitted event
+  export type GetPageAck = (cfg: Users.LeaderboardInit) => void;
 
   // A page of the leaderboard is a list of entries
   export type LeaderboardPage = LeaderboardEntry[];

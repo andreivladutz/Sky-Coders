@@ -4,6 +4,8 @@ import UIScene from "../../scenes/UIScene";
 import CST from "../../CST";
 
 import Image = Phaser.GameObjects.Image;
+import Pointer = Phaser.Input.Pointer;
+import EventData = Phaser.Types.Input.EventData;
 
 // static UI element that just prevents propagating events
 export class UIImage extends Image {
@@ -76,9 +78,22 @@ export default class ButtonImage<T extends UIComponent> extends UIImage {
 }
 
 // function to be used to prevent events from propagating underneath
-function preventAndCallbackHandler(context?: any, cbName?: string) {
-  // just ignore the pointer, localX and localY
-  return (_1: any, _2: any, _3: any, event: Phaser.Types.Input.EventData) => {
+function preventAndCallbackHandler(
+  context?: ButtonImage<UIComponent>,
+  cbName?: string
+) {
+  // just ignore the localX and localY
+  return (pointer: Pointer, _2: any, _3: any, event: EventData) => {
+    let gameCanvas = context?.parentUI.uiScene.game.canvas;
+    // Check if the event is targeted straight on the canvas
+    if (
+      cbName === "onTap" &&
+      gameCanvas &&
+      pointer.event.target !== gameCanvas
+    ) {
+      return;
+    }
+
     if (context && cbName && typeof context[cbName] === "function") {
       context[cbName].call(context);
     }

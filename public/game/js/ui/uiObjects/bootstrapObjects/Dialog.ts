@@ -7,7 +7,9 @@ const MODAL = CST.UI.BOOTSTRAP_MODAL;
 
 export default class Dialog {
   private static instance = null;
+
   private dialogWindow: GameWindow;
+  public contentElement: HTMLDivElement;
 
   private constructor() {
     this.dialogWindow = new GameWindow();
@@ -27,18 +29,19 @@ export default class Dialog {
     });
   }
 
-  public show(title: string, content: string) {
-    $(() => {
-      this.dialogWindow.openWindow();
-      this.dialogWindow.on(CST.WINDOW.OPEN_ANIM_EVENT, () => {
-        let el = $(`#${MODAL.ID}`);
+  public show(title: string, content: string = "") {
+    this.dialogWindow.openWindow();
 
-        el.modal("show");
-        el.find(MODAL.TITLE_SELECTOR).text(title);
-        el.find(MODAL.CONTENT_SELECTOR).html(content);
+    let el = $(`#${MODAL.ID}`);
+    el.find(MODAL.TITLE_SELECTOR).text(title);
+    this.contentElement = el
+      .find(MODAL.CONTENT_SELECTOR)
+      .html(content)
+      .get()[0] as HTMLDivElement;
 
-        this.resizeDialog();
-      });
+    this.dialogWindow.on(CST.WINDOW.OPEN_ANIM_EVENT, () => {
+      el.modal("show");
+      this.resizeDialog();
     });
   }
 

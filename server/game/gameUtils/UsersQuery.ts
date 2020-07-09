@@ -1,6 +1,6 @@
 /** Utilities useful for user-related db querying */
 import User, { UserType } from "../../models/User";
-import CST from "../../SERVER_CST";
+import CST from "../../../public/common/CommonCST";
 import GameObjectsManager from "./GameObjectsManager";
 import GameInstance from "../GameInstance";
 
@@ -47,11 +47,12 @@ export default class UsersManager extends GameObjectsManager {
     this.listenForEvents();
   }
 
-  private async sendLeaderboardInit(ack: (cfg: Users.LeaderboardInit) => void) {
-    let firstPage: Users.LeaderboardPage = [];
+  // Get any page
+  private async sendLeaderboardPage(pg: number, ack: Users.GetPageAck) {
+    let currPage: Users.LeaderboardPage = [];
 
-    // Get details about the users on the first page of the leaderboard
-    for (let user of await getLbUsersPage(1, { name: 1, "game.islands": 1 })) {
+    // Get details about the users on this page of the leaderboard
+    for (let user of await getLbUsersPage(pg, { name: 1, "game.islands": 1 })) {
       let userDoc = user as UserType;
       // Count the islands, the buildings and the characters owned by the user
       let islandCount = userDoc.game.islands.length;
@@ -63,7 +64,7 @@ export default class UsersManager extends GameObjectsManager {
         charasCount += userDoc.game.islands[i].characters.length;
       }
 
-      firstPage.push({
+      currPage.push({
         name: userDoc.name,
         islandCount,
         buildingsCount,
@@ -73,13 +74,13 @@ export default class UsersManager extends GameObjectsManager {
 
     let initCfg: Users.LeaderboardInit = {
       pagesCount: await leaderboardPageCount(),
-      page: firstPage
+      page: currPage
     };
 
     ack(initCfg);
   }
 
   private listenForEvents() {
-    this.sender.on(Users.LEADERB_FIRST, this.sendLeaderboardInit.bind(this));
+    this.sender.on(Users.LEADERB_GET_PAGE, this.sendLeaderboardPage.bind(this));
   }
 }

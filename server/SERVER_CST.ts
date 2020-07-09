@@ -45,11 +45,6 @@ export default {
     // Update the game instance and save to db every 20s
     UPDATE_INTERVAL: 20000
   },
-  // CSTs related to users query
-  USERS_QUERY: {
-    // Limit the results to 10 users
-    LEADERBOARD_LIMIT: 3
-  },
   // Common constants between the client and the server
   COMMON_CST
 };
