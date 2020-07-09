@@ -16,6 +16,9 @@ export default class ResourcesManager extends Manager {
   public resourcesUi: ResourcesUI;
   public mainUi: MainUI;
 
+  // TODO: this adds stink to the code -> property changed inside the Settings component
+  public animationsActive = true;
+
   public initResourcesUi(gameScene: IsoScene) {
     [this.resourcesUi, this.mainUi] = UIComponents.getUIComponents(
       [ResourcesUI, MainUI],

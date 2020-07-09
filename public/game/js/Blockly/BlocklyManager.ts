@@ -21,12 +21,14 @@ export default class BlocklyManager extends Manager {
     .Classic;
 
   public workspace: Blockly.WorkspaceSvg;
+  public currentRenderer: "zelos" | "geras" = "zelos";
+
   // The default workspace containing the three allowed command blocks
   private defaultXMLWorkspace: HTMLDocument;
 
+  private toolboxXml: HTMLDocument;
   // The current actor's code Handler
   private currCodeHandler: ActorCodeHandler;
-
   private darkModeToggleButton: HTMLButtonElement;
   private window: GameWindow;
 
@@ -134,17 +136,21 @@ export default class BlocklyManager extends Manager {
   // The toolbox xml is being loaded by Phaser's loader and taken from Phaser's cache
   // The init method HAS to be called after all actors have been created as it loads the code from their workspace
   public init(cache: Phaser.Cache.CacheManager) {
-    let toolboxXml = cache.xml.get(this.toolboxKey);
+    this.toolboxXml = cache.xml.get(this.toolboxKey);
     this.defaultXMLWorkspace = cache.xml.get(this.defaultWorkspaceKey);
 
-    if (!toolboxXml) {
+    if (!this.toolboxXml) {
       throw new Error(
         "The toolbox XML could not be retreived from the cache in BlocklyManager's constructor"
       );
     }
 
+    // Translate the labels (text) that appear inside the toolbox
+    this.localizeLabels();
+
     this.initBlocks(cache);
-    this.initWorkspace(toolboxXml);
+    // Init with default renderer "zelos"
+    this.initWorkspace(this.currentRenderer);
     this.initDarkToggleButton();
 
     this.window = new GameWindow(
@@ -190,15 +196,15 @@ export default class BlocklyManager extends Manager {
   }
 
   // Translate the label tags' text in the Blockly toolbox
-  private localizeLabels(toolboxXml: HTMLDocument) {
+  private localizeLabels() {
     let langFile = GameManager.getInstance().langFile;
     let textAttribToLocalized = [
       [CST.BLOCKLY.LABELS.COORDS, langFile.Blockly.labels.coords],
-      [CST.BLOCKLY.LABELS.BUILDINGS, langFile.Blockly.labels.builds]
+      [CST.BLOCKLY.LABELS.BUILDINGS, langFile.Blockly.labels.builds],
     ];
 
     for (let [textAttrib, localizedText] of textAttribToLocalized) {
-      toolboxXml
+      this.toolboxXml
         .querySelectorAll(`label[text="${textAttrib}"`)[0]
         .setAttribute("text", localizedText);
     }
@@ -214,33 +220,39 @@ export default class BlocklyManager extends Manager {
     };
   }
 
-  private initWorkspace(toolboxXml: HTMLDocument) {
+  public initWorkspace(renderer: "zelos" | "geras") {
+    this.currentRenderer = renderer;
+
     let startScale = SYSTEM.TOUCH_ENABLED
       ? CST.BLOCKLY.MOBILE_INITIAL_SCALE
       : CST.BLOCKLY.INITIAL_SCALE;
 
-    this.localizeLabels(toolboxXml);
+    this.injectBlockly(startScale, renderer);
+    this.synchronizeVolume();
+    this.workspace.addChangeListener(Blockly.Events.disableOrphans);
+    this.addReservedWords();
+  }
+
+  private injectBlockly(startScale: number, renderer: "zelos" | "geras") {
+    if (this.workspace) {
+      this.workspace.dispose();
+    }
 
     this.workspace = Blockly.inject(CST.BLOCKLY.AREA_ID, {
-      toolbox: toolboxXml.getElementById(CST.BLOCKLY.TOOLBOX_ID),
+      toolbox: this.toolboxXml.getElementById(CST.BLOCKLY.TOOLBOX_ID),
       // horizontalLayout: true,
       theme: this.darkTheme,
       zoom: {
         controls: true,
-        startScale
+        startScale,
       },
       move: {
         scrollbars: true,
-        drag: true
+        drag: true,
       },
       trashcan: false,
-      renderer: "zelos"
+      renderer,
     });
-
-    this.synchronizeVolume();
-
-    this.workspace.addChangeListener(Blockly.Events.disableOrphans);
-    this.addReservedWords();
   }
 
   // Init the custom Blockly blocks from the loaded json defs (already parsed)
@@ -254,7 +266,7 @@ export default class BlocklyManager extends Manager {
     // TODO: Change the custom block localization. No need to import all locales
     defineCustomBlocks(blockDefs, {
       RO: roLang,
-      EN: enLang
+      EN: enLang,
     });
 
     let chosenLangCode = GameManager.getInstance().chosenLangCode;

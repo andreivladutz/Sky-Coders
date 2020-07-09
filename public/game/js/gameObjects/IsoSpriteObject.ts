@@ -57,7 +57,7 @@ export enum GridColor {
   BLUE = 0x51a0d5,
   NEUTRAL_GREEN = 0x59c878,
   PURPLE = 0x8d4585,
-  PINK = 0xe51a4c
+  PINK = 0xe51a4c,
 }
 
 // check if a tile is out of bounds
@@ -224,16 +224,22 @@ export default class IsoSpriteObject extends IsoSprite {
     }
 
     this.setInteractive()
-      .on("pointerover", () => {
+      .on("pointerover", (pointer: Phaser.Input.Pointer) => {
         // prevent tilemove events propagating to the map
         this.mapManager.events.registerDefaultPrevention(this);
         this.setTint(this.selectedTintColor);
 
         // Don't emit long hover event on touch enabled devices
-        if (!SYSTEM.TOUCH_ENABLED) {
+        if (SYSTEM.TOUCH_ENABLED) {
+          return;
+        }
+
+        if (this.gameCanvasIsTarget(pointer.event)) {
           this.longHoverTimeout = setTimeout(() => {
             this.emit(CST.EVENTS.OBJECT.LONG_HOVER);
           }, CST.EVENTS.OBJECT.HOVER_TIME);
+        } else {
+          clearTimeout(this.longHoverTimeout);
         }
       })
       .on("pointerout", () => {
@@ -258,6 +264,7 @@ export default class IsoSpriteObject extends IsoSprite {
   // Handler function for "pointerdown" event -> checking PRESS
   private checkPressLogic = (pointer: Phaser.Input.Pointer) => {
     if (!this.gameCanvasIsTarget(pointer.event)) {
+      clearTimeout(this.longHoverTimeout);
       return;
     }
 
@@ -281,6 +288,7 @@ export default class IsoSpriteObject extends IsoSprite {
   // Handler function for "pointerup" event
   protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
     if (!this.gameCanvasIsTarget(pointer.event)) {
+      clearTimeout(this.longHoverTimeout);
       return;
     }
 

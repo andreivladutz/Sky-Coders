@@ -65,7 +65,7 @@ export default class BuildingObject extends IsoSpriteObject {
       shouldBeAppliedToLayer: false,
       // override local computed tiles
       localTileX,
-      localTileY
+      localTileY,
     });
 
     this.buildingType = buildingType;
@@ -110,14 +110,25 @@ export default class BuildingObject extends IsoSpriteObject {
     return {
       buildingType: this.buildingType,
       isReady: this.isProductionReady,
-      id: this.dbId
+      id: this.dbId,
     };
   }
 
+  // Class method different than the base one (makeSelectable) or the Phaser's Spritesheet one (setInteractive)
   public makeInteractive(): this {
     this.makeSelectable().setSelectedTintColor(CST.BUILDINGS.SELECTION_TINT);
 
     this.on(CST.EVENTS.OBJECT.LONG_HOVER, this.handleLongHover, this);
+
+    // Corner case, cancelling the popover
+    this.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      if (!this.gameCanvasIsTarget(pointer.event)) {
+        if (this.popoverObjInstance) {
+          this.popoverObjInstance.hidePopover();
+          this.popoverObjInstance = null;
+        }
+      }
+    });
 
     this.on("pointerout", () => {
       if (this.popoverObjInstance) {

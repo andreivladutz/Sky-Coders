@@ -181,3 +181,17 @@ ul.pagination > li.page-item.active > a.page-link {
   background-color: #4e342e;
   color: white;
 }
+
+/* Settings page */
+.modal-body form {
+  font-family: "Roboto";
+  color: white;
+  background-color: #4e342e;
+
+  padding-top: 2%;
+  padding-bottom: 2%;
+  padding-left: 5%;
+  padding-right: 5%;
+
+  vertical-align: middle;
+}

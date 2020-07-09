@@ -15,7 +15,7 @@ const BUTTON_TYPES = {
   WOOD_BG: "wood_texture",
   WOOD_PLANK: "wood_plank",
   CANCEL: "Cancel",
-  OK: "Ok"
+  OK: "Ok",
 };
 
 export interface MultiatlasConfig {
@@ -45,13 +45,13 @@ export default {
     WIDTH: 1920,
     HEIGHT: 1080,
     TITLE: "HTML5 Multiplayer Isometric Game",
-    VERSION: "0.1"
+    VERSION: "0.1",
   },
   // scene keys
   SCENES: {
     LOAD: "LOAD",
     GAME: "GAME",
-    UI: "UISCENE"
+    UI: "UISCENE",
   },
   // Base url for the game assets
   BASE_URL: "./game/assets/",
@@ -61,23 +61,23 @@ export default {
     HEIGHT: 128,
     DEFAULT_CFG: {
       frequency: 0.025,
-      exponent: 1
+      exponent: 1,
     },
     // maximum value when discretizing the noise map
-    HEIGHT_MAP_MAX: 0.85
+    HEIGHT_MAP_MAX: 0.85,
   },
   PLUGINS: {
     ISO: {
       FILE_IDENTIFIER: "IsoPlugin",
-      SCENE_KEY: "iso"
-    }
+      SCENE_KEY: "iso",
+    },
   },
   // the isoScene projector found in the game and the UI scenes
   PROJECTOR: {
     ORIGIN: {
       X: 0.5,
-      Y: 0.2
-    }
+      Y: 0.2,
+    },
   },
   // camera controller params
   CAMERA: {
@@ -99,7 +99,7 @@ export default {
     // don t let the user scroll outside of the map
     PANLIMIT_RATIO: 4,
     // Keep preventing the user from zooming this amount of time after a pan animation has ended
-    EXTRA_ZOOM_PREVENTION: 250
+    EXTRA_ZOOM_PREVENTION: 250,
   },
   // options for the board grid
   GRID: {
@@ -110,7 +110,7 @@ export default {
     // if the game is zoomed out too much, the grid will hide
     ZOOM_DEACTIVATE: 0.2,
     // fill alpha for game objects' grid
-    FILL_ALPHA: 0.3
+    FILL_ALPHA: 0.3,
   },
   TILEMAP: {
     // How many drawn but not visible tiles have to be to consider
@@ -121,12 +121,12 @@ export default {
 
     CHUNK: {
       HEIGHT: 16,
-      WIDTH: 32
-    }
+      WIDTH: 32,
+    },
   },
   // service-worker related csts
   SW: {
-    BUILT_SW_PATH: "./sw-build.js"
+    BUILT_SW_PATH: "./sw-build.js",
   },
   ENVIRONMENT: {
     // the prefix added to Phaser's frames
@@ -145,19 +145,19 @@ export default {
       END: 5,
       ZERO_PAD: 2,
       // probability that a grass tile appears instead of a base one
-      PROBABILITIES: [1 / 100, 1 / 20, 0, 1 / 300, 1 / 300]
+      PROBABILITIES: [1 / 100, 1 / 20, 0, 1 / 300, 1 / 300],
     },
     TREES: {
       PREFIX: "Trees/",
-      TREE_NAMES: ["PineTree", "Tree", "Tree1", "Tree2"]
+      TREE_NAMES: ["PineTree", "Tree", "Tree1", "Tree2"],
     },
     CLIFFS: {
       PREFIX: "Cliffs/",
-      CLIFF_NAMES: ["cliff1", "cliff2", "cliff3"]
+      CLIFF_NAMES: ["cliff1", "cliff2", "cliff3"],
     },
     ORES: {
       PREFIX: "Ores/",
-      ORES_NAMES: ["black_ore", "crystal"]
+      ORES_NAMES: ["black_ore", "crystal"],
     },
     // the empty tile's index
     EMPTY_TILE: 0,
@@ -168,7 +168,7 @@ export default {
     // offsets of tiles in the tilemap
     // e.g. map grass indices 1, 2,..,5 to 0,...,4
     BASE_OFFSET: 1,
-    GRASS_OFFSET: 6
+    GRASS_OFFSET: 6,
   },
   BUILDINGS: {
     // the key of the atlas resource
@@ -181,9 +181,9 @@ export default {
     // the prefix of all buildings' frames
     PREFIX: "Buildings/",
     TYPES: {
-      RESIDENTIAL: "residential"
+      RESIDENTIAL: "residential",
     },
-    SELECTION_TINT: 0xe6e6fa
+    SELECTION_TINT: 0xe6e6fa,
   },
   BUTTONS: {
     // the key of the atlas resource
@@ -203,7 +203,7 @@ export default {
     // the prefix of all buttons' frames
     PREFIX: "Buttons/",
     // the types of the buttons
-    TYPES: BUTTON_TYPES
+    TYPES: BUTTON_TYPES,
   },
   // CSTs for the PlacementManager
   REGIONS: {
@@ -216,12 +216,12 @@ export default {
     MINTREES: 8,
     // how many tiles should be around the trees
     TREE_RADIUS: 1,
-    ORE_RADIUS: 5
+    ORE_RADIUS: 5,
   },
   ACTOR: {
     SELECTION_TINT: 0xd0f5e9,
     FOCUS_ZOOM_TIME: 750,
-    FOCUS_PAN_TIME: 500
+    FOCUS_PAN_TIME: 500,
   },
   NAV_OBJECT: {
     SPEED: 400,
@@ -238,10 +238,10 @@ export default {
         NE: "walking.NE",
         NW: "walking.NW",
         E: "walking.E",
-        W: "walking.W"
+        W: "walking.W",
       },
-      IDLE: "idle"
-    }
+      IDLE: "idle",
+    },
   },
   COLORS: {
     WHITE: 0xffffff,
@@ -251,7 +251,7 @@ export default {
     LIME: 0xd5ff00,
     MAROON: 0x4e342e,
     LIGHT_MAROON: 0x7b5e57,
-    DARK_MAROON: 0x260e04
+    DARK_MAROON: 0x260e04,
   },
   EVENTS: {
     MAP: {
@@ -260,7 +260,7 @@ export default {
       PRESS: "tilepressstart",
       PREVENTING: "startedpreventingevents",
       // The view rectangle of the isoboard becomes dirty
-      IS_DIRTY: "mapisdirty"
+      IS_DIRTY: "mapisdirty",
     },
     OBJECT: {
       SELECT: "object.select",
@@ -270,18 +270,18 @@ export default {
       // Time needed for the pointerdown event
       // to be considered a press event
       PRESS_TIME: 300,
-      HOVER_TIME: 1000
+      HOVER_TIME: 1000,
     },
     // The building finished its production
     BUILDING: {
-      PROD_READY: "building.prodready"
+      PROD_READY: "building.prodready",
     },
     ARROWS_UI: {
-      TAP: "arrow.tapped"
+      TAP: "arrow.tapped",
     },
     LOAD_SCENE: {
-      LOAD_COMPLETE: "loadcomplete"
-    }
+      LOAD_COMPLETE: "loadcomplete",
+    },
   },
   // layer depth for different rendering "objects"
   LAYER_DEPTH: {
@@ -290,7 +290,7 @@ export default {
     WORLD_GRID: 2,
     OBJECT_GRID: 3,
     HTML_UI: 4,
-    UI: Infinity
+    UI: Infinity,
   },
   // CONSTANTS FOR THE LAYER MANAGER
   LAYERS: {
@@ -298,7 +298,7 @@ export default {
     OBJ_ID: {
       TREE: 4,
       ORE: 5,
-      BUILDING: 6
+      BUILDING: 6,
     },
     ACTOR_ID: 100,
     // Represent the map grid efficiently using only 8 bits per tile
@@ -306,8 +306,8 @@ export default {
     MASK: {
       FLIPX_BIT: 7,
       FLIPY_BIT: 6,
-      TILE_ID_MASK: 63
-    }
+      TILE_ID_MASK: 63,
+    },
   },
   ARROW_SHAPE: {
     // Make the arrow size relative to this tile height
@@ -320,18 +320,18 @@ export default {
     EAST: Math.PI / 2,
     SOUTH: Math.PI,
     WEST: (3 * Math.PI) / 2,
-    Z_EFFECT: 40
+    Z_EFFECT: 40,
   },
   UI: {
     HTML_LAYER: {
       BG_UI: 0,
       DECORATIONS: 1,
-      POPOVER: 2
+      POPOVER: 2,
     },
     VOLUME_SLIDER: {
       // Width ratio
       MAIN_BUTTONS_RATIO_WIDTH: 0.75,
-      MAIN_BUTTONS_RATIO_HEIGHT: 0.2
+      MAIN_BUTTONS_RATIO_HEIGHT: 0.2,
     },
     POPOVER: {
       HTML_ELEMENT: "a",
@@ -341,15 +341,15 @@ export default {
       // The query used to get the popovers
       QUERY: "#gamePopover",
       DEFAULT_STYLE: {
-        visibility: "hidden"
+        visibility: "hidden",
       },
       // The attributes to set on the anchor element at first
       INIT_ATTRIBS: {
         tabindex: "0",
         "data-toggle": "popover",
         "data-trigger": "manual",
-        id: "gamePopover"
-      }
+        id: "gamePopover",
+      },
     },
     BOOTSTRAP_MODAL: {
       ID: "bsModal",
@@ -358,15 +358,17 @@ export default {
       BACKDROP_CLASS: "modal-backdrop",
       BACKDROP_SHOWN_CLASS: "show",
       TITLE_SELECTOR: ".modal-title",
-      CONTENT_SELECTOR: ".modal-body"
+      CONTENT_SELECTOR: ".modal-body",
+      // Select the footer so we can insert more buttons!
+      FOOTER_CLASS: "modal-footer",
     },
     // Toast display message
     TOAST: {
       TRANSITION_TIME: 200,
-      DISPLAY_TIME: 2000
+      DISPLAY_TIME: 2000,
     },
     SVG: {
-      DEFAULT_CLASS: "SVGObject"
+      DEFAULT_CLASS: "SVGObject",
     },
     // The coins' svgs
     COINS: {
@@ -375,16 +377,16 @@ export default {
       TYPES: {
         GOLD: {
           FILENAME: "gold_coin.svg",
-          KEY: "gold_coin"
+          KEY: "gold_coin",
         },
         PURPLE: {
           FILENAME: "purple_coin.svg",
-          KEY: "purple_coin"
+          KEY: "purple_coin",
         },
         PURPLE_SIMPLE: {
           FILENAME: "purple_coin_simple.svg",
-          KEY: "purple_coin_simple"
-        }
+          KEY: "purple_coin_simple",
+        },
       },
       // The ratio relative to the bottom bar
       RATIO: 0.75,
@@ -396,7 +398,7 @@ export default {
       BOUNCE_DELTAY: 100,
       BOUNCE_TIME: 1500,
       // Time needed to go out of the screen
-      COLLECT_ANIM_TIME: 250
+      COLLECT_ANIM_TIME: 250,
     },
     ROUND_RECT: {
       DEFAULT_RADIUS: 10,
@@ -407,8 +409,8 @@ export default {
         "-ms-user-select": "none" /* IE 10+ */,
         "user-select": "none" /* Likely future */,
         color: "white",
-        "text-align": "center"
-      }
+        "text-align": "center",
+      },
     },
     MODAL: {
       ID: "modal-window",
@@ -418,34 +420,34 @@ export default {
         CLASS: "modal__btn",
         PRIMARY_CLASS: "modal__btn-primary",
         CLOSE_ATTRIB: "data-micromodal-close",
-        CLOSE_ARIA_LABEL: "Close this dialog window"
+        CLOSE_ARIA_LABEL: "Close this dialog window",
       },
       HEADER: "modal-window-header",
       FOOTER: "modal-window-footer",
-      CONTENT: "modal-window-content"
+      CONTENT: "modal-window-content",
     },
     BUTTONS: {
-      TINT_COLOR: 0xffe4b5
+      TINT_COLOR: 0xffe4b5,
     },
     BUILD_PLACE: {
       // arrow offset from the building
-      ARROW_OFFSET: 1.5
+      ARROW_OFFSET: 1.5,
     },
     CONFIRM_BUTTONS: {
       ANCHOR: {
         top: "top",
-        left: "center"
+        left: "center",
       },
       ORIENTATION: "x",
       SPACE: 5,
       ALIGN: "center",
-      SCALE: 0.7
+      SCALE: 0.7,
     },
     MAIN_BUTTONS: {
       // position
       BG_ANCHOR: {
         bottom: "bottom",
-        left: "left+10"
+        left: "left+10",
       },
       BTNS_ROWS: 2,
       BTNS_COLS: 3,
@@ -455,53 +457,53 @@ export default {
         BUTTON_TYPES.LEADERBOARD,
         BUTTON_TYPES.SETTINGS,
         BUTTON_TYPES.SOUND,
-        BUTTON_TYPES.LOGOUT
+        BUTTON_TYPES.LOGOUT,
       ],
       BTN_SCALE: 0.7,
       BG_SCALE_Y: 0.9,
       TILED_DECORATION_SCALE_Y: 0.9,
       BG_IMG: BUTTON_TYPES.WOOD_BG,
       EXPAND_BTN: false,
-      ALIGN_BTN: "center"
+      ALIGN_BTN: "center",
     },
     BUILD_MENU: {
       SIZER: {
-        ORIENTATION: "y"
+        ORIENTATION: "y",
       },
       ANCHOR: {
         left: "left",
-        top: "top"
+        top: "top",
       },
       // vertical scrolling
       SCROLL_MODE: 0,
       // shrink the real buildings to use them as buttons
-      BUTTONS_SIZE: 0.1
+      BUTTONS_SIZE: 0.1,
     },
     DEPTH: {
       DECORATIONS: 0,
       BG: 1,
-      BUTTONS: 2
+      BUTTONS: 2,
     },
     // buttons transitioning in and out of screen
     MOVEMENT: {
       DURATION: 750,
       // moving inside and outside of the screen
-      DEFAULT_DISTANCE: 200
-    }
+      DEFAULT_DISTANCE: 200,
+    },
   },
   STATES: {
     MAIN_UI: "mainUIState",
     BUILD_MENU: "buildMenuState",
-    BUILD_PLACING: "buildPlacingState"
+    BUILD_PLACING: "buildPlacingState",
   },
   // SOCKET.IO CONSTANTS
   IO: {
     EVENTS: {
       CONNECT: "connect",
-      RECONNECT: "reconnect"
+      RECONNECT: "reconnect",
     },
     // If the game doesn't connect in 3 seconds, consider it offline
-    OFFLINE_TIMEOUT: 2 * 1000
+    OFFLINE_TIMEOUT: 2 * 1000,
   },
   BLOCKLY: {
     AREA_ID: "blocklyArea",
@@ -509,7 +511,7 @@ export default {
     CONTAINER_ID: "blocklyContainer",
     ANIMATION: {
       ATTRIB: "aria-hidden",
-      CLASS: "blocklyTransition"
+      CLASS: "blocklyTransition",
     },
     INITIAL_SCALE: 0.8,
     MOBILE_INITIAL_SCALE: 0.5,
@@ -526,20 +528,20 @@ export default {
       BLOCKS: {
         JSON_PATH: "blockDefs/blocksJson/",
         FILENAME_SUFFIX: "_blocks.json",
-        CATEGORIES: ["actions", "environment", "events"]
-      }
+        CATEGORIES: ["actions", "environment", "events"],
+      },
     },
     // Regex used to identify the top blocks
     TOPBLOCK_REGEX: {
       FUNCTION: /^procedure/,
       COMMAND: /^command$/,
-      EVENT: /^event/
+      EVENT: /^event/,
     },
     // Text inside labels to be localized
     LABELS: {
       COORDS: "#coords#",
-      BUILDINGS: "#builds#"
-    }
+      BUILDINGS: "#builds#",
+    },
   },
   WINDOW: {
     CLOSE_EVENT: "window-close",
@@ -550,8 +552,8 @@ export default {
 
     CLASSES: {
       CONTAINER: "windowOverlay",
-      WINDOW: "windowContainer"
-    }
+      WINDOW: "windowContainer",
+    },
   },
   CHARA_SELECTION: {
     CONTAINER_ID: "characterContainer",
@@ -563,14 +565,14 @@ export default {
       CMDS_SPACE_RATIO: 0.01,
       FONT_RATIO: 0.035,
       BTN_BG_DEPTH: 7,
-      BTN_TEXT_DEPTH: 8
-    }
+      BTN_TEXT_DEPTH: 8,
+    },
   },
   TERMINAL: {
     CLASS: "termDiv",
     TERMINAL_RATIO: {
       WIDTH: 99,
-      HEIGHT: 98
+      HEIGHT: 98,
     },
     DEBOUNCE_TIME: 100,
     // color codes to use in the terminal
@@ -579,20 +581,20 @@ export default {
       GREEN: "92m",
       YELLOW: "93m",
       MAGENTA: "35m",
-      CYAN: "96m"
+      CYAN: "96m",
     },
     BACKGROUND: {
-      GRAY: "100m"
+      GRAY: "100m",
     },
     // Ansi escape
     ESCAPE: {
       START: "\x1B[1;3;",
-      END: "\x1B[0m"
-    }
+      END: "\x1B[0m",
+    },
   },
   LANGUAGE_CODES: {
     ENGLISH: "en",
-    ROMANIAN: "ro"
+    ROMANIAN: "ro",
   },
   AUDIO: {
     FOOTSTEPS: {
@@ -602,8 +604,8 @@ export default {
         { KEY: "step1", URLS: ["stepdirt_1.wav"] },
         { KEY: "step2", URLS: ["stepdirt_2.wav"] },
         { KEY: "step3", URLS: ["stepdirt_3.wav"] },
-        { KEY: "step4", URLS: ["stepdirt_4.wav"] }
-      ]
+        { KEY: "step4", URLS: ["stepdirt_4.wav"] },
+      ],
     },
     SOUNDTRACK: {
       PREFIX: "SOUNDTRACK.",
@@ -611,9 +613,9 @@ export default {
       FILES: [
         {
           KEY: "mainTrack",
-          URLS: ["Winds Of Stories.mp3", "Winds Of Stories.ogg"]
-        }
-      ]
+          URLS: ["Winds Of Stories.mp3", "Winds Of Stories.ogg"],
+        },
+      ],
     },
     UI: {
       PREFIX: "UI_AUDIO.",
@@ -623,8 +625,8 @@ export default {
           KEY: "click",
           URLS: ["click.wav"],
           OPTIONS: {
-            volume: 0.95
-          }
+            volume: 0.95,
+          },
         },
         { KEY: "coin", URLS: ["coin.wav"] },
         {
@@ -632,8 +634,8 @@ export default {
           URLS: ["menu_transition.wav"],
           OPTIONS: {
             volume: 0.9,
-            rate: 0.2
-          }
+            rate: 0.2,
+          },
         },
         {
           KEY: "center_camera",
@@ -641,17 +643,17 @@ export default {
           OPTIONS: {
             volume: 0.9,
             rate: 0.4,
-            delay: 100
-          }
+            delay: 100,
+          },
         },
         {
           KEY: "build",
           URLS: ["build.ogg"],
           OPTIONS: {
-            volume: 0.8
-          }
-        }
-      ]
+            volume: 0.8,
+          },
+        },
+      ],
     },
     // KEYS USED TO GET THE AUDIO
     KEYS: {
@@ -659,14 +661,14 @@ export default {
         "ENVIRONMENT.step1",
         "ENVIRONMENT.step2",
         "ENVIRONMENT.step3",
-        "ENVIRONMENT.step4"
+        "ENVIRONMENT.step4",
       ],
       SOUNDTRACKS: ["SOUNDTRACK.mainTrack"],
       CLICK: "UI_AUDIO.click",
       COIN: "UI_AUDIO.coin",
       MENU_TRANSITION: "UI_AUDIO.menu_transition",
       CENTER_CAMERA: "UI_AUDIO.center_camera",
-      BUILD: "UI_AUDIO.build"
+      BUILD: "UI_AUDIO.build",
     },
     SOUNDTRACK_VOLUME: 0.1,
     // Play the footsteps' sound a little slower to match the actor animation
@@ -681,14 +683,14 @@ export default {
     LOWER_VOLUME_RATE: 0.005,
     AUDIBLE_AREA_RADIUS: {
       MIN: 0.3,
-      MAX: 1
+      MAX: 1,
     },
-    DEFAULT_VOLUME: 0
+    DEFAULT_VOLUME: 0,
   },
   // Stuff related to the leaderboard dialog page
   LEADERBOARD: {
     PAGE_NAV: {
-      ARIA_LABEL: "Leaderboard pagination"
+      ARIA_LABEL: "Leaderboard pagination",
     },
     UL: {
       CLASSES: ["pagination", "pagination-lg", "justify-content-center"],
@@ -701,14 +703,14 @@ export default {
           HREF: "#",
           PREV: {
             ARIA_LABEL: "Previous",
-            INNER_HTML: `<span aria-hidden="true">&laquo;</span>`
+            INNER_HTML: `<span aria-hidden="true">&laquo;</span>`,
           },
           NEXT: {
             ARIA_LABEL: "Next",
-            INNER_HTML: `<span aria-hidden="true">&raquo;</span>`
-          }
-        }
-      }
+            INNER_HTML: `<span aria-hidden="true">&raquo;</span>`,
+          },
+        },
+      },
     },
     // The table holding all users
     TABLE: {
@@ -724,12 +726,61 @@ export default {
         </thead>`,
       TABLE_CLASSES: ["table", "table-dark", "table-striped"],
       BODY: {
-        GET_ROW_HEAD: (index: number) => `<th scope="row">${index}</th>`
-      }
-    }
+        GET_ROW_HEAD: (index: number) => `<th scope="row">${index}</th>`,
+      },
+    },
+  },
+  SETTINGS: {
+    CONTENT_HTML: `<div class="d-flex justify-content-center h-100" id="settings">
+      <form class="rounded">
+        <div class="form-group row">
+          <div class="col-auto">
+            <label for="renderer-choice" class="col-form-label"
+              >Blockly Renderer:</label
+            >
+          </div>
+          <div class="col-auto">
+            <select class="custom-select" id="renderer-choice">
+              <option value="zelos" selected>Zelos</option>
+              <option value="geras">Blockly Default</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-auto">
+            <input type="checkbox" id="environment-animations" />
+            <label
+              class="form-check-label user-select-none"
+              for="environment-animations"
+              >Enable Environment Animations</label
+            >
+          </div>
+        </div>
+
+        <div class="form-group row">
+          <div class="col-auto">
+            <label for="ui-volume">UI Volume</label>
+          </div>
+
+          <div class="col-auto">
+            <input
+              type="range"
+              class="form-control-range"
+              id="ui-volume"
+            />
+          </div>
+        </div>
+      </form>
+    </div>`,
+    UI_VOL_ID: "ui-volume",
+    BLOCKLY_RENDER_ID: "renderer-choice",
+    ANIM_CHECK_ID: "environment-animations",
+    SAVE_CHANGES_BTN_CLS: ["btn", "btn-secondary"],
+    INNER_SAVE_CHANGES_TXT: "Save Changes",
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST,
   // COMMON CSTS between the client and the sv
-  COMMON_CST
+  COMMON_CST,
 };

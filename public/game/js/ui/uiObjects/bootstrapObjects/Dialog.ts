@@ -2,20 +2,25 @@ import $ from "jquery";
 import "bootstrap/js/dist/modal";
 import CST from "../../../CST";
 import GameWindow from "../../GameWindow";
+import AudioManager from "../../../managers/AudioManager";
 
 const MODAL = CST.UI.BOOTSTRAP_MODAL;
 
-export default class Dialog {
+export default class Dialog extends Phaser.Events.EventEmitter {
   private static instance = null;
 
   private dialogWindow: GameWindow;
   public contentElement: HTMLDivElement;
+  public footerElement: HTMLDivElement;
 
   private constructor() {
+    super();
+
     this.dialogWindow = new GameWindow();
 
     $(() => {
-      this.initModal($(`#${MODAL.ID}`));
+      let jQObj = $(`#${MODAL.ID}`);
+      this.initModal(jQObj);
     });
 
     this.dialogWindow.on(
@@ -33,10 +38,16 @@ export default class Dialog {
     this.dialogWindow.openWindow();
 
     let el = $(`#${MODAL.ID}`);
+
     el.find(MODAL.TITLE_SELECTOR).text(title);
+
     this.contentElement = el
       .find(MODAL.CONTENT_SELECTOR)
       .html(content)
+      .get()[0] as HTMLDivElement;
+
+    this.footerElement = el
+      .find(`.${MODAL.FOOTER_CLASS}`)
       .get()[0] as HTMLDivElement;
 
     this.dialogWindow.on(CST.WINDOW.OPEN_ANIM_EVENT, () => {
@@ -49,6 +60,8 @@ export default class Dialog {
     $(() => {
       this.dialogWindow.closeWindow();
       $(`#${MODAL.ID}`).modal("hide");
+
+      this.emit(CST.WINDOW.CLOSE_EVENT);
     });
   }
 
@@ -77,7 +90,10 @@ export default class Dialog {
     jQObj
       .modal({
         backdrop: "static",
-        show: false
+        show: false,
+      })
+      .on("hide.bs.modal", () => {
+        AudioManager.getInstance().playUiSound(CST.AUDIO.KEYS.CLICK);
       })
       .on("hidden.bs.modal", () => {
         this.close();
