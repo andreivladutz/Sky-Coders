@@ -22,6 +22,7 @@ export default class Leaderboard {
 
   private constructor() {
     this.dialog = Dialog.getInstance();
+    this.translateTableHead();
 
     this.generatePaginationNav();
     this.generateTableElements();
@@ -31,10 +32,23 @@ export default class Leaderboard {
     await this.changeLbPage(1);
 
     // Show the dialog holding the leaderboard
-    this.dialog.show("Leaderboard");
+    this.dialog.show(GameManager.getInstance().langFile.leaderboard.title);
 
     this.dialog.contentElement.appendChild(this.usersTable);
     this.dialog.contentElement.appendChild(this.paginationNav);
+  }
+
+  private translateTableHead() {
+    const lbLang = GameManager.getInstance().langFile.leaderboard;
+    const REPLACE = LB.TABLE.REPLACE_TOKENS;
+
+    LB.TABLE.INNER_HTML = LB.TABLE.INNER_HTML.replace(
+      REPLACE.BUILDINGS_COUNT,
+      lbLang.tableEntries.buildingsCount
+    )
+      .replace(REPLACE.NAME, lbLang.tableEntries.name)
+      .replace(REPLACE.ISLE_COUNT, lbLang.tableEntries.islandsCount)
+      .replace(REPLACE.CHARAS_COUNT, lbLang.tableEntries.charasCount);
   }
 
   // Change the page of the leaderboard
@@ -87,7 +101,7 @@ export default class Leaderboard {
       tableEntry.name,
       tableEntry.islandCount,
       tableEntry.buildingsCount,
-      tableEntry.charasCount
+      tableEntry.charasCount,
     ].forEach(value => {
       let td = document.createElement("td");
       td.innerText = value.toString();

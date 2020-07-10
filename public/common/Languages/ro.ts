@@ -9,7 +9,7 @@ const ro: LangFile = {
     registerRedirect: "Nu ești înregistrat? ",
     register: "Înregistrează-te",
     placeholdEmail: "Introduceți Email-ul",
-    placeholdPass: "Introduceți Parola"
+    placeholdPass: "Introduceți Parola",
   },
   register: {
     title: "Înregistrează-te",
@@ -22,17 +22,17 @@ const ro: LangFile = {
     placeholdNickname: "Introduceți o poreclă de joc",
     placeholdEmail: "Introduceți Email",
     placeholdPass: "Creați o Parolă",
-    placeholdConfirmPass: "Confirmă Parola"
+    placeholdConfirmPass: "Confirmă Parola",
   },
   logout: {
-    anotherDeviceReason: "Un alt device s-a conectat cu acest cont."
+    anotherDeviceReason: "Un alt device s-a conectat cu acest cont.",
   },
   // Messages displayed to the user on the login page
   loginMessages: {
     logoutMessage: "Ați fost delogat!",
     reason: "Motivul",
     registerSuccessful: "V-ați înregistrat cu succes",
-    registerFailed: "Înregistrarea a eșuat! Încercați mai târziu."
+    registerFailed: "Înregistrarea a eșuat! Încercați mai târziu.",
   },
   // Game toasts and such
   buildings: {
@@ -40,24 +40,48 @@ const ro: LangFile = {
     cannotPlace: "O clădire nu poate fi plasată aici!",
     noActorSelected: "Selectați un caracter pentru a culege resursele!",
     names: {
-      [BuildNames.residential]: "Clădire Rezidențială"
+      [BuildNames.residential]: "Clădire Rezidențială",
     },
     description: {
       prodReady:
         "Producția este gata. Trimiteți un caracter să colecteze resursele.",
-      prodNotReady: "Producția va fi gata în: "
-    }
+      prodNotReady: "Producția va fi gata în: ",
+    },
   },
   actors: {
     cannotOpenWorkspace:
-      "Selectați un caracter pentru a deschide editorul de cod!"
+      "Selectați un caracter pentru a deschide editorul de cod!",
   },
   Blockly: {
     labels: {
       coords: "Coordonate:",
-      builds: "Clădiri:"
-    }
-  }
+      builds: "Clădiri:",
+    },
+  },
+  settings: {
+    title: "Setări",
+    closeBtn: "Închide",
+    saveBtn: "Salvează Schimbările",
+    labels: {
+      bkyRenderer: "Aspectul Editorului de Cod:",
+      envAnims: "Activează Animațiile de Mediu",
+      uiVolume: "Volum UI",
+    },
+    bkyRendererOptions: {
+      scratch: "Aspect Scratch",
+      blockly: "Aspect Blockly",
+    },
+  },
+  leaderboard: {
+    title: "Clasament",
+    closeBtn: "Închide",
+    tableEntries: {
+      name: "Nume",
+      islandsCount: "Numărul Insulelor",
+      buildingsCount: "Numărul Clădirilor",
+      charasCount: "Numărul Caracterelor",
+    },
+  },
 };
 
 export default ro;

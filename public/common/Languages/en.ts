@@ -9,7 +9,7 @@ const en: LangFile = {
     registerRedirect: "No Account? ",
     register: "Register",
     placeholdEmail: "Enter Email",
-    placeholdPass: "Enter Password"
+    placeholdPass: "Enter Password",
   },
   register: {
     title: "Register",
@@ -22,17 +22,17 @@ const en: LangFile = {
     placeholdNickname: "Enter a Nickname",
     placeholdEmail: "Enter Email",
     placeholdPass: "Create a Password",
-    placeholdConfirmPass: "Confirm Password"
+    placeholdConfirmPass: "Confirm Password",
   },
   logout: {
-    anotherDeviceReason: "This account connected on another device"
+    anotherDeviceReason: "This account connected on another device",
   },
   // Messages displayed to the user on the login page
   loginMessages: {
     logoutMessage: "You have been logged out!",
     reason: "Reason",
     registerSuccessful: "You have been successfully registered!",
-    registerFailed: "Registration failed! Please try again later!"
+    registerFailed: "Registration failed! Please try again later!",
   },
   // Game toasts and such
   buildings: {
@@ -40,23 +40,47 @@ const en: LangFile = {
     cannotPlace: "The building cannot be placed here!",
     noActorSelected: "Select a character to collect the building!",
     names: {
-      [BuildNames.residential]: "Residential Building"
+      [BuildNames.residential]: "Residential Building",
     },
     description: {
       prodReady:
         "The production is ready. Send a character to collect the resources.",
-      prodNotReady: "The production will be ready in: "
-    }
+      prodNotReady: "The production will be ready in: ",
+    },
   },
   actors: {
-    cannotOpenWorkspace: "Select a character to open the code editor!"
+    cannotOpenWorkspace: "Select a character to open the code editor!",
   },
   Blockly: {
     labels: {
       coords: "Coordinates:",
-      builds: "Buildings:"
-    }
-  }
+      builds: "Buildings:",
+    },
+  },
+  settings: {
+    title: "Settings",
+    closeBtn: "Close",
+    saveBtn: "Save Changes",
+    labels: {
+      bkyRenderer: "Code Editor's Look:",
+      envAnims: "Enable Environment Animations",
+      uiVolume: "UI Volume",
+    },
+    bkyRendererOptions: {
+      scratch: "Scratch Look",
+      blockly: "Blockly Look",
+    },
+  },
+  leaderboard: {
+    title: "Leaderboard",
+    closeBtn: "Close",
+    tableEntries: {
+      name: "Name",
+      islandsCount: "Islands Count",
+      buildingsCount: "Buildings Count",
+      charasCount: "Charas Count",
+    },
+  },
 };
 
 export default en;

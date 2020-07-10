@@ -8,6 +8,7 @@ import AwaitLoaderPlugin from "phaser3-rex-plugins/plugins/awaitloader-plugin.js
 import UIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin.js";
 
 import CST from "../CST";
+import SYSTEM from "./system";
 
 // set the canvas to be fullscreen, centered and set the parent to the container div
 const scaleConfig: Phaser.Types.Core.ScaleConfig = {
@@ -17,7 +18,7 @@ const scaleConfig: Phaser.Types.Core.ScaleConfig = {
   expandParent: true,
   autoCenter: Phaser.Scale.CENTER_BOTH,
   mode: Phaser.Scale.ScaleModes.RESIZE,
-  fullscreenTarget: "canvas-container"
+  fullscreenTarget: "canvas-container",
 };
 
 const pluginsConfig: Phaser.Types.Core.PluginObject = {
@@ -25,25 +26,26 @@ const pluginsConfig: Phaser.Types.Core.PluginObject = {
     {
       key: "rexAwaitLoader",
       plugin: AwaitLoaderPlugin,
-      start: true
-    }
+      start: true,
+    },
   ],
   scene: [
     {
       sceneKey: CST.SCENES.UI,
       key: "rexUI",
       plugin: UIPlugin,
-      mapping: "rexUI"
-    }
-  ]
+      mapping: "rexUI",
+    },
+  ],
 };
 
 const gameConfig: Phaser.Types.Core.GameConfig = {
   // choose between WebGL and canvas automatically
   type: Phaser.AUTO,
   // the width and height will be changed by the scale manager
-  width: CST.GAME.WIDTH,
-  height: CST.GAME.HEIGHT,
+  width: SYSTEM.SCREEN_WIDTH, // CST.GAME.WIDTH,
+  height: SYSTEM.SCREEN_HEIGHT, //CST.GAME.HEIGHT,
+  resolution: SYSTEM.PIXEL_RATIO,
   // title and version
   title: CST.GAME.TITLE,
   version: CST.GAME.VERSION,
@@ -53,17 +55,21 @@ const gameConfig: Phaser.Types.Core.GameConfig = {
   disableContextMenu: true,
   scale: scaleConfig,
   render: {
+    antialias: true,
+    antialiasGL: false,
     //pixelArt: true,
     roundPixels: true,
-    transparent: true
+    transparent: true,
+    powerPreference: "high-performance",
+    failIfMajorPerformanceCaveat: true,
   },
   physics: {
-    default: "arcade"
+    default: "arcade",
   },
   plugins: pluginsConfig,
   dom: {
-    createContainer: true
-  }
+    createContainer: true,
+  },
 };
 
 export default gameConfig;

@@ -5,9 +5,10 @@ const SYSTEM = {
   },
   SCREEN_WIDTH: screenPixelWidth(),
   SCREEN_HEIGHT: screenPixelHeight(),
+  PIXEL_RATIO: deviceRatio(),
   // TOUCH_ENABLED, WORKER_SUPPORT added when a phaser game is inited in the loading scene
   TOUCH_ENABLED: false,
-  WORKER_SUPPORT: false
+  WORKER_SUPPORT: false,
 };
 
 export default SYSTEM;
@@ -34,6 +35,10 @@ function getVariant() {
   else {
     return "hd";
   }
+}
+
+function deviceRatio() {
+  return window.devicePixelRatio;
 }
 
 function screenPixelWidth() {

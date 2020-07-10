@@ -718,15 +718,21 @@ export default {
         <thead>
           <tr>
             <th scope="col">#</th>
-            <th scope="col">Name</th>
-            <th scope="col">Islands Count</th>
-            <th scope="col">Buildings Count</th>
-            <th scope="col">Charas Count</th>
+            <th scope="col">{{name}}</th>
+            <th scope="col">{{isleCount}}</th>
+            <th scope="col">{{buildCount}}</th>
+            <th scope="col">{{charaCount}}</th>
           </tr>
         </thead>`,
       TABLE_CLASSES: ["table", "table-dark", "table-striped"],
       BODY: {
         GET_ROW_HEAD: (index: number) => `<th scope="row">${index}</th>`,
+      },
+      REPLACE_TOKENS: {
+        NAME: "{{name}}",
+        ISLE_COUNT: "{{isleCount}}",
+        BUILDINGS_COUNT: "{{buildCount}}",
+        CHARAS_COUNT: "{{charaCount}}",
       },
     },
   },
@@ -736,13 +742,13 @@ export default {
         <div class="form-group row">
           <div class="col-auto">
             <label for="renderer-choice" class="col-form-label"
-              >Blockly Renderer:</label
+              >{{bkyRendLabel}}</label
             >
           </div>
           <div class="col-auto">
             <select class="custom-select" id="renderer-choice">
-              <option value="zelos" selected>Zelos</option>
-              <option value="geras">Blockly Default</option>
+              <option value="zelos" selected>{{scratchOption}}</option>
+              <option value="geras">{{blocklyOption}}</option>
             </select>
           </div>
         </div>
@@ -753,14 +759,14 @@ export default {
             <label
               class="form-check-label user-select-none"
               for="environment-animations"
-              >Enable Environment Animations</label
+              >{{envAnimLabel}}</label
             >
           </div>
         </div>
 
         <div class="form-group row">
           <div class="col-auto">
-            <label for="ui-volume">UI Volume</label>
+            <label for="ui-volume">{{UIVolLabel}}</label>
           </div>
 
           <div class="col-auto">
@@ -776,8 +782,17 @@ export default {
     UI_VOL_ID: "ui-volume",
     BLOCKLY_RENDER_ID: "renderer-choice",
     ANIM_CHECK_ID: "environment-animations",
-    SAVE_CHANGES_BTN_CLS: ["btn", "btn-secondary"],
+    SAVE_CHANGES_BTN_CLS: ["btn", "btn-primary"],
     INNER_SAVE_CHANGES_TXT: "Save Changes",
+    REPLACE_TOKENS: {
+      BKY_REND_LABEL: "{{bkyRendLabel}}",
+      ENV_ANIM_LABEL: "{{envAnimLabel}}",
+      UI_VOL_LABEL: "{{UIVolLabel}}",
+      BKY_OPTIONS: {
+        SCRATCH_LIKE: "{{scratchOption}}",
+        BLOCKLY_LIKE: "{{blocklyOption}}",
+      },
+    },
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST,

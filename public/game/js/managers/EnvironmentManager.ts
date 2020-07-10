@@ -40,20 +40,17 @@ export default class EnvironmentManager extends Manager {
   public TILE_WIDTH: number;
   public TILE_HEIGHT: number;
 
+  // TODO: Keeping the indexing methods to check if these actually become useful later in the game
   // Trees and ores indexed efficiently in a kd-tree so they can be
   // Retrieved fast when they are in view range
-  environmentObjStorage: BboxKDStorage<IsoSpriteObject>;
+  /* environmentObjStorage: BboxKDStorage<IsoSpriteObject>;*/
+
   // Index the objects currently in view by their tile coordinates
   // No objects are overlayed so this is safe
-  environmentObjInView: Map<number, Map<number, IsoSpriteObject>> = new Map();
-  // {
-  //   [yCoord: number]: {
-  //     [xCoord: number]: IsoSpriteObject;
-  //   };
-  // } = {};
+  /*environmentObjInView: Map<number, Map<number, IsoSpriteObject>> = new Map();*/
 
   // Keep this flag so listeners do not get registered multiple times
-  initedListeners: boolean = false;
+  /*initedListeners: boolean = false;*/
 
   // placementManager: PlacementManager;
 
@@ -73,7 +70,7 @@ export default class EnvironmentManager extends Manager {
       (_, idx: number): GrassTileConfig => ({
         baseTile: idx + this.BASE_OFFSET,
         grassTile: idx + this.GRASS_OFFSET,
-        decorationProbability: CST.ENVIRONMENT.GRASS.PROBABILITIES[idx]
+        decorationProbability: CST.ENVIRONMENT.GRASS.PROBABILITIES[idx],
       })
     );
   }
@@ -103,74 +100,74 @@ export default class EnvironmentManager extends Manager {
       seed
     );
 
-    let environmentObjects = placementManager.oreObjects.concat(
-      placementManager.treesObjects
-    );
+    // let environmentObjects = placementManager.oreObjects.concat(
+    //   placementManager.treesObjects
+    // );
 
-    // Index trees and ores
-    this.environmentObjStorage = new BboxKDStorage(environmentObjects);
+    // // Index trees and ores
+    // this.environmentObjStorage = new BboxKDStorage(environmentObjects);
 
-    for (let object of environmentObjects) {
-      object.setActive(false).setVisible(false);
-    }
+    // for (let object of environmentObjects) {
+    //   object.setActive(false).setVisible(false);
+    // }
 
     // Start listening for map events
-    this.initListeners();
+    //this.initListeners();
 
     PlacementManager.destroyInstance();
   }
 
   // Listen to the map view rectangle getting dirty
   // That means we have to redraw the objects in view
-  private initListeners() {
-    if (this.initedListeners) {
-      return;
-    }
+  // private initListeners() {
+  //   if (this.initedListeners) {
+  //     return;
+  //   }
 
-    this.initedListeners = true;
+  //   this.initedListeners = true;
 
-    MapManager.getInstance().events.on(
-      CST.EVENTS.MAP.IS_DIRTY,
-      this.enableObjectsInView.bind(this)
-    );
-  }
+  //   MapManager.getInstance().events.on(
+  //     CST.EVENTS.MAP.IS_DIRTY,
+  //     this.enableObjectsInView.bind(this)
+  //   );
+  // }
 
   // Set the objects that are currently visible as active and visible
   // And also remove the ones that are not being visible anymore
-  private enableObjectsInView(viewRect: Phaser.Geom.Rectangle) {
-    if (!this.environmentObjStorage) {
-      return;
-    }
+  // private enableObjectsInView(viewRect: Phaser.Geom.Rectangle) {
+  //   if (!this.environmentObjStorage) {
+  //     return;
+  //   }
 
-    let objectBounds = new Phaser.Geom.Rectangle();
+  //   let objectBounds = new Phaser.Geom.Rectangle();
 
-    // First, deactivate the object that are no longer visible to the player
-    for (let sameYObjects of this.environmentObjInView.values()) {
-      for (let [tileX, object] of sameYObjects.entries()) {
-        object.getBounds(objectBounds);
+  //   // First, deactivate the object that are no longer visible to the player
+  //   for (let sameYObjects of this.environmentObjInView.values()) {
+  //     for (let [tileX, object] of sameYObjects.entries()) {
+  //       object.getBounds(objectBounds);
 
-        if (!Phaser.Geom.Rectangle.Overlaps(viewRect, objectBounds)) {
-          object.setVisible(false).setActive(false);
+  //       if (!Phaser.Geom.Rectangle.Overlaps(viewRect, objectBounds)) {
+  //         object.setVisible(false).setActive(false);
 
-          sameYObjects.delete(tileX);
-        }
-      }
-    }
+  //         sameYObjects.delete(tileX);
+  //       }
+  //     }
+  //   }
 
-    let objectsInView = this.environmentObjStorage.getObjectsInView(viewRect);
+  //   let objectsInView = this.environmentObjStorage.getObjectsInView(viewRect);
 
-    for (let object of objectsInView) {
-      object.setActive(true).setVisible(true);
+  //   for (let object of objectsInView) {
+  //     object.setActive(true).setVisible(true);
 
-      // Index the object so we can deactivate it once it is no longer visible
-      let { tileX, tileY } = object;
-      if (!this.environmentObjInView.get(tileY)) {
-        this.environmentObjInView.set(tileY, new Map());
-      }
+  //     // Index the object so we can deactivate it once it is no longer visible
+  //     let { tileX, tileY } = object;
+  //     if (!this.environmentObjInView.get(tileY)) {
+  //       this.environmentObjInView.set(tileY, new Map());
+  //     }
 
-      this.environmentObjInView.get(tileY).set(tileX, object);
-    }
-  }
+  //     this.environmentObjInView.get(tileY).set(tileX, object);
+  //   }
+  // }
 
   async preload(load: Phaser.Loader.LoaderPlugin) {
     this.loadResources(load);
@@ -198,8 +195,8 @@ export default class EnvironmentManager extends Manager {
         start: ENV.GRASS.START,
         end: ENV.GRASS.END,
         zeroPad: ENV.GRASS.ZERO_PAD,
-        prefix: ENV.GRASS.PREFIX
-      }
+        prefix: ENV.GRASS.PREFIX,
+      },
     ];
 
     this.grassFrames = scene.anims

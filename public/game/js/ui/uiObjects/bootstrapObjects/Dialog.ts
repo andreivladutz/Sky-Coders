@@ -3,6 +3,7 @@ import "bootstrap/js/dist/modal";
 import CST from "../../../CST";
 import GameWindow from "../../GameWindow";
 import AudioManager from "../../../managers/AudioManager";
+import GameManager from "../../../online/GameManager";
 
 const MODAL = CST.UI.BOOTSTRAP_MODAL;
 
@@ -113,6 +114,10 @@ export default class Dialog extends Phaser.Events.EventEmitter {
       .on("hidePrevented.bs.modal", () => {
         this.close();
       });
+
+    jQObj
+      .find(".btn.btn-secondary")
+      .text(GameManager.getInstance().langFile.settings.closeBtn);
   }
 
   public static getInstance(): Dialog {

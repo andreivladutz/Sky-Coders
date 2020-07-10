@@ -55,6 +55,30 @@ export default interface LangFile {
       builds: string;
     };
   };
+  settings: {
+    title: string;
+    closeBtn: string;
+    saveBtn: string;
+    labels: {
+      bkyRenderer: string;
+      envAnims: string;
+      uiVolume: string;
+    };
+    bkyRendererOptions: {
+      scratch: string;
+      blockly: string;
+    };
+  };
+  leaderboard: {
+    title: string;
+    closeBtn: string;
+    tableEntries: {
+      name: string;
+      islandsCount: string;
+      buildingsCount: string;
+      charasCount: string;
+    };
+  };
 }
 
 export const LanguageIds: {
@@ -67,13 +91,13 @@ export const LanguageIds: {
     // The two letter ISO country code
     flagCode: "gb",
     // The name of the language shown on the login page
-    langName: "English"
+    langName: "English",
   },
   {
     langCode: "ro",
     // The two letter ISO country code
     flagCode: "ro",
     // The name of the language shown on the login page
-    langName: "Română"
-  }
+    langName: "Română",
+  },
 ];
