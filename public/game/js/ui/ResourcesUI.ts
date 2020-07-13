@@ -68,7 +68,7 @@ export default class ResourcesUI extends UIComponent {
       duration: COINS.COLLECT_ANIM_TIME,
     });
 
-    coin.animationTween.on("complete", () => {
+    coin.animationTween.once("complete", () => {
       coin.animationTween.remove();
       coin.animationTween = null;
 

@@ -4,7 +4,7 @@ import * as path from "path";
 
 import authenticate from "./authentication/authenticateMiddleware";
 // Routers
-import authRouter from "./routes/authRouter";
+import usersRouter from "./routes/userRoute/userRouter";
 import gameRouter from "./routes/gameRouter";
 import CST from "./SERVER_CST";
 import ConfigManager from "./utils/configure";
@@ -12,7 +12,7 @@ import GamesManager from "./game/GamesManager";
 
 // Load the environment config from .env file
 dotenv.config({
-  path: path.join(__dirname, "/../../config/.env")
+  path: path.join(__dirname, "/../../config/.env"),
 });
 
 const PORT = Number(process.env.PORT) || 8080;
@@ -37,7 +37,7 @@ const PORT = Number(process.env.PORT) || 8080;
     })
     .use("/no_auth", express.static(CST.NO_AUTH_FOLDER))
     // the login / register path
-    .use("/users", authRouter)
+    .use("/users", usersRouter)
     // authenticated game route
     .use(authenticate, gameRouter);
   // static files that do not require authentication

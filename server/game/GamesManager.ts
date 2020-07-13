@@ -78,6 +78,7 @@ export default class GamesManager {
       this.connectedGames[user.id] = {};
     }
 
+    // TODO: Maybe reuse the game instance if the user is already connected on another device?
     let newGameInstance = new GameInstance(socket, user);
     this.connectedGames[user.id][socket.id] = newGameInstance;
 

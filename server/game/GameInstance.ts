@@ -43,6 +43,12 @@ export default class GameInstance extends EventEmitter {
   } = {};
 
   private updateInterval: any;
+  // Prevent parallel save errors
+  private savingDbDoc: boolean = false;
+  // Another save is waiting to be sent to the db
+  // As soon as the current save is persisted, launch another save
+  private anotherSaveWaiting: boolean = false;
+
   // After a timeout time of being disconnected,
   // Declare the user logged out and clear the memory
   private logoutTimeout: any;
@@ -92,7 +98,7 @@ export default class GameInstance extends EventEmitter {
    * @param isKicked the user is being kicked for connecting on other devices / pages
    * @default false
    */
-  public logout(reason?: string, isKicked = false) {
+  public async logout(reason?: string, isKicked = false) {
     this.isLoggedOut = true;
     // Remove all listeners to avoid memory leaks
     this.removeListeners();
@@ -101,6 +107,8 @@ export default class GameInstance extends EventEmitter {
       .logoutUser(this.sender, reason, isKicked)
       .onUserLoggedOut(this.userDocument.id);
 
+    // Update once more before cleaning up i.e. save to the db
+    await this.saveDocumentsToDb();
     // Stop the update interval
     clearInterval(this.updateInterval);
     this.objectsManagers.buildingsManger.cleanUp();
@@ -188,7 +196,7 @@ export default class GameInstance extends EventEmitter {
       seed: this.seed,
       languageCode: this.userDocument.languageCode,
       resources: this.userDocument.game.resources,
-      buildings: this.currIslandDocument.buildings
+      buildings: this.currIslandDocument.buildings,
     };
 
     this.sender.emit(Game.INIT_EVENT, gameConfig);
@@ -197,7 +205,7 @@ export default class GameInstance extends EventEmitter {
     // Send the uids used to identify the client
     let uids: Connection.Uids = {
       socketUid: this.sender.socket.id,
-      userUid: this.userDocument.id
+      userUid: this.userDocument.id,
     };
 
     this.sender.emit(Connection.INIT_UIDS_EVENT, uids);
@@ -207,9 +215,9 @@ export default class GameInstance extends EventEmitter {
   private async createGameSubdoc() {
     this.userDocument.game = {
       resources: {
-        coins: CST.GAME_CONFIG.INITIAL_COINS
+        coins: CST.GAME_CONFIG.INITIAL_COINS,
       } as ResourcesType,
-      islands: [] as DocumentArray<IslandType>
+      islands: [] as DocumentArray<IslandType>,
     };
 
     await this.createIsland();
@@ -221,7 +229,7 @@ export default class GameInstance extends EventEmitter {
       // generate a random 32 length string
       seed: randomstring.generate(),
       buildings: [],
-      characters: []
+      characters: [],
     });
 
     // Save the new island document so it can be found on the next join
@@ -235,21 +243,35 @@ export default class GameInstance extends EventEmitter {
 
   // Update the game instance
   // * save the user doc and the island
-  private update() {
+  private async update() {
     // If the socket is currently disconnected, don't update
     if (this.sender.socket.disconnected) {
       return;
     }
 
-    this.saveDocumentsToDb();
+    await this.saveDocumentsToDb();
   }
 
   // Save the user document and island
   private async saveDocumentsToDb() {
+    // Avoid Parallel save errors
+    if (this.savingDbDoc) {
+      this.anotherSaveWaiting = true;
+      return;
+    }
+    this.savingDbDoc = true;
+
     // Save the island document
     await this.saveCurrentIslandDoc();
     // Save the user document
     await this.saveUserDoc();
+
+    this.savingDbDoc = false;
+
+    if (this.anotherSaveWaiting) {
+      this.anotherSaveWaiting = false;
+      await this.saveDocumentsToDb();
+    }
 
     // debug.userHas(this.userDocument, "saved progress to db");
   }
@@ -293,7 +315,7 @@ export default class GameInstance extends EventEmitter {
       await doc.save();
     } catch (err) {
       if (err.name === "ParallelSaveError") {
-        // Error that can be temporarily ignored
+        // TODO: Error that can be temporarily ignored
         return this.handleDbError(err, errMsg, false);
       }
 
