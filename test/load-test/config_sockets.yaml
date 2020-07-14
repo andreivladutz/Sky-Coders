@@ -1,0 +1,31 @@
+# Configuration for load testing game communication logic with socket.io engine
+config:
+  target: http://localhost:3000/
+  phases:
+    - duration: 120
+      arrivalRate: 10
+      maxVusers: 200
+  # The script containing functions used to handle the testing
+  processor: "./loadTestSocketProc.js"
+  # Read the users session cookies from the users.csv file
+  payload:
+    - path: "./users.csv"
+      fields:
+        - "sessCookie"
+      order: sequence
+scenarios:
+  - engine: "socketio"
+    flow:
+      # init the events variables and secret key / cookie
+      - function: "initVariables"
+      - get:
+          url: "/"
+          followRedirect: false
+      - emit:
+          channel: "{{ connectionEvent }}"
+          data:
+            "{{ connectPayload }}"
+            #'{ "testKey": "{{ testKey }}", "sessCookie": "cookies" }'
+      - think: 5
+      - emit:
+          channel: "{{ loadedEvent }}"

@@ -6,9 +6,9 @@ import { UserType } from "../../models/User";
 // Common code: The language manager
 import LangManager from "../../../public/common/Languages/LangManager";
 
-import Debug from "debug";
+import { NamespaceDebugger } from "../../utils/debug";
 // If debugging is active this will write logs to the console
-const debug = Debug("authRouter");
+let debug = new NamespaceDebugger("logoutRedirectRouter");
 
 function redirectAuthenticatedMw(
   req: express.Request,
@@ -33,11 +33,9 @@ async function logoutMw(req: express.Request, res: express.Response) {
 
   if (user) {
     if (userKicked) {
-      debug(
-        `User ${user.name} was logged out for connecting on another device/page.`
-      );
+      debug.userHas(user, "logged out for connecting on another device/page.");
     } else {
-      debug(`User ${user.name} logged out.`);
+      debug.userHas(user, "logged out.");
     }
   }
 

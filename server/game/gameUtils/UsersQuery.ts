@@ -44,7 +44,7 @@ export default class UsersManager extends GameObjectsManager {
   constructor(gameInstance: GameInstance) {
     super(gameInstance);
 
-    this.listenForEvents();
+    this.initListeners();
   }
 
   // Get any page
@@ -68,19 +68,19 @@ export default class UsersManager extends GameObjectsManager {
         name: userDoc.name,
         islandCount,
         buildingsCount,
-        charasCount
+        charasCount,
       });
     }
 
     let initCfg: Users.LeaderboardInit = {
       pagesCount: await leaderboardPageCount(),
-      page: currPage
+      page: currPage,
     };
 
     ack(initCfg);
   }
 
-  private listenForEvents() {
+  public initListeners() {
     this.sender.on(Users.LEADERB_GET_PAGE, this.sendLeaderboardPage.bind(this));
   }
 }

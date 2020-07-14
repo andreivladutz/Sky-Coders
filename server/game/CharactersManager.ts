@@ -13,8 +13,6 @@ import { CharacterType } from "../models/Island";
 export default class CharactersManager extends GameObjectsManager {
   constructor(gameInstance: GameInstance) {
     super(gameInstance);
-
-    this.listenForEvents();
   }
 
   // Get the initial characters from the db that are sent to the client
@@ -37,7 +35,7 @@ export default class CharactersManager extends GameObjectsManager {
   private addNewChara(actorKey: ACTOR_NAMES = ACTOR_NAMES.MALLACK) {
     this.islandDoc.characters.push({
       actorKey,
-      workspaceBlockly: ""
+      workspaceBlockly: "",
     });
 
     let newChara: CharacterType = this.islandDoc.characters[
@@ -55,7 +53,7 @@ export default class CharactersManager extends GameObjectsManager {
   }
 
   // Listen for events coming from the client
-  private listenForEvents() {
+  public initListeners() {
     this.sender.on(
       Characters.UPDATE_CHARA_EVENT,
       (chara: Characters.DbCharacter) => {

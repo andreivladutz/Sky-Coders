@@ -11,6 +11,7 @@ import ConfigManager from "./utils/configure";
 import GamesManager from "./game/GamesManager";
 
 // Load the environment config from .env file
+// As it seems to be some kind of race condition, the .env is also loaded in utils/debug -> NamespaceDebugger
 dotenv.config({
   path: path.join(__dirname, "/../../config/.env"),
 });

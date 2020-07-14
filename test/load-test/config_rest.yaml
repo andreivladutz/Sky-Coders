@@ -9,13 +9,11 @@ config:
       arrivalRate: 10
       name: "Sustained max load"
   # Functions handling variables and such in a js file
-  processor: "./loadTestProcessor.js"
+  processor: "./loadTestRestProc.js"
   variables:
     # Save this as password for all accounts created
     pass:
       - "test123"
-    email: "emailTest"
-    connectionEvent: "Connection.first_connect"
 scenarios:
   - flow:
       # generate a random email

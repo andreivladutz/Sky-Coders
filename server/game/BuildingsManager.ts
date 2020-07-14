@@ -1,7 +1,7 @@
 import RBush, { BBox } from "rbush";
 import BuildingTypes, {
   BuildingType,
-  Resources
+  Resources,
 } from "../../public/common/BuildingTypes";
 
 import { ObjectId } from "mongodb";
@@ -129,7 +129,7 @@ export default class BuildingsManager extends GameObjectsManager {
 
       // TODO: If more resources, count them in here
       let collectResources = {
-        coins: -productionResources.coins
+        coins: -productionResources.coins,
       };
 
       // Spend negative resources i.e. collect !
@@ -150,7 +150,7 @@ export default class BuildingsManager extends GameObjectsManager {
       // TODO: keep an eye for more resources
       coins: resourcesAfter.coins,
       _id: buildingId,
-      lastProdTime: collectedBuild.lastProdTime
+      lastProdTime: collectedBuild.lastProdTime,
     };
 
     ackCb(responseEvent, responseResources);
@@ -165,7 +165,7 @@ export default class BuildingsManager extends GameObjectsManager {
       _id: new ObjectId(),
       buildingType,
       position,
-      lastProdTime: Date.now()
+      lastProdTime: Date.now(),
     };
     // Prepare the building for indexing in the RTree, also get the building type object
     let indexedBuilding = new IndexedBuilding(buildingInfo);
@@ -228,7 +228,7 @@ export default class BuildingsManager extends GameObjectsManager {
       _id: indexedBuilding.dbBuildingDoc._id,
       // TODO: Check out the resources status
       coins: resourcesAfterPlacing.coins,
-      buildingPosition: indexedBuilding.dbBuildingDoc.position
+      buildingPosition: indexedBuilding.dbBuildingDoc.position,
     };
   }
 
@@ -252,7 +252,7 @@ export default class BuildingsManager extends GameObjectsManager {
       // Copy the currResources
       // TODO: If more resources later, change the copy logic
       spendableResources = {
-        coins: currResources.coins
+        coins: currResources.coins,
       };
     }
 

@@ -1,7 +1,7 @@
 import GameInstance from "../GameInstance";
 
 // The common base class for all Managers: BuildingsManager, CharactersManager, etc.
-export default class GameObjectsManager {
+export default abstract class GameObjectsManager {
   protected gameInstanceParent: GameInstance;
 
   protected get islandDoc() {
@@ -21,4 +21,8 @@ export default class GameObjectsManager {
   constructor(gameInstance: GameInstance) {
     this.gameInstanceParent = gameInstance;
   }
+
+  // This has to be called every time a socket reconnection is detected
+  // So the GameObjects Managers listen for events on the new socket
+  public abstract initListeners(): void;
 }

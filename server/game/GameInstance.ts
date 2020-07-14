@@ -75,15 +75,16 @@ export default class GameInstance extends EventEmitter {
     this.sender = new BufferMessenger(socket);
     this.userDocument = userDocument;
 
+    // TODO: init these after joining the island doc
     this.objectsManagers.buildingsManger = new BuildingsManager(this);
     this.objectsManagers.charactersManager = new CharactersManager(this);
     this.objectsManagers.usersManager = new UsersManager(this);
 
     // If the user is just reconnecting, then the game is already
     // inited on the client side
+    // TODO: this has to go!
     this._isGameInited = isUserReconnect;
 
-    this.initListeners();
     this.initClient();
 
     // Update this game instance on an interval
@@ -134,6 +135,8 @@ export default class GameInstance extends EventEmitter {
     this.sender.socket.removeAllListeners();
   }
 
+  // This is called on gameInstance init but it is also called on reconnect
+  // When the sender's internal socket is replaced
   private initListeners() {
     // Event emitted when the game on the client completely loaded
     this.sender.once(Game.LOAD_EVENT, () => {
@@ -148,20 +151,24 @@ export default class GameInstance extends EventEmitter {
     this.sender.socket.on("disconnect", () => {
       // Save everything to the db, in case the user
       // never connects again and has to be logged out
-      this.saveDocumentsToDb();
+      if (this.userDocument) {
+        this.saveDocumentsToDb();
+      }
 
       if (this.logoutTimeout) {
         return;
       }
 
       // After disconnecting start a logout timeout
-      this.logoutTimeout = setTimeout(
-        () => this.logout(),
-        CST.COMMON_CST.CONNECTION.LOGOUT_TIMEOUT
-      );
+      this.logoutTimeout = setTimeout(() => {
+        this.logoutTimeout = null;
+        this.logout();
+      }, CST.COMMON_CST.CONNECTION.LOGOUT_TIMEOUT);
     });
 
-    this.objectsManagers.buildingsManger.initListeners();
+    for (let objectManager of Object.values(this.objectsManagers)) {
+      objectManager.initListeners();
+    }
   }
 
   // Fire the initialisation event
@@ -178,7 +185,9 @@ export default class GameInstance extends EventEmitter {
 
     // This method is being called on client reconnection
     // after a sv restart. No need to reinit the client
+    // TODO: This has to go!
     if (this._isGameInited) {
+      this.initListeners();
       return;
     }
 
@@ -186,7 +195,7 @@ export default class GameInstance extends EventEmitter {
     if (!this.currIslandDocument) {
       this.userDocument.game = null;
 
-      this.initClient();
+      return this.initClient();
     }
 
     this.seed = this.currIslandDocument.seed;
@@ -209,6 +218,7 @@ export default class GameInstance extends EventEmitter {
     };
 
     this.sender.emit(Connection.INIT_UIDS_EVENT, uids);
+    this.initListeners();
   }
 
   // The first time a user connects, they don't have a game subdocument created
