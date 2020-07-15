@@ -12,6 +12,9 @@ import { SVGCoin } from "../ui/ResourcesUI";
 import GameManager from "../online/GameManager";
 import { InternalBuilding } from "../Blockly/CODE_CST";
 
+import Pointer = Phaser.Input.Pointer;
+import EventData = Phaser.Types.Input.EventData;
+
 interface Tile {
   x: number;
   y: number;
@@ -184,10 +187,17 @@ export default class BuildingObject extends IsoSpriteObject {
   }
 
   // Handler function for "pointerup" event. Override the one in IsoSpriteObject
-  protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
+  protected handleSelectionToggle = (
+    pointer: Pointer,
+    localX: any,
+    localY: any,
+    event: EventData
+  ) => {
     if (!this.gameCanvasIsTarget(pointer.event)) {
       return;
     }
+
+    event.stopPropagation();
 
     this.actorWalkToBuilding();
   };

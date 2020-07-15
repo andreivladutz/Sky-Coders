@@ -48,6 +48,8 @@ export default class MapManager extends Manager {
   private isoDebug: IsoDebugger;
 
   events: MapEventEmitter = new MapEventEmitter();
+  // If the camera is being interacted with, cancel the following pointerup
+  public cameraInteraction: boolean = false;
 
   // register to events and emit them further
   private initEvents() {
@@ -63,19 +65,38 @@ export default class MapManager extends Manager {
         }
 
         this.tileMap.onTileOver(tile);
-      })
-      .on(CST.EVENTS.MAP.TAP, (tap: any, tile: TileXY) => {
-        if (this.events.shouldPreventDefault(tile)) {
-          return;
-        }
-
-        // TODO: IF ON MOBILE (DETECT) then on tile over should be called
-        //this.tileMap.onTileOver(tile);
-        this.events.emit(CST.EVENTS.MAP.TAP, tile, tap.lastPointer);
-      })
-      .on(CST.EVENTS.MAP.PRESS, (pointer, tile: TileXY) => {
-        this.events.emit(CST.EVENTS.MAP.PRESS, tile);
       });
+    // .on(CST.EVENTS.MAP.TAP, (tap: any, tile: TileXY) => {
+    //   if (this.events.shouldPreventDefault(tile)) {
+    //     return;
+    //   }
+
+    //   // TODO: IF ON MOBILE (DETECT) then on tile over should be called
+    //   //this.tileMap.onTileOver(tile);
+    //   this.events.emit(CST.EVENTS.MAP.TAP, tile, tap.lastPointer);
+    // })
+    // .on(CST.EVENTS.MAP.PRESS, (pointer, tile: TileXY) => {
+    //   this.events.emit(CST.EVENTS.MAP.PRESS, tile);
+    // });
+
+    this.gameScene.input.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+      // Cancel the pointerup event that stops a pan / pinch event
+      if (this.cameraInteraction) {
+        this.cameraInteraction = false;
+
+        return;
+      }
+
+      let tile: TileXY = this.worldToTileCoords(pointer.worldX, pointer.worldY);
+
+      if (this.events.shouldPreventDefault(tile)) {
+        return;
+      }
+
+      // TODO: IF ON MOBILE (DETECT) then on tile over should be called
+      //this.tileMap.onTileOver(tile);
+      this.events.emit(CST.EVENTS.MAP.TAP, tile, pointer);
+    });
 
     // when
     this.events.on(CST.EVENTS.MAP.PREVENTING, () => {
@@ -91,7 +112,7 @@ export default class MapManager extends Manager {
   public getMapTilesize(): MapTileSize {
     return {
       w: this.tileMap.mapWidth,
-      h: this.tileMap.mapHeight
+      h: this.tileMap.mapHeight,
     };
   }
 
@@ -239,7 +260,7 @@ export default class MapManager extends Manager {
       tileHeight: this.envManager.TILE_HEIGHT,
       mapWidth: this.mapMatrix[0].length,
       mapHeight: this.mapMatrix.length,
-      mapMatrix: this.mapMatrix
+      mapMatrix: this.mapMatrix,
     });
 
     let mapSize = this.getMapTilesize();
@@ -251,7 +272,7 @@ export default class MapManager extends Manager {
         mapWidth: mapSize.w,
         mapHeight: mapSize.h,
         mapGrid: this.mapMatrix,
-        unwalkableTile: CST.ENVIRONMENT.EMPTY_TILE
+        unwalkableTile: CST.ENVIRONMENT.EMPTY_TILE,
       }
     );
 
@@ -292,7 +313,7 @@ export default class MapManager extends Manager {
       seed: this.gameSeed,
       width: CST.MAP.WIDTH,
       height: CST.MAP.HEIGHT,
-      frequency: CST.MAP.DEFAULT_CFG.frequency
+      frequency: CST.MAP.DEFAULT_CFG.frequency,
       // pass along for debugging the noise map
       //debug: true,
       //scene: this
@@ -300,7 +321,7 @@ export default class MapManager extends Manager {
 
     this.mapMatrix = terrainGen.generateIslandTerrain({
       emptyTileRatio: CST.ENVIRONMENT.EMPTY_TILE_RATIO,
-      tileConfigs: this.envManager.getTilesIndicesConfigs()
+      tileConfigs: this.envManager.getTilesIndicesConfigs(),
     });
 
     // Some tiles remain undefined. For those falsy values, just convert them to empty tiles

@@ -4,6 +4,7 @@ import "xterm/css/xterm.css";
 import CST from "../CST";
 import GameWindow from "../ui/GameWindow";
 import TerminalCommands from "./TerminalCommands";
+import GameManager from "../online/GameManager";
 
 export default class CharacterTerminal {
   private terminal: Terminal;
@@ -48,25 +49,14 @@ export default class CharacterTerminal {
   private runTerminal(actorKey: string) {
     this.currentTerminalRow = 0;
 
-    this.printLine(
-      `Hello from ${this.coloredText(
-        actorKey,
-        CST.TERMINAL.COLORS.CYAN
-      )}'s terminal!`
-    );
+    let terminalLang = GameManager.getInstance().langFile.terminal;
 
-    this.printLine(
-      "Here you can see any code that's being run for this character,",
-      CST.TERMINAL.COLORS.MAGENTA
-    );
-    this.printLine(
-      "any code output and you can type and run commands.",
-      CST.TERMINAL.COLORS.MAGENTA
-    );
-    this.printLine(
-      "Write 'help' for more details!",
-      CST.TERMINAL.COLORS.MAGENTA
-    );
+    this.printLine(terminalLang.greet);
+
+    for (let line of terminalLang.description) {
+      this.printLine(line, CST.TERMINAL.COLORS.MAGENTA);
+    }
+
     this.prompt();
 
     if (this.actorKey) {

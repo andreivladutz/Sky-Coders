@@ -115,19 +115,89 @@ export default class Leaderboard {
   // On showing, regenerate the pagination list
   private regeneratePaginationList(currPage: number, pageCount: number) {
     this.pagesList.innerHTML = "";
-
     this.createPrevListItem(currPage === 1);
+    this.createNumberedPage(1, currPage);
 
-    for (let i = 1; i <= pageCount; i++) {
-      let anchor = this.createPageListItem(i === currPage);
-      anchor.innerText = i.toString();
+    let pagLeft = Math.max(currPage - LB.PAGINATION.PAD, 2);
+    let pagRight = Math.min(currPage + LB.PAGINATION.PAD, pageCount - 1);
 
-      anchor.onclick = () => {
-        this.changeLbPage(i);
-      };
+    // Current page is 1 or current page is pageCount
+    if (pagLeft === pagRight) {
+      if (pagLeft === 2) {
+        // 1 accounts for the lost left pad
+        // 1 accounts for the lost dots element
+        // 1 account for the lost first = "1" element which is currPage
+        pagRight = Math.min(pagRight + 3, pageCount - 1);
+      }
+      // Symmetrical to the begining
+      else if (pagRight === pageCount - 1) {
+        pagLeft = Math.max(pagLeft - 3, 2);
+      }
+    }
+    // Current page is 2 or 3 or pageCount - 1 or pageCount - 2
+    else {
+      let padR = 0,
+        padL = 0;
+
+      // 1 page element lost on the first = "1" element which is padLeft
+      // 1 page element lost on the dots = "..." element
+      if (currPage === 2) {
+        padR = 2;
+      }
+      // 1 page element lost on the dots = "..." element
+      else if (currPage === 3) {
+        padR = 1;
+      }
+
+      // Symmetrical
+      if (currPage === pageCount - 1) {
+        padL = 2;
+      }
+      // 1 page lost on the dots
+      else if (currPage === pageCount - 2) {
+        padL = 1;
+      }
+
+      if (pagLeft === 2) {
+        pagRight = Math.min(pagRight + padR, pageCount - 1);
+      }
+      // Symmetrical
+      else if (pagRight === pageCount - 1) {
+        pagLeft = Math.max(pagLeft - padL, 2);
+      }
     }
 
+    if (pagLeft > 2) {
+      this.createDotsPage();
+    }
+
+    for (let i = pagLeft; i <= pagRight; i++) {
+      this.createNumberedPage(i, currPage);
+    }
+
+    if (pagRight < pageCount - 1) {
+      this.createDotsPage();
+    }
+
+    this.createNumberedPage(pageCount, currPage);
     this.createNextListItem(currPage === pageCount);
+  }
+
+  // i = the number to be displayed on the pagination element
+  // currPage = the page the user is currently on
+  private createNumberedPage(i: number, currPage: number) {
+    let anchor = this.createPageListItem(i === currPage);
+    anchor.innerText = i.toString();
+
+    anchor.onclick = () => {
+      this.changeLbPage(i);
+    };
+  }
+
+  // Create a "..." pagination element
+  private createDotsPage() {
+    let aElement = this.createPageListItem(false, true);
+    aElement.innerText = "...";
   }
 
   private generateTableElements() {

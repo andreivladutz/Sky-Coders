@@ -82,6 +82,37 @@ const ro: LangFile = {
       charasCount: "Numărul Caracterelor",
     },
   },
+  // Code related to the character's terminal
+  terminal: {
+    // The greet line (first in the terminal)
+    greet: "Salutări din terminalul acestui caracter!",
+    // The lines describing the terminal
+    description: [
+      "Aici puteți vedea codul rulat de acest caracter și",
+      'orice este afișat cu ajutorul comenzii "imprimare" și puteți rula comenzi.',
+      'Inserați comanda "help" pentru mai multe detalii!',
+    ],
+
+    // The commands for the terminal
+    cmds: {
+      // The translated "Error message"
+      error: "Eroare",
+      unkownCmd: "Comandă necunoscută",
+      // The help messages shown by the "help cmd"
+      help: {
+        help: "Afișați acest dialog de ajutor",
+        clear: "Ștergeți conținutul terminalului",
+      },
+      // Messages displayed to the user
+      msg: {
+        // The message that's being displayed when a command is run
+        runningCode: "Următorul cod este rulat:",
+        // The message prepended to a text output
+        textOutput: "Text imprimat din cod:",
+        errorCaught: "O eroare a fost aruncată în cod:",
+      },
+    },
+  },
 };
 
 export default ro;

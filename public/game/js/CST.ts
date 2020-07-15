@@ -685,15 +685,19 @@ export default {
       MIN: 0.3,
       MAX: 1,
     },
-    DEFAULT_VOLUME: 0,
+    DEFAULT_VOLUME: 0.45,
   },
   // Stuff related to the leaderboard dialog page
   LEADERBOARD: {
     PAGE_NAV: {
       ARIA_LABEL: "Leaderboard pagination",
     },
+    PAGINATION: {
+      // How many extra pages to pad around the current page
+      PAD: 1,
+    },
     UL: {
-      CLASSES: ["pagination", "pagination-lg", "justify-content-center"],
+      CLASSES: ["pagination", "pagination-md", "justify-content-center"],
       LI: {
         CLASS: "page-item",
         ACTIVE: "active",

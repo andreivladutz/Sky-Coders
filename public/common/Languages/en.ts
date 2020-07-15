@@ -81,6 +81,36 @@ const en: LangFile = {
       charasCount: "Charas Count",
     },
   },
+  // Code related to the character's terminal
+  terminal: {
+    // The greet line (first in the terminal)
+    greet: "Hello from this character's terminal!",
+    // The lines describing the terminal
+    description: [
+      "Here you can see any code that's being run for this character and",
+      'any text output using the"print" command.',
+      'You can also type and run commands. Type "help" for more details!',
+    ],
+    // The commands for the terminal
+    cmds: {
+      // The translated "Error message"
+      error: "Error",
+      unkownCmd: "Unknown command",
+      // The help messages shown by the "help cmd"
+      help: {
+        help: "Display this help dialog",
+        clear: "Clear the terminal contents",
+      },
+      // Messages displayed to the user
+      msg: {
+        // The message that's being displayed when a command is run
+        runningCode: "Running the following code:",
+        // The message prepended to a text output
+        textOutput: "Text output from code:",
+        errorCaught: "Error caught inside code:",
+      },
+    },
+  },
 };
 
 export default en;

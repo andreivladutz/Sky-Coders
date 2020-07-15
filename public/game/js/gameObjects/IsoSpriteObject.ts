@@ -7,6 +7,9 @@ import LayersManager from "../managers/LayersManager";
 import AudioComponent from "../audio/AudioComponent";
 import SYSTEM from "../system/system";
 
+import Pointer = Phaser.Input.Pointer;
+import EventData = Phaser.Types.Input.EventData;
+
 interface IsoSpriteConfig {
   scene: Phaser.Scene;
   tileX: number;
@@ -286,7 +289,12 @@ export default class IsoSpriteObject extends IsoSprite {
   };
 
   // Handler function for "pointerup" event
-  protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
+  protected handleSelectionToggle = (
+    pointer: Pointer,
+    localX: any,
+    localY: any,
+    event: EventData
+  ) => {
     if (!this.gameCanvasIsTarget(pointer.event)) {
       clearTimeout(this.longHoverTimeout);
       return;
