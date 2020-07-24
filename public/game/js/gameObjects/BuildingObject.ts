@@ -25,7 +25,6 @@ export default class BuildingObject extends IsoSpriteObject {
   // Keep the id of the building in the db
   public dbId: string;
   // The last time this building produced resources (were collected)
-  // TODO: Show a timer
   public lastProdTime: number;
   // Boolean to know if the production is ready
   public isProductionReady: boolean = false;
@@ -117,23 +116,41 @@ export default class BuildingObject extends IsoSpriteObject {
     };
   }
 
-  // Class method different than the base one (makeSelectable) or the Phaser's Spritesheet one (setInteractive)
-  public makeInteractive(): this {
-    this.makeSelectable().setSelectedTintColor(CST.BUILDINGS.SELECTION_TINT);
+  protected getOverriddenInputHandlers() {
+    const inputHandlers = super.getOverriddenInputHandlers();
 
-    this.on(CST.EVENTS.OBJECT.LONG_HOVER, this.handleLongHover, this);
+    inputHandlers.onLongHover = () => this.handleLongHover();
+    inputHandlers.onTap = (ptr: Pointer, e: EventData) => {
+      e.stopPropagation();
+      this.actorWalkToBuilding();
+    };
+
+    return inputHandlers;
+  }
+
+  // Class method different than the base one (onInteractive) or the Phaser's Spritesheet one (setInteractive)
+  public makeInteractive(): this {
+    this.onInteractive().setSelectedTintColor(CST.BUILDINGS.SELECTION_TINT);
 
     // Corner case, cancelling the popover
-    this.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-      if (!this.gameCanvasIsTarget(pointer.event)) {
-        if (this.popoverObjInstance) {
-          this.popoverObjInstance.hidePopover();
-          this.popoverObjInstance = null;
-        }
-      }
-    });
+    // this.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+    //   if (!this.gameCanvasIsTarget(pointer.event)) {
+    //     if (this.popoverObjInstance) {
+    //       this.popoverObjInstance.hidePopover();
+    //       this.popoverObjInstance = null;
+    //     }
+    //   }
+    // });
 
-    this.on("pointerout", () => {
+    // this.on("pointerout", () => {
+    //   if (this.popoverObjInstance) {
+    //     this.popoverObjInstance.hidePopover();
+    //     this.popoverObjInstance = null;
+    //   }
+    // });
+
+    // Get the long hover state and wait for it to emit the exit event
+    this.inputComponent.getState(CST.INPUT_STATES.LONG_HOV).on("exit", () => {
       if (this.popoverObjInstance) {
         this.popoverObjInstance.hidePopover();
         this.popoverObjInstance = null;
@@ -185,22 +202,6 @@ export default class BuildingObject extends IsoSpriteObject {
       }:${remainingSec < 10 ? "0" + remainingSec : remainingSec}`;
     }
   }
-
-  // Handler function for "pointerup" event. Override the one in IsoSpriteObject
-  protected handleSelectionToggle = (
-    pointer: Pointer,
-    localX: any,
-    localY: any,
-    event: EventData
-  ) => {
-    if (!this.gameCanvasIsTarget(pointer.event)) {
-      return;
-    }
-
-    event.stopPropagation();
-
-    this.actorWalkToBuilding();
-  };
 
   // Send an actor to this building for collecting purposes
   public async actorWalkToBuilding(

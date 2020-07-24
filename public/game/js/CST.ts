@@ -685,7 +685,7 @@ export default {
       MIN: 0.3,
       MAX: 1,
     },
-    DEFAULT_VOLUME: 0.45,
+    DEFAULT_VOLUME: 0,
   },
   // Stuff related to the leaderboard dialog page
   LEADERBOARD: {
@@ -797,6 +797,19 @@ export default {
         BLOCKLY_LIKE: "{{blocklyOption}}",
       },
     },
+  },
+  // The states of the inputComponent state machine
+  INPUT_STATES: {
+    FOCUSED: "focused",
+    UNFOCUSED: "unfocused",
+    LONG_HOV: "longHover",
+    // Intermediary state
+    TOUCHED: "touched",
+    DRAG: "drag",
+    // Intermediary
+    PRESSABLE: "pressable",
+    PRESS: "press",
+    TAP: "tap",
   },
   // constants imported from the worker cst
   WORKER: WORKER_CST,

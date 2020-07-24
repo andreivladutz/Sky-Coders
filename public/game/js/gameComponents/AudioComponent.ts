@@ -1,20 +1,21 @@
-import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 import BaseSound = Phaser.Sound.BaseSound;
 import HTML5AudioSound = Phaser.Sound.HTML5AudioSound;
 import WebAudioSound = Phaser.Sound.WebAudioSound;
 import Circle = Phaser.Geom.Circle;
+
 import CST from "../CST";
+import GameComponent from "./GameComponent";
+import IsoSpriteObject from "../gameObjects/IsoSpriteObject";
 
 type Sound = WebAudioSound | HTML5AudioSound;
 
 // Sprite Objects have this audio component so they can play different sounds
-export default class AudioComponent {
-  public parentObject: IsoSpriteObject;
+export default class AudioComponent extends GameComponent {
   // The current playing sounds
   private soundsPlaying: Set<Sound> = new Set<Sound>();
 
   public constructor(parent: IsoSpriteObject) {
-    this.parentObject = parent;
+    super(parent);
   }
 
   // Add the sound to the set of sounds and remove it once it finishes playing

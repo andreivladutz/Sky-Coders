@@ -3,7 +3,7 @@ import ACTORS_CST, {
   ACTOR_NAMES,
   ACTOR_STATES,
   ACTOR_DIRECTIONS,
-  ActorAnimConfig
+  ActorAnimConfig,
 } from "../ACTORS_CST";
 import Phaser from "phaser";
 import { IsoScene } from "../IsoPlugin/IsoPlugin";
@@ -31,7 +31,7 @@ const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
     [WALK_EV.SE]: DIR.SE,
     [WALK_EV.NE]: DIR.NE,
     [WALK_EV.NW]: DIR.NW,
-    [WALK_EV.SW]: DIR.SW
+    [WALK_EV.SW]: DIR.SW,
   },
   // mapping 8 directions to 4
   DIRECTION8_TO_DIRECTION4 = {
@@ -42,7 +42,7 @@ const WALK_EV = CST.NAV_OBJECT.EVENTS.WALKING,
     [DIR.EAST]: DIR.SE,
     [DIR.NW]: DIR.NW,
     [DIR.NORTH]: DIR.NE,
-    [DIR.WEST]: DIR.SW
+    [DIR.WEST]: DIR.SW,
   };
 
 // config received by the actor config
@@ -87,7 +87,7 @@ export default class Actor extends NavSpriteObject {
       // Place the actors at different rexBoard's tileZ coords so they don't collide
       tileZ: ActorsManager.getInstance().sceneActors.length + 1,
       objectId: CST.LAYERS.ACTOR_ID,
-      texture: config.actorKey
+      texture: config.actorKey,
     });
 
     if (config.group) {
@@ -220,8 +220,7 @@ export default class Actor extends NavSpriteObject {
    *  - selectable
    */
   makeInteractive(): this {
-    this.makeSelectable().setSelectedTintColor(CST.ACTOR.SELECTION_TINT);
-    this.pressCancelsSelection = true;
+    this.onInteractive().setSelectedTintColor(CST.ACTOR.SELECTION_TINT);
 
     this.on(CST.EVENTS.OBJECT.PRESS, async (pointer: Phaser.Input.Pointer) => {
       let charaUI = this.actorsManager.charaUI;
@@ -303,7 +302,7 @@ export default class Actor extends NavSpriteObject {
       GridColor.BLUE,
       GridColor.NEUTRAL_GREEN,
       GridColor.PURPLE,
-      GridColor.PINK
+      GridColor.PINK,
     ]);
     this.enableGridDrawing(randomColor);
 
@@ -380,7 +379,7 @@ export default class Actor extends NavSpriteObject {
           end: animation.end,
           zeroPad: animation.zeroPad,
           prefix: animation.prefix + animation.DIRECTIONS[DIRECTION],
-          suffix: animation.suffix
+          suffix: animation.suffix,
         });
 
         this.scene.anims.create({
@@ -388,7 +387,7 @@ export default class Actor extends NavSpriteObject {
           frames: frameNames,
           frameRate: ACTORS_CST.frameRate,
           repeat: -1,
-          skipMissedFrames: false
+          skipMissedFrames: false,
         });
       }
     }
