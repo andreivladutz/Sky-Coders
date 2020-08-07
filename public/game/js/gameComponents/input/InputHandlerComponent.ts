@@ -52,6 +52,17 @@ export default class InputHandlerComponent extends InputComponent
     }
   }
 
+  // Enable the drag FSM state and enable the scene's dragging input for the parent
+  public enableDrag() {
+    this.config.dragEnabled = true;
+    this.scene.input.setDraggable([this.parentObject]);
+  }
+
+  public disableDrag() {
+    this.config.dragEnabled = false;
+    this.scene.input.setDraggable(this.parentObject, false);
+  }
+
   // Get an input state from the state machine (useful for listening to Exit events or such)
   public getState(stateName: string) {
     return this.stateMachine.states[stateName];

@@ -37,7 +37,7 @@ interface IsoSpriteConfig {
   inputCfg?: InputHandlerCfg;
 }
 
-const DEFAULT_INPUT_CFG: InputHandlerCfg = {
+export const DEFAULT_INPUT_CFG: InputHandlerCfg = {
   longHoverEnabled: true,
   longHoverTime: CST.EVENTS.OBJECT.HOVER_TIME,
   pressEnabled: true,

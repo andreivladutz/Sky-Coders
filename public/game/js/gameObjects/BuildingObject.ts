@@ -1,4 +1,7 @@
-import IsoSpriteObject, { GridColor } from "./IsoSpriteObject";
+import IsoSpriteObject, {
+  GridColor,
+  DEFAULT_INPUT_CFG,
+} from "./IsoSpriteObject";
 import CST from "../CST";
 
 import BuildingsManager from "../managers/BuildingsManager";
@@ -68,6 +71,11 @@ export default class BuildingObject extends IsoSpriteObject {
       // override local computed tiles
       localTileX,
       localTileY,
+      inputCfg: {
+        ...DEFAULT_INPUT_CFG,
+        pressEnabled: false,
+        dragEnabled: true,
+      },
     });
 
     this.buildingType = buildingType;
@@ -119,10 +127,14 @@ export default class BuildingObject extends IsoSpriteObject {
   protected getOverriddenInputHandlers() {
     const inputHandlers = super.getOverriddenInputHandlers();
 
-    inputHandlers.onLongHover = () => this.handleLongHover();
+    inputHandlers.onLongHover = (ptr: Pointer) => this.handleLongHover(ptr);
     inputHandlers.onTap = (ptr: Pointer, e: EventData) => {
       e.stopPropagation();
       this.actorWalkToBuilding();
+    };
+
+    inputHandlers.onDrag = (ptr: Pointer) => {
+      console.log("dragging", ptr);
     };
 
     return inputHandlers;
@@ -131,23 +143,6 @@ export default class BuildingObject extends IsoSpriteObject {
   // Class method different than the base one (onInteractive) or the Phaser's Spritesheet one (setInteractive)
   public makeInteractive(): this {
     this.onInteractive().setSelectedTintColor(CST.BUILDINGS.SELECTION_TINT);
-
-    // Corner case, cancelling the popover
-    // this.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
-    //   if (!this.gameCanvasIsTarget(pointer.event)) {
-    //     if (this.popoverObjInstance) {
-    //       this.popoverObjInstance.hidePopover();
-    //       this.popoverObjInstance = null;
-    //     }
-    //   }
-    // });
-
-    // this.on("pointerout", () => {
-    //   if (this.popoverObjInstance) {
-    //     this.popoverObjInstance.hidePopover();
-    //     this.popoverObjInstance = null;
-    //   }
-    // });
 
     // Get the long hover state and wait for it to emit the exit event
     this.inputComponent.getState(CST.INPUT_STATES.LONG_HOV).on("exit", () => {
@@ -161,7 +156,7 @@ export default class BuildingObject extends IsoSpriteObject {
   }
 
   // Show a popover with details about this building
-  protected async handleLongHover() {
+  protected async handleLongHover(pointer: Pointer) {
     if (!this.buildingsManager.PopoverObject) {
       this.buildingsManager.PopoverObject = (
         await import("../ui/uiObjects/bootstrapObjects/PopoverObject")
@@ -169,7 +164,7 @@ export default class BuildingObject extends IsoSpriteObject {
     }
 
     let lang = GameManager.getInstance().langFile;
-    let pointer = this.scene.input.activePointer;
+    //let pointer = this.scene.input.activePointer;
 
     this.popoverObjInstance = this.buildingsManager.PopoverObject.getInstance(
       this.scene as IsoScene,
@@ -250,7 +245,12 @@ export default class BuildingObject extends IsoSpriteObject {
       this.layersManager.removeObjectFromLayer(this);
     }
 
-    this.removeInteractive();
+    if (this.inputComponent) {
+      this.inputComponent.destroyInteractive();
+    } else {
+      this.removeInteractive();
+    }
+
     // Remove the building from the buildings' phaser group
     this.buildingsManager.sceneBuildings.remove(this);
     this.mapManager.removeSpriteObjectFromBoard(this);

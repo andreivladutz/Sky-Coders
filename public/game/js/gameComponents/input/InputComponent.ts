@@ -103,16 +103,16 @@ export default class InputComponent extends GameComponent {
 
     this.config = config;
 
-    if (config.dragEnabled) {
-      this.scene.input.setDraggable(parent);
-    }
-
     this.initEventHandlers().initInputStates();
   }
 
   // Set the game object as interactive
   public onInteractive(): this {
     this.parentObject.setInteractive();
+
+    if (this.config.dragEnabled) {
+      this.scene.input.setDraggable(this.parentObject);
+    }
 
     return this;
   }
@@ -298,9 +298,7 @@ export default class InputComponent extends GameComponent {
 
       // Cancel the timeout if the state exits before it fires
       onExit = function() {
-        if (config.timeOut.timeoutId) {
-          clearTimeout(config.timeOut.timeoutId);
-        }
+        clearTimeout(config.timeOut.timeoutId);
       };
     }
 
@@ -456,7 +454,7 @@ export default class InputComponent extends GameComponent {
           to: ST.PRESS,
         },
       }),
-      // If the mouse moves out of the element, don't go to unfocused
+      // If the mouse moves out of the element, don't go to unfocused (not using this.toUnfocusedConfig)
       [ST.DRAG]: {
         emitsEvent: true,
         [E.up]: {
