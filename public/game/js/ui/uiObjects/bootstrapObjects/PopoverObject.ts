@@ -21,7 +21,7 @@ export default class PopoverObject extends Phaser.GameObjects.DOMElement {
     // Enable html insertion into the popover content
     $(() => {
       $(CST.UI.POPOVER.QUERY).popover({
-        html: true
+        html: true,
       });
     });
 
@@ -71,7 +71,6 @@ export default class PopoverObject extends Phaser.GameObjects.DOMElement {
     $(() => {
       $(CST.UI.POPOVER.QUERY).popover("hide");
     });
-
     this.isVisible = false;
 
     return this;

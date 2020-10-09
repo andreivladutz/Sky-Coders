@@ -4,7 +4,17 @@ import MapManager from "../managers/MapManager";
 import CST from "../CST";
 import { TileXY } from "../map/IsoBoard";
 import LayersManager from "../managers/LayersManager";
-import AudioComponent from "../audio/AudioComponent";
+
+import AudioComponent from "../gameComponents/AudioComponent";
+import InputHandlerComponent, {
+  InputHandlerCfg,
+  HandlersCfg,
+} from "../gameComponents/input/InputHandlerComponent";
+
+import Pointer = Phaser.Input.Pointer;
+import EventData = Phaser.Types.Input.EventData;
+import { State } from "../utils/StateMachine";
+import InputComponent from "../gameComponents/input/InputComponent";
 import SYSTEM from "../system/system";
 
 interface IsoSpriteConfig {
@@ -22,7 +32,18 @@ interface IsoSpriteConfig {
   localTileY?: number;
   // optional Tile layering
   tileZ?: number;
+  // The config object setting the behaviour of the internal input component
+  // If not provided the default config object will be used
+  inputCfg?: InputHandlerCfg;
 }
+
+export const DEFAULT_INPUT_CFG: InputHandlerCfg = {
+  longHoverEnabled: true,
+  longHoverTime: CST.EVENTS.OBJECT.HOVER_TIME,
+  pressEnabled: true,
+  pressTime: CST.EVENTS.OBJECT.PRESS_TIME,
+  dragEnabled: false,
+};
 
 function isDefinedOrDefault<T>(value: T, typeCheck: string, defaultValue: T) {
   if (typeof value === typeCheck) {
@@ -45,6 +66,11 @@ function applyDefaultValues(config: IsoSpriteConfig) {
   );
   config.tileZ = isDefinedOrDefault(config.tileZ, "number", 0);
   config.z = isDefinedOrDefault(config.z, "number", 0);
+  config.inputCfg = isDefinedOrDefault(
+    config.inputCfg,
+    "object",
+    DEFAULT_INPUT_CFG
+  );
 }
 
 export enum GridColor {
@@ -57,7 +83,7 @@ export enum GridColor {
   BLUE = 0x51a0d5,
   NEUTRAL_GREEN = 0x59c878,
   PURPLE = 0x8d4585,
-  PINK = 0xe51a4c
+  PINK = 0xe51a4c,
 }
 
 // check if a tile is out of bounds
@@ -109,14 +135,9 @@ export default class IsoSpriteObject extends IsoSprite {
   // is this object selected?
   selected: boolean = false;
 
-  // This flag should be set if the press event should cancel the selection / deselection event
-  protected pressCancelsSelection: boolean = false;
-  // Flag to know if the press event has been fired
-  private pressWasFired: boolean = false;
-  private pressTimeout: any;
-
-  // Timeout used to determine if the user hovered a game object for long
-  private longHoverTimeout: any;
+  // The input component having an internal state machine
+  protected inputComponent: InputHandlerComponent;
+  private inputConfig: InputHandlerCfg;
 
   // tile coords of this object
   // CAN BE FLOATING POINT NUMBERS!!!
@@ -143,6 +164,8 @@ export default class IsoSpriteObject extends IsoSprite {
       config.texture,
       config.frame
     );
+    this.inputConfig = config.inputCfg;
+
     this.objectId = config.objectId;
     this.audioComponent = new AudioComponent(this);
 
@@ -215,38 +238,66 @@ export default class IsoSpriteObject extends IsoSprite {
     return this;
   }
 
-  // make this iso object selectable or unselectable
-  // pass false to the enable parameter to deactivate the selectable property
-  public makeSelectable(enable: boolean = true): this {
-    if (enable === false) {
-      this.disableInteractive();
-      return this;
+  // Override the input handlers functions on the InputComponent. To be overriden in superclasses for specific behaviour
+  protected getOverriddenInputHandlers(): HandlersCfg {
+    const inputHandlers: HandlersCfg = {};
+    inputHandlers.onFocused = () => {
+      // prevent tilemove events propagating to the map
+      this.mapManager.events.registerDefaultPrevention(this);
+      this.setTint(this.selectedTintColor);
+    };
+
+    inputHandlers.onUnfocused = () => {
+      this.mapManager.events.unregisterDefaultPrevention();
+      if (!this.selected) {
+        this.clearTint();
+      }
+    };
+
+    inputHandlers.onTap = (pointer: Pointer, evData: EventData) => {
+      this.toggleSelected(pointer);
+    };
+
+    inputHandlers.onPress = (pointer: Pointer, evData: EventData) => {
+      this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
+    };
+
+    return inputHandlers;
+  }
+
+  // Turn on the input interactive state of this game object by turning on the input component
+  public onInteractive(): this {
+    if (!this.inputComponent) {
+      this.inputConfig.handlers = this.getOverriddenInputHandlers();
+      this.inputComponent = new InputHandlerComponent(this, this.inputConfig);
+
+      // Mobile hack, cancel the focus when exiting the tap or press states
+      type St = State<InputComponent>;
+      this.inputComponent.onStateMachineEvent(
+        "transition",
+        (fromState: St, toState: St) => {
+          if (
+            toState.name === CST.INPUT_STATES.FOCUSED &&
+            SYSTEM.TOUCH_ENABLED
+          ) {
+            switch (fromState.name) {
+              case CST.INPUT_STATES.PRESS:
+              case CST.INPUT_STATES.TAP:
+                this.inputComponent.onUnfocused();
+            }
+          }
+        }
+      );
     }
 
-    this.setInteractive()
-      .on("pointerover", () => {
-        // prevent tilemove events propagating to the map
-        this.mapManager.events.registerDefaultPrevention(this);
-        this.setTint(this.selectedTintColor);
+    this.inputComponent.onInteractive();
 
-        // Don't emit long hover event on touch enabled devices
-        if (!SYSTEM.TOUCH_ENABLED) {
-          this.longHoverTimeout = setTimeout(() => {
-            this.emit(CST.EVENTS.OBJECT.LONG_HOVER);
-          }, CST.EVENTS.OBJECT.HOVER_TIME);
-        }
-      })
-      .on("pointerout", () => {
-        this.mapManager.events.unregisterDefaultPrevention();
+    return this;
+  }
 
-        clearTimeout(this.longHoverTimeout);
-
-        if (!this.selected) {
-          this.clearTint();
-        }
-      })
-      .on("pointerdown", this.checkPressLogic)
-      .on("pointerup", this.handleSelectionToggle);
+  // Turn off the interactive input component
+  public offInteractive(): this {
+    this.inputComponent.offInteractive();
 
     return this;
   }
@@ -254,48 +305,6 @@ export default class IsoSpriteObject extends IsoSprite {
   protected gameCanvasIsTarget(ev: MouseEvent | TouchEvent) {
     return ev.target === this.scene.game.canvas;
   }
-
-  // Handler function for "pointerdown" event -> checking PRESS
-  private checkPressLogic = (pointer: Phaser.Input.Pointer) => {
-    if (!this.gameCanvasIsTarget(pointer.event)) {
-      return;
-    }
-
-    // Consider the right mouse button as being a press action
-    if (pointer.rightButtonDown()) {
-      this.pressWasFired = true;
-      this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
-
-      return;
-    }
-
-    // Check for press event
-    this.pressTimeout = setTimeout(() => {
-      if (pointer.isDown) {
-        this.pressWasFired = true;
-        this.emit(CST.EVENTS.OBJECT.PRESS, pointer);
-      }
-    }, CST.EVENTS.OBJECT.PRESS_TIME);
-  };
-
-  // Handler function for "pointerup" event
-  protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
-    if (!this.gameCanvasIsTarget(pointer.event)) {
-      return;
-    }
-
-    // If the press event fired and it should cancel selection / deselection
-    if (this.pressWasFired && this.pressCancelsSelection) {
-      this.pressWasFired = false;
-
-      return;
-    }
-
-    // Cancel the listening for press event as this was canceled by this up event
-    clearTimeout(this.pressTimeout);
-    this.pressWasFired = false;
-    this.toggleSelected(pointer);
-  };
 
   // select or deselect the actor
   private toggleSelected(pointer: Phaser.Input.Pointer) {
@@ -491,14 +500,10 @@ export default class IsoSpriteObject extends IsoSprite {
   // }
 
   get tileX() {
-    // this.computeTileCoords();
-
     return Math.round(this.tileCoords.x);
   }
 
   get tileY() {
-    // this.computeTileCoords();
-
     return Math.round(this.tileCoords.y);
   }
 

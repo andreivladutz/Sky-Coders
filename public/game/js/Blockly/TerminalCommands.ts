@@ -1,10 +1,12 @@
 import CharacterTerminal from "./CharacterTerminal";
 import CST from "../CST";
+import GameManager from "../online/GameManager";
 
 const COLORS = CST.TERMINAL.COLORS;
 
 export default class TerminalCommands {
   private terminal: CharacterTerminal;
+  private cmdsLangFile = GameManager.getInstance().langFile.terminal.cmds;
 
   constructor(terminal: CharacterTerminal) {
     this.terminal = terminal;
@@ -12,10 +14,9 @@ export default class TerminalCommands {
 
   private handleUnknownCmd = (cmd: string) => {
     this.terminal.printLine(
-      `${this.terminal.coloredText(
-        "Error:",
-        COLORS.RED
-      )} Unknown command ${cmd}`
+      `${this.terminal.coloredText(this.cmdsLangFile.error, COLORS.RED)} ${
+        this.cmdsLangFile.unkownCmd
+      } ${cmd}`
     );
   };
 
@@ -55,9 +56,9 @@ export default class TerminalCommands {
   private readonly COMMANDS: {
     [key: string]: [() => void, string];
   } = {
-    help: [this.handleHelpCmd, "Display this help dialog"],
-    clear: [this.handleClearCmd, "Clear the terminal contents"],
-    cici: [this.handleCiciCmd, ""]
+    help: [this.handleHelpCmd, this.cmdsLangFile.help.help],
+    clear: [this.handleClearCmd, this.cmdsLangFile.help.clear],
+    cici: [this.handleCiciCmd, ""],
   };
 
   // Verify if any command matches the cmd and run the handler
@@ -77,12 +78,7 @@ export default class TerminalCommands {
       return;
     }
 
-    this.terminal.printLine(
-      `Running the following ${this.terminal.coloredText(
-        "code",
-        COLORS.GREEN
-      )}:`
-    );
+    this.terminal.printLine(this.cmdsLangFile.msg.runningCode);
 
     for (let codeLine of code) {
       this.terminal.printLine(codeLine, COLORS.GREEN);
@@ -94,13 +90,16 @@ export default class TerminalCommands {
   // Output of print cmd
   public codePrint(text: string) {
     this.terminal.printLine(
-      `${this.terminal.coloredText("Code output", COLORS.YELLOW)}: ${text}`
+      `${this.terminal.coloredText(
+        this.cmdsLangFile.msg.textOutput,
+        COLORS.YELLOW
+      )}: ${text}`
     );
   }
 
   // Report an error caught inside the code
   public reportCodeError(e: Error) {
-    this.terminal.printLine("Error caught inside code:", COLORS.RED);
+    this.terminal.printLine(this.cmdsLangFile.msg.errorCaught, COLORS.RED);
     this.terminal.printLine(`${e.message}`, COLORS.RED);
   }
 }

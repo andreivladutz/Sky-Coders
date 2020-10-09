@@ -4,6 +4,13 @@ import Phaser from "phaser";
 import EventEmitter = Phaser.Events.EventEmitter;
 import AudioManager from "../managers/AudioManager";
 
+type WindowSize = {
+  width: number;
+  height: number;
+  left: number;
+  top: number;
+};
+
 /**
  * Events emitting in this order on window open:
  *   - OPEN EVENT
@@ -18,11 +25,91 @@ export default class GameWindow extends EventEmitter {
   private windowOverlay: HTMLDivElement;
   public windowContainer: HTMLDivElement;
 
+  private windowWidthPercentage: number;
+  private windowHeightPercentage: number;
+
   public constructor(windowElement?: HTMLDivElement) {
     super();
 
     this.initContainerElement(windowElement);
     this.hideWindow();
+    this.debounceResizeEvent();
+  }
+
+  private debounceResizeEvent() {
+    let debounceTimeout = null;
+
+    window.addEventListener("resize", () => {
+      if (debounceTimeout) {
+        return;
+      }
+
+      debounceTimeout = setTimeout(() => {
+        this.emit(CST.WINDOW.DEBOUNCED_RESIZE_EVENT);
+
+        debounceTimeout = null;
+      }, CST.TERMINAL.DEBOUNCE_TIME);
+    });
+  }
+
+  private computeWindowPercentages() {
+    let divParent = this.windowContainer;
+    let parentComputedStyle = getComputedStyle(divParent);
+
+    this.windowWidthPercentage = parseInt(
+      parentComputedStyle.getPropertyValue("width")
+    );
+    this.windowHeightPercentage = parseInt(
+      parentComputedStyle.getPropertyValue("height")
+    );
+
+    let bodyStyle = getComputedStyle(document.body);
+    if (parentComputedStyle.getPropertyValue("width").endsWith("px")) {
+      let bodyWidth = parseInt(bodyStyle.getPropertyValue("width"));
+      this.windowWidthPercentage = Math.round(
+        (this.windowWidthPercentage / bodyWidth) * 100
+      );
+    }
+
+    if (parentComputedStyle.getPropertyValue("height").endsWith("px")) {
+      let bodyHeight = parseInt(bodyStyle.getPropertyValue("height"));
+      this.windowHeightPercentage = Math.round(
+        (this.windowHeightPercentage / bodyHeight) * 100
+      );
+    }
+  }
+
+  // Get the pixel size for the width, height and position of the
+  // inner window of this game window
+  /**
+   *
+   * @param innerWRatio width percentage
+   * @param innerHRatio height percentage
+   */
+  public getPixelSize(innerWRatio: number, innerHRatio: number): WindowSize {
+    // The first time around, get the percentages from css
+    if (!this.windowHeightPercentage) {
+      this.computeWindowPercentages();
+    }
+
+    let bodyStyle = getComputedStyle(document.body);
+    let bodyHeight = parseInt(bodyStyle.getPropertyValue("height"));
+    let bodyWidth = parseInt(bodyStyle.getPropertyValue("width"));
+
+    let realHeight =
+      (innerHRatio * (this.windowHeightPercentage * bodyHeight)) / 10000;
+    let realWidth =
+      (innerWRatio * (this.windowWidthPercentage * bodyWidth)) / 10000;
+
+    let left = (bodyWidth - realWidth) / 2;
+    let top = (bodyHeight - realHeight) / 2;
+
+    return {
+      width: realWidth,
+      height: realHeight,
+      left,
+      top
+    };
   }
 
   // Add the animation class so a transition is animated via css

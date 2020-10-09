@@ -4,6 +4,7 @@ import "xterm/css/xterm.css";
 import CST from "../CST";
 import GameWindow from "../ui/GameWindow";
 import TerminalCommands from "./TerminalCommands";
+import GameManager from "../online/GameManager";
 
 export default class CharacterTerminal {
   private terminal: Terminal;
@@ -14,12 +15,6 @@ export default class CharacterTerminal {
 
   private currentTerminalRow: number;
   private actorKey: string = "";
-
-  // Size percentages for the screen positioning
-  private windowWidthPercentage: number;
-  private windowHeightPercentage: number;
-  private windowParentWidthPercentage: number;
-  private windowParentHeightPercentage: number;
 
   public commandsHandler: TerminalCommands;
 
@@ -54,25 +49,14 @@ export default class CharacterTerminal {
   private runTerminal(actorKey: string) {
     this.currentTerminalRow = 0;
 
-    this.printLine(
-      `Hello from ${this.coloredText(
-        actorKey,
-        CST.TERMINAL.COLORS.CYAN
-      )}'s terminal!`
-    );
+    let terminalLang = GameManager.getInstance().langFile.terminal;
 
-    this.printLine(
-      "Here you can see any code that's being run for this character,",
-      CST.TERMINAL.COLORS.MAGENTA
-    );
-    this.printLine(
-      "any code output and you can type and run commands.",
-      CST.TERMINAL.COLORS.MAGENTA
-    );
-    this.printLine(
-      "Write 'help' for more details!",
-      CST.TERMINAL.COLORS.MAGENTA
-    );
+    this.printLine(terminalLang.greet);
+
+    for (let line of terminalLang.description) {
+      this.printLine(line, CST.TERMINAL.COLORS.MAGENTA);
+    }
+
     this.prompt();
 
     if (this.actorKey) {
@@ -251,73 +235,27 @@ export default class CharacterTerminal {
 
   // Resize terminal on window resize, but debounce the resize
   private registerWindowResizing() {
-    let debounceTimeout = null;
-
-    window.addEventListener("resize", () => {
-      if (debounceTimeout) {
-        return;
-      }
-
-      debounceTimeout = setTimeout(() => {
-        this.repositionTerminalWindow();
-
-        debounceTimeout = null;
-      }, CST.TERMINAL.DEBOUNCE_TIME);
-    });
+    this.terminalWindow.on(
+      CST.WINDOW.DEBOUNCED_RESIZE_EVENT,
+      this.repositionTerminalWindow,
+      this
+    );
 
     this.repositionTerminalWindow();
   }
 
-  private computeWindowPercentages() {
-    // Create and append the div that dictates the terminal size
-    let div = document.createElement("div");
-    div.classList.add(CST.TERMINAL.CLASS);
-    this.terminalWindow.windowContainer.appendChild(div);
-
-    let divParent = div.parentElement;
-
-    let computedStyle = getComputedStyle(div);
-    let parentComputedStyle = getComputedStyle(divParent);
-
-    this.windowHeightPercentage = parseInt(
-      computedStyle.getPropertyValue("height")
-    );
-    this.windowWidthPercentage = parseInt(
-      computedStyle.getPropertyValue("width")
-    );
-
-    this.windowParentWidthPercentage = parseInt(
-      parentComputedStyle.getPropertyValue("width")
-    );
-    this.windowParentHeightPercentage = parseInt(
-      parentComputedStyle.getPropertyValue("height")
-    );
-  }
-
   // Resize and reposition the terminal window corectly
   private repositionTerminalWindow() {
-    if (!this.windowHeightPercentage) {
-      this.computeWindowPercentages();
-    }
-    let bodyStyle = getComputedStyle(document.body);
+    let { left, top, width, height } = this.terminalWindow.getPixelSize(
+      CST.TERMINAL.TERMINAL_RATIO.WIDTH,
+      CST.TERMINAL.TERMINAL_RATIO.HEIGHT
+    );
 
-    let bodyHeight = parseInt(bodyStyle.getPropertyValue("height"));
-    let bodyWidth = parseInt(bodyStyle.getPropertyValue("width"));
+    this.terminal.element.style.width = width + "px";
+    this.terminal.element.style.height = height + "px";
 
-    let realHeight =
-      (this.windowHeightPercentage *
-        (this.windowParentHeightPercentage * bodyHeight)) /
-      10000;
-    let realWidth =
-      (this.windowWidthPercentage *
-        (this.windowParentWidthPercentage * bodyWidth)) /
-      10000;
-
-    this.terminal.element.style.width = realWidth + "px";
-    this.terminal.element.style.height = realHeight + "px";
-
-    this.terminal.element.style.left = (bodyWidth - realWidth) / 2 + "px";
-    this.terminal.element.style.top = (bodyHeight - realHeight) / 2 + "px";
+    this.terminal.element.style.left = left + "px";
+    this.terminal.element.style.top = top + "px";
 
     let characterSize = (this.terminal as any)._core.viewport._renderService
       ._renderer.dimensions;
@@ -325,8 +263,8 @@ export default class CharacterTerminal {
     let oldCols = this.terminal.cols;
 
     this.terminal.resize(
-      Math.floor(realWidth / characterSize.actualCellWidth) - 1,
-      Math.floor(realHeight / characterSize.actualCellHeight)
+      Math.floor(width / characterSize.actualCellWidth) - 1,
+      Math.floor(height / characterSize.actualCellHeight)
     );
 
     if (this.terminal.cols < oldCols) {

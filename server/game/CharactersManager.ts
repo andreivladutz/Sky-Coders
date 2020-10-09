@@ -1,4 +1,4 @@
-import GameObjectsManager from "./GameObjectsManager";
+import GameObjectsManager from "./gameUtils/GameObjectsManager";
 import GameInstance from "./GameInstance";
 
 import { Characters } from "../../public/common/MessageTypes";
@@ -7,14 +7,12 @@ import CST from "../../public/common/CommonCST";
 
 import mongoose from "mongoose";
 import DocumentArray = mongoose.Types.DocumentArray;
-import Island, { CharacterType } from "../models/Island";
+import { CharacterType } from "../models/Island";
 
 // Handle the game characters for a user
 export default class CharactersManager extends GameObjectsManager {
   constructor(gameInstance: GameInstance) {
     super(gameInstance);
-
-    this.listenForEvents();
   }
 
   // Get the initial characters from the db that are sent to the client
@@ -37,7 +35,7 @@ export default class CharactersManager extends GameObjectsManager {
   private addNewChara(actorKey: ACTOR_NAMES = ACTOR_NAMES.MALLACK) {
     this.islandDoc.characters.push({
       actorKey,
-      workspaceBlockly: ""
+      workspaceBlockly: "",
     });
 
     let newChara: CharacterType = this.islandDoc.characters[
@@ -55,7 +53,7 @@ export default class CharactersManager extends GameObjectsManager {
   }
 
   // Listen for events coming from the client
-  private listenForEvents() {
+  public initListeners() {
     this.sender.on(
       Characters.UPDATE_CHARA_EVENT,
       (chara: Characters.DbCharacter) => {

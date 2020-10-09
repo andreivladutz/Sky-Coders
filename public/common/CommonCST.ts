@@ -11,5 +11,10 @@ export default {
     INITIAL_NO: 2,
     // Update the character every ... ms when the Blockly workspace is open
     UPDATES_INTERVAL: 5000
+  },
+  // CSTs related to users query
+  USERS_QUERY: {
+    // Limit the results to 10 users
+    LEADERBOARD_LIMIT: 5
   }
 };

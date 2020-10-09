@@ -45,15 +45,15 @@ export default class LayersManager extends Manager {
     this.initTileGrid(mapGrid);
     this.initObjectLayer(mapGrid[0].length, mapGrid.length);
 
-    MapManager.getInstance().events.on(CST.EVENTS.MAP.MOVE, (tile: Tile) => {
-      // console.log(
-      //   MapManager.getInstance()
-      //     .getIsoBoard()
-      //     .board.tileXYToChessArray(tile.x, tile.y)
-      // );
-      // console.log(this.getTileConfig(tile.x, tile.y).id);
-      // console.log(MapManager.getInstance().mapMatrix[tile.y][tile.x]);
-    });
+    // MapManager.getInstance().events.on(CST.EVENTS.MAP.MOVE, (tile: Tile) => {
+    //   console.log(
+    //     MapManager.getInstance()
+    //       .getIsoBoard()
+    //       .board.tileXYToChessArray(tile.x, tile.y)
+    //   );
+    //   console.log(this.getTileConfig(tile.x, tile.y).id);
+    //   console.log(MapManager.getInstance().mapMatrix[tile.y][tile.x]);
+    // });
   }
 
   // Get the config of the tile situated at x, y tile coords
@@ -64,7 +64,7 @@ export default class LayersManager extends Manager {
     return {
       id: this.tileGrid[y][x] & CST.LAYERS.MASK.TILE_ID_MASK,
       flipX,
-      flipY
+      flipY,
     };
   }
 
@@ -116,8 +116,8 @@ export default class LayersManager extends Manager {
       this.notifyAstarWorker([
         {
           x: obj.tileX,
-          y: obj.tileY
-        }
+          y: obj.tileY,
+        },
       ]);
     }
 
@@ -163,8 +163,8 @@ export default class LayersManager extends Manager {
         [
           {
             x: obj.tileX,
-            y: obj.tileY
-          }
+            y: obj.tileY,
+          },
         ],
         true
       );

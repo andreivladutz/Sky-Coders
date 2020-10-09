@@ -9,7 +9,13 @@ interface StateConfig {
   onExit?: () => void;
   onceOnEnter?: () => void;
 }
-
+/**
+ * THE ORDER OF THE CALLBACKS ON A TRANSITION:
+ * - transitionCb
+ * - current state's onExit
+ * - next state's onEnter
+ * - next state's onceOnEnter
+ */
 export default class StateMachine<T> extends EventEmitter {
   context: T;
   // the states of this machine
@@ -47,6 +53,7 @@ export default class StateMachine<T> extends EventEmitter {
 
     this.currState.transitionTo(otherStateName, ...args);
     otherState.enter();
+
     this.emit("transition", this.currState, otherState, args);
 
     this.currState = otherState;
@@ -99,7 +106,7 @@ export class State<T> extends EventEmitter {
       name: this.name,
       onExit: this.onExit,
       onEnter: this.onEnter,
-      onceOnEnter: this.onceOnEnter
+      onceOnEnter: this.onceOnEnter,
     } = config);
   }
 

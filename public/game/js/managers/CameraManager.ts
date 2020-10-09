@@ -114,7 +114,7 @@ export default class CameraManager extends Manager {
 
     return {
       x: view.x + view.width / 2,
-      y: view.y + view.height / 2
+      y: view.y + view.height / 2,
     };
   }
 
@@ -131,20 +131,21 @@ export default class CameraManager extends Manager {
     // init the plugin object
     this.pan = new Pan(this.scene, {
       enable: true,
-      threshold: CST.CAMERA.PAN_THRESHOLD
+      threshold: CST.CAMERA.PAN_THRESHOLD,
     });
 
     this.pan.on(
       "pan",
       (pan: Pan) => {
         const mapManager = MapManager.getInstance();
+        mapManager.cameraInteraction = true;
 
         // limit the panning to the map's size
         let {
             leftmostX,
             rightmostX,
             topmostY,
-            lowermostY
+            lowermostY,
           } = mapManager.getExtremesTileCoords(),
           { w, h } = mapManager.getMapTilesize();
 
@@ -193,7 +194,7 @@ export default class CameraManager extends Manager {
   enableZoom(): this {
     // enable zoom by pinching on touch devices
     this.pinch = new Pinch(this.scene, {
-      enable: true
+      enable: true,
     });
 
     // made a function so code doesn't get dupplicated
@@ -226,6 +227,8 @@ export default class CameraManager extends Manager {
     this.pinch.on(
       "pinch",
       (pinch: Pinch) => {
+        MapManager.getInstance().cameraInteraction = true;
+
         zoomCamera(pinch.scaleFactor);
       },
       this

@@ -29,9 +29,9 @@ const IsPlainObject = Phaser.Utils.Objects.IsPlainObject;
 const Circle = Phaser.Geom.Circle;
 const CircleToCircle = Phaser.Geom.Intersects.CircleToCircle;
 
-// Search for a random position for this milliseconds
+// Search for a random position for this iterations
 // if it doesn't find a position, quit searching
-const MAX_TIME_SEARCHING = 100;
+const MAX_ITERS = 500;
 
 interface GameObjectLike {
   x: number;
@@ -94,10 +94,10 @@ export default function RandomPlace(
       var circle = new Circle(0, 0, radius);
       let isOverlapping: boolean;
 
-      let startTime = Date.now();
+      let iters = 0;
 
       do {
-        if (Date.now() - startTime >= MAX_TIME_SEARCHING) {
+        if (iters > MAX_ITERS) {
           return items;
         }
 
@@ -109,6 +109,8 @@ export default function RandomPlace(
             break;
           }
         }
+
+        iters++;
       } while (isOverlapping);
 
       collisionCircles.push(circle);

@@ -12,6 +12,11 @@ import Circle = Phaser.Geom.Circle;
 
 const { AUDIO } = CST;
 
+interface UiSound extends BaseSound {
+  // The volume from the CST configs
+  __relativeVolume__?: number;
+}
+
 type ActorFootsteps = {
   actor: Actor;
   footstepsSounds: BaseSound[];
@@ -28,12 +33,15 @@ type ActorFootsteps = {
 
 export default class AudioManager extends Manager {
   public isInited = false;
+
   public volume: number;
+  // Volume specific to ui sound
+  public uiSoundsVolume: number = 1;
 
   private scene: Scene;
   private soundTrack: BaseSound;
   // Keep a dictionary of ui sounds
-  private uiSounds: { [soundKey: string]: BaseSound } = {};
+  private uiSounds: { [soundKey: string]: UiSound } = {};
   // Multiple actors can play the footsteps sound at the same time
   private actorsFootsteps: ActorFootsteps[] = [];
   // Keep a reference to each object currently playing a sound
@@ -94,7 +102,7 @@ export default class AudioManager extends Manager {
     if (!this.soundTrack) {
       this.soundTrack = this.scene.sound.add(AUDIO.KEYS.SOUNDTRACKS[0], {
         volume: AUDIO.SOUNDTRACK_VOLUME,
-        loop: true
+        loop: true,
       });
     }
 
@@ -121,9 +129,17 @@ export default class AudioManager extends Manager {
       }
 
       this.uiSounds[soundKey] = this.scene.sound.add(soundKey, options);
+      this.uiSounds[soundKey].__relativeVolume__ =
+        options && options.volume ? options.volume : 1;
     }
 
-    this.uiSounds[soundKey].play();
+    // Overwrite the current volume to play this sound
+    this.uiSounds[soundKey].play({
+      volume:
+        this.uiSoundsVolume *
+        this.volume *
+        this.uiSounds[soundKey].__relativeVolume__,
+    });
 
     return this;
   }
@@ -228,7 +244,7 @@ export default class AudioManager extends Manager {
       for (let key of AUDIO.KEYS.FOOTSTEPS) {
         footstepsSounds.push(
           actor.scene.sound.add(key, {
-            rate: AUDIO.FOOTSTEPS_RATE
+            rate: AUDIO.FOOTSTEPS_RATE,
           })
         );
       }
@@ -236,7 +252,7 @@ export default class AudioManager extends Manager {
       inactiveSounds = {
         actor,
         footstepsSounds,
-        active: true
+        active: true,
       };
 
       this.actorsFootsteps.push(inactiveSounds);

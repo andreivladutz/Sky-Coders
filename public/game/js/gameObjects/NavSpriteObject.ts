@@ -50,7 +50,7 @@ export default class NavSpriteObject extends IsoSpriteObject {
     // This type of object doesn't get applied to the layer as it travels all the time
     super({
       ...config,
-      shouldBeAppliedToLayer: false
+      shouldBeAppliedToLayer: false,
     });
 
     this.tileZ = config.tileZ;
@@ -65,13 +65,13 @@ export default class NavSpriteObject extends IsoSpriteObject {
           CST.NAV_OBJECT.IDEAL_TILESIZE),
       rotateToTarget: false,
       //occupiedTest: false,
-      blockerTest: false
+      blockerTest: false,
     });
 
     // the size of the map in tiles, useful for walkable checking
     ({
       w: this.mapWidth,
-      h: this.mapHeight
+      h: this.mapHeight,
     } = this.mapManager.getMapTilesize());
 
     this.astarWorkerManager = AstarWorkerManager.getInstance();
@@ -82,7 +82,7 @@ export default class NavSpriteObject extends IsoSpriteObject {
         localTileX: this.localTileX,
         localTileY: this.localTileY,
         tileWidthX: this.tileWidthX,
-        tileWidthY: this.tileWidthY
+        tileWidthY: this.tileWidthY,
       });
     }
   }
@@ -136,11 +136,11 @@ export default class NavSpriteObject extends IsoSpriteObject {
       this.actorKey,
       {
         x: this.tileX,
-        y: this.tileY
+        y: this.tileY,
       },
       {
         x: tileX,
-        y: tileY
+        y: tileY,
       },
       strictPath
     );
@@ -152,7 +152,7 @@ export default class NavSpriteObject extends IsoSpriteObject {
       this.actorKey,
       {
         x: this.tileX,
-        y: this.tileY
+        y: this.tileY,
       },
       acceptableTiles
     );

@@ -11,7 +11,7 @@ import AudioManager from "../managers/AudioManager";
 export default class GameScene extends IsoScene {
   constructor() {
     const config = {
-      key: CST.SCENES.GAME
+      key: CST.SCENES.GAME,
     };
 
     super(config);
@@ -55,7 +55,7 @@ export default class GameScene extends IsoScene {
       camera: this.cameras.main,
       scene: this,
       enablePan: true,
-      enableZoom: true
+      enableZoom: true,
     });
 
     // Place the buildings from the server

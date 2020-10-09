@@ -14,7 +14,7 @@ let BLOCKS = CODE_CST.BLOCKS;
 export enum TopLevelBlocks {
   EVENT_SELECTED = "events_selected",
   EVENT_PRODREADY = "events_prod_ready",
-  COMMAND = "command"
+  COMMAND = "command",
 }
 
 const { TOPBLOCK_REGEX } = CST.BLOCKLY;
@@ -124,7 +124,7 @@ export default class ActorCodeHandler {
   private handleCommand(topBlock: Block, blockCode: string) {
     this.codeCommands.push({
       name: topBlock.getFieldValue("NAME"),
-      code: blockCode
+      code: blockCode,
     });
   }
 
@@ -158,8 +158,29 @@ export default class ActorCodeHandler {
 
     // Save the registered handler so we can unregister it later
     this.registeredEvents.push({
-      [blockType]: prodReadyHandler
+      [blockType]: prodReadyHandler,
     });
+
+    // ALSO: should check if the production is already ready NOW
+
+    // If the option is ANY -> take all the buildings that have prodready now
+    if (chosenBuildingId === BLOCKS.PROD_READY.ANY_OPTION_ID) {
+      let readyBuildings = BuildingsManager.getInstance().getProdReadyBuildings();
+
+      for (let building of readyBuildings) {
+        prodReadyHandler(building);
+      }
+    }
+    // If the option is specific get that building
+    else {
+      let readyBuilding = BuildingsManager.getInstance().getBuildingWithId(
+        chosenBuildingId
+      );
+
+      if (readyBuilding) {
+        prodReadyHandler(readyBuilding);
+      }
+    }
   }
 
   private handleOnSelectedEvent(blockType: TopLevelBlocks, blockCode: string) {
@@ -170,7 +191,7 @@ export default class ActorCodeHandler {
     this.parentActor.on(CST.EVENTS.OBJECT.SELECT, selectHandler);
     // Save the registered handler so we can unregister it later
     this.registeredEvents.push({
-      [blockType]: selectHandler
+      [blockType]: selectHandler,
     });
   }
 

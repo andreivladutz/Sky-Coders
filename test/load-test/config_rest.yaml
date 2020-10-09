@@ -1,0 +1,41 @@
+config:
+  target: http://localhost:3000
+  phases:
+    - duration: 120
+      arrivalRate: 2
+      rampTo: 10
+      name: "Warm up registration"
+    - duration: 120
+      arrivalRate: 10
+      name: "Sustained max load"
+  # Functions handling variables and such in a js file
+  processor: "./loadTestRestProc.js"
+  variables:
+    # Save this as password for all accounts created
+    pass:
+      - "test123"
+scenarios:
+  - flow:
+      # generate a random email
+      - function: "populateEmail"
+      # register a new user
+      - post:
+          url: "/users/register"
+          form:
+            name: "{{ $randomString() }}"
+            email: "{{ email }}@email.com"
+            password: "{{ pass }}"
+            password_confirm: "{{ pass }}"
+      # login as the new user
+      - post:
+          url: "/users/login"
+          form:
+            email: "{{ email }}@email.com"
+            password: "{{ pass }}"
+          capture:
+            json: "$.success"
+            as: "loginSuccess"
+      # if the login is successful then this get will get the game page
+      - get:
+          url: "/"
+          afterResponse: "loginResponse"

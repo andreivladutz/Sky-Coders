@@ -10,6 +10,12 @@ import MessageSender from "../../public/common/MessageHandlers/MessageSender";
 import LangManager from "../../public/common/Languages/LangManager";
 const debug = new NamespaceDebugger("GamesManager");
 
+// Constants used to load test the app
+import TEST_CST from "../../test/load-test/TEST_CST";
+interface TEST_CST {
+  CONNECT: string;
+}
+
 // Singleton manager of the game instances
 export default class GamesManager {
   private static _instance = null;
@@ -40,6 +46,13 @@ export default class GamesManager {
         }
       }
     );
+
+    // Stress testing for the game connections. We have to verify the identity of the tester!!
+    socket.on(
+      TEST_CST.CONNECT,
+      (dataObject: { sessCookie: string; testKey: string }) =>
+        this.handleLoadTestConnection(socket, dataObject)
+    );
   }
 
   /**
@@ -63,8 +76,9 @@ export default class GamesManager {
     return this.replaceSocketOnReconnect(socket, uids);
   }
 
-  public async initGameInstance(socket: SocketIO.Socket) {
-    let user = await this.getUserFromCookie(socket);
+  // A test user (for the load testing scenario) can be sent to bypass the getUserFromCookie
+  public async initGameInstance(socket: SocketIO.Socket, testUser?: UserType) {
+    let user = testUser || (await this.getUserFromCookie(socket));
 
     if (!user) {
       return;
@@ -78,8 +92,21 @@ export default class GamesManager {
       this.connectedGames[user.id] = {};
     }
 
+    // TODO: Maybe reuse the game instance if the user is already connected on another device?
     let newGameInstance = new GameInstance(socket, user);
     this.connectedGames[user.id][socket.id] = newGameInstance;
+
+    if (debug.debug.enabled) {
+      let usersConnected = 0;
+
+      for (let user of Object.values(this.connectedGames)) {
+        if (Object.keys(this.connectedGames).length) {
+          usersConnected++;
+        }
+      }
+
+      debug.debug(`${usersConnected} users are currently connected.`);
+    }
 
     // Check if the user is already connected from another device / page
     // When the new game completely loads, disconnect the other devices
@@ -124,14 +151,12 @@ export default class GamesManager {
     return this;
   }
 
-  // Called from the authentication router /users/logout
+  // Called from the logout() GameInstance method
   // Remove the game instance when the user logged out
   public onUserLoggedOut(userId: string): this {
     if (!userId || !this.connectedGames[userId]) {
       return;
     }
-
-    debug.debug(`User logout cleanup for userid: ${userId}`);
 
     // Discard the logged out users
     let loggedOutSocketsIds = Object.keys(this.connectedGames[userId]).filter(
@@ -139,6 +164,7 @@ export default class GamesManager {
     );
 
     for (let socketId of loggedOutSocketsIds) {
+      debug.debug(`User logout cleanup for userid: ${userId}`);
       delete this.connectedGames[userId][socketId];
     }
 
@@ -221,6 +247,12 @@ export default class GamesManager {
   }
 
   private async getUserFromCookie(socket: SocketIO.Socket): Promise<UserType> {
+    if (typeof socket.handshake.headers.cookie !== "string") {
+      this.logoutUser(socket);
+
+      return null;
+    }
+
     // The user's id should be stored in the session cookie
     let parsedCookies = cookie.parse(socket.handshake.headers.cookie);
     let encryptedId = parsedCookies[CST.SESSION_COOKIE.ID];
@@ -232,10 +264,7 @@ export default class GamesManager {
       return null;
     }
 
-    // decrypt the user id
-    let userId = cryptr.decrypt(encryptedId);
-    // Retrieve the user
-    let user = (await User.findById(userId)) as UserType;
+    let user = await this.decryptAndGetDbUser(encryptedId);
 
     if (!user) {
       this.logoutUser(socket);
@@ -252,11 +281,46 @@ export default class GamesManager {
     return user;
   }
 
+  // Decrypt an encrypted session id from a cookie and get the user with that id from the db
+  private async decryptAndGetDbUser(encryptedId: string): Promise<UserType> {
+    // decrypt the user id
+    let userId = cryptr.decrypt(encryptedId);
+    // Retrieve the user
+    return (await User.findById(userId)) as UserType;
+  }
+
   private addDisconnectListener(user: UserType, socket: SocketIO.Socket) {
     // Disconnects happen all the time, but socket.io will connect again and keep going
     socket.on("disconnect", () => {
       debug.userHas(user, `disconnected from socket ${socket.id}`);
     });
+  }
+
+  // Handle the connection event sent by the load-test
+  // Also check if the event being sent is legit... don't let anyone stress the server this way
+  // Bypass the cookie session id parsing, and init a game instance
+  private async handleLoadTestConnection(
+    socket: SocketIO.Socket,
+    dataObject: { sessCookie: string; testKey: string }
+  ) {
+    if (
+      !dataObject ||
+      typeof dataObject !== "object" ||
+      typeof dataObject.sessCookie !== "string" ||
+      typeof dataObject.testKey !== "string"
+    ) {
+      return;
+    }
+
+    // Verify if the test key is correct
+    if (!(dataObject.testKey === process.env.TEST_KEY)) {
+      return;
+    }
+
+    this.initGameInstance(
+      socket,
+      await this.decryptAndGetDbUser(dataObject.sessCookie)
+    );
   }
 
   private constructor() {}

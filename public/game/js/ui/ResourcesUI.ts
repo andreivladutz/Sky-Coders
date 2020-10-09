@@ -12,6 +12,7 @@ import Tween = Phaser.Tweens.Tween;
 import Rectangle = Phaser.Geom.Rectangle;
 import MainUI from "./MainUI";
 import CameraManager from "../managers/CameraManager";
+import ResourcesManager from "../managers/ResourcesManager";
 
 const COINS = CST.UI.COINS;
 export interface SVGCoin extends SVGObject {
@@ -22,6 +23,7 @@ export interface SVGCoin extends SVGObject {
 export default class ResourcesUI extends UIComponent {
   public readonly coinSize = EnvironmentManager.getInstance().TILE_WIDTH;
   public coins: Group;
+
   // A Rectangle reused as bounds for each coin
   private coinBounds = new Rectangle();
   private mainUi: MainUI;
@@ -48,6 +50,12 @@ export default class ResourcesUI extends UIComponent {
       return;
     }
 
+    // If animations are turned off, just hide the coin
+    if (!ResourcesManager.getInstance().animationsActive) {
+      this.coins.killAndHide(coin);
+      return;
+    }
+
     if (coin.animationTween) {
       coin.animationTween.remove();
     }
@@ -57,10 +65,10 @@ export default class ResourcesUI extends UIComponent {
       targets: coin,
       y: CameraManager.getInstance().camera.worldView.y - this.coinSize,
       ease: "Linear",
-      duration: COINS.COLLECT_ANIM_TIME
+      duration: COINS.COLLECT_ANIM_TIME,
     });
 
-    coin.animationTween.on("complete", () => {
+    coin.animationTween.once("complete", () => {
       coin.animationTween.remove();
       coin.animationTween = null;
 
@@ -171,6 +179,11 @@ export default class ResourcesUI extends UIComponent {
     coin.x = (leftFrontCorner.x + rightBackCorner.x - this.coinSize) / 2;
     coin.y = (leftBackCorner.y + rightFrontCorner.y - this.coinSize * 3) / 2;
 
+    // If animations are turned off don't create any tween
+    if (!ResourcesManager.getInstance().animationsActive) {
+      return;
+    }
+
     // The y of the coin when it is idle
     let idleY = coin.y;
 
@@ -184,13 +197,13 @@ export default class ResourcesUI extends UIComponent {
           },
           getEnd: () => {
             return idleY;
-          }
-        }
+          },
+        },
       },
       ease: "Linear",
       duration: COINS.BOUNCE_TIME,
       repeat: -1,
-      yoyo: true
+      yoyo: true,
     });
   }
 }

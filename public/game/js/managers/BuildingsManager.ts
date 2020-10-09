@@ -2,7 +2,7 @@ import Manager from "./Manager";
 import CST from "../CST";
 import LoaderInjector, {
   LoadingInjectedManager,
-  FramesMap
+  FramesMap,
 } from "./LoaderInjector";
 import BuildingObject from "../gameObjects/BuildingObject";
 import IsoScene from "../IsoPlugin/IsoScene";
@@ -90,6 +90,19 @@ export default class BuildingsManager extends Manager
     });
 
     return foundBuilding;
+  }
+
+  // Get the builings that have the production ready right now
+  public getProdReadyBuildings(): BuildingObject[] {
+    let foundBuildings: BuildingObject[] = [];
+
+    this.sceneBuildings.children.iterate((building: BuildingObject) => {
+      if (building.isProductionReady) {
+        foundBuildings.push(building);
+      }
+    });
+
+    return foundBuildings;
   }
 
   private initComponents(gameScene: IsoScene) {
@@ -241,8 +254,8 @@ export default class BuildingsManager extends Manager
       // The tile position of this building
       position: {
         x: building.tileX,
-        y: building.tileY
-      }
+        y: building.tileY,
+      },
     });
   }
 

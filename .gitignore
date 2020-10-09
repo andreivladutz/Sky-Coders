@@ -3,4 +3,6 @@ public/build/*
 public/index.html
 public/sw-build.js
 .env
+.vscode
+vscodeWorkspace.code-workspace
 server/build/*

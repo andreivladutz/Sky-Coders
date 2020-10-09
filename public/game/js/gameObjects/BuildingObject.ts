@@ -1,4 +1,7 @@
-import IsoSpriteObject, { GridColor } from "./IsoSpriteObject";
+import IsoSpriteObject, {
+  GridColor,
+  DEFAULT_INPUT_CFG,
+} from "./IsoSpriteObject";
 import CST from "../CST";
 
 import BuildingsManager from "../managers/BuildingsManager";
@@ -12,6 +15,9 @@ import { SVGCoin } from "../ui/ResourcesUI";
 import GameManager from "../online/GameManager";
 import { InternalBuilding } from "../Blockly/CODE_CST";
 
+import Pointer = Phaser.Input.Pointer;
+import EventData = Phaser.Types.Input.EventData;
+
 interface Tile {
   x: number;
   y: number;
@@ -22,7 +28,6 @@ export default class BuildingObject extends IsoSpriteObject {
   // Keep the id of the building in the db
   public dbId: string;
   // The last time this building produced resources (were collected)
-  // TODO: Show a timer
   public lastProdTime: number;
   // Boolean to know if the production is ready
   public isProductionReady: boolean = false;
@@ -65,7 +70,12 @@ export default class BuildingObject extends IsoSpriteObject {
       shouldBeAppliedToLayer: false,
       // override local computed tiles
       localTileX,
-      localTileY
+      localTileY,
+      inputCfg: {
+        ...DEFAULT_INPUT_CFG,
+        pressEnabled: false,
+        dragEnabled: true,
+      },
     });
 
     this.buildingType = buildingType;
@@ -110,16 +120,32 @@ export default class BuildingObject extends IsoSpriteObject {
     return {
       buildingType: this.buildingType,
       isReady: this.isProductionReady,
-      id: this.dbId
+      id: this.dbId,
     };
   }
 
+  protected getOverriddenInputHandlers() {
+    const inputHandlers = super.getOverriddenInputHandlers();
+
+    inputHandlers.onLongHover = (ptr: Pointer) => this.handleLongHover(ptr);
+    inputHandlers.onTap = (ptr: Pointer, e: EventData) => {
+      e.stopPropagation();
+      this.actorWalkToBuilding();
+    };
+
+    inputHandlers.onDrag = (ptr: Pointer) => {
+      console.log("dragging", ptr);
+    };
+
+    return inputHandlers;
+  }
+
+  // Class method different than the base one (onInteractive) or the Phaser's Spritesheet one (setInteractive)
   public makeInteractive(): this {
-    this.makeSelectable().setSelectedTintColor(CST.BUILDINGS.SELECTION_TINT);
+    this.onInteractive().setSelectedTintColor(CST.BUILDINGS.SELECTION_TINT);
 
-    this.on(CST.EVENTS.OBJECT.LONG_HOVER, this.handleLongHover, this);
-
-    this.on("pointerout", () => {
+    // Get the long hover state and wait for it to emit the exit event
+    this.inputComponent.getState(CST.INPUT_STATES.LONG_HOV).on("exit", () => {
       if (this.popoverObjInstance) {
         this.popoverObjInstance.hidePopover();
         this.popoverObjInstance = null;
@@ -130,7 +156,7 @@ export default class BuildingObject extends IsoSpriteObject {
   }
 
   // Show a popover with details about this building
-  protected async handleLongHover() {
+  protected async handleLongHover(pointer: Pointer) {
     if (!this.buildingsManager.PopoverObject) {
       this.buildingsManager.PopoverObject = (
         await import("../ui/uiObjects/bootstrapObjects/PopoverObject")
@@ -138,7 +164,7 @@ export default class BuildingObject extends IsoSpriteObject {
     }
 
     let lang = GameManager.getInstance().langFile;
-    let pointer = this.scene.input.activePointer;
+    //let pointer = this.scene.input.activePointer;
 
     this.popoverObjInstance = this.buildingsManager.PopoverObject.getInstance(
       this.scene as IsoScene,
@@ -171,15 +197,6 @@ export default class BuildingObject extends IsoSpriteObject {
       }:${remainingSec < 10 ? "0" + remainingSec : remainingSec}`;
     }
   }
-
-  // Handler function for "pointerup" event. Override the one in IsoSpriteObject
-  protected handleSelectionToggle = (pointer: Phaser.Input.Pointer) => {
-    if (!this.gameCanvasIsTarget(pointer.event)) {
-      return;
-    }
-
-    this.actorWalkToBuilding();
-  };
 
   // Send an actor to this building for collecting purposes
   public async actorWalkToBuilding(
@@ -228,7 +245,12 @@ export default class BuildingObject extends IsoSpriteObject {
       this.layersManager.removeObjectFromLayer(this);
     }
 
-    this.removeInteractive();
+    if (this.inputComponent) {
+      this.inputComponent.destroyInteractive();
+    } else {
+      this.removeInteractive();
+    }
+
     // Remove the building from the buildings' phaser group
     this.buildingsManager.sceneBuildings.remove(this);
     this.mapManager.removeSpriteObjectFromBoard(this);
