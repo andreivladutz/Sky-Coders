@@ -29,10 +29,22 @@
       <h1 class="text-center mb-3"><i class="fas fa-sign-in-alt"></i>  <%= title %> </h1>
       <!-- Display temporary messages -->
       <%- include('./partials/messages.ejs') %>
+
+      <!-- TODO: to be removed -->
+      <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <strong> Credentials are not required. Just hit "Login" </strong>
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <!-- END  -->
+
       <form id="login-form" action="/users/login" method="POST">
         <div class="form-group">
           <label for="email">Email</label>
           <input
+            disabled
+
             type="email"
             id="email"
             name="email"
@@ -43,6 +55,8 @@
         <div class="form-group">
           <label for="password"><%= pass %> </label>
           <input
+          disabled
+
             type="password"
             id="password"
             name="password"

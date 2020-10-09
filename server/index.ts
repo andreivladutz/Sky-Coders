@@ -40,7 +40,10 @@ const PORT = Number(process.env.PORT) || 8080;
     // the login / register path
     .use("/users", usersRouter)
     // authenticated game route
-    .use(authenticate, gameRouter);
+    //.use(authenticate, gameRouter);
+    // TODO: Temporarily deactivated authentication
+    .use(gameRouter)
+    .use(express.static(CST.PUBLIC_FOLDER + "/build/"));
   // static files that do not require authentication
   //.use("/no_auth", express.static(CST.PUBLIC_FOLDER))
 })();

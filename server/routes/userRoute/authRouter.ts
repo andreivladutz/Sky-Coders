@@ -3,7 +3,7 @@ import passport from "passport";
 import cryptr from "../../utils/cryptr";
 import CST from "../../SERVER_CST";
 
-import { UserType } from "../../models/User";
+import User, { UserType } from "../../models/User";
 
 // Common code: The language manager
 import { LanguageIds } from "../../../public/common/Languages/LangFileInterface";
@@ -73,14 +73,25 @@ const router = express.Router();
 router
   .get("/login", handleLoginGet)
   // Handle login with passport
+
+  // TODO: temporarily deactivated login
   .post(
     "/login",
-    passport.authenticate("local", {
-      //successRedirect: "/",
-      failureRedirect: "login",
-      failureFlash: true,
-    }),
+    async (req, res, next) => {
+      req.user = (await User.findOne({ email: "test@test.com" })) as UserType;
+
+      next();
+    },
     setSessionUserId
   );
+// .post(
+//   "/login",
+//   passport.authenticate("local", {
+//     //successRedirect: "/",
+//     failureRedirect: "login",
+//     failureFlash: true,
+//   }),
+//   setSessionUserId
+// );
 
 export default router;
