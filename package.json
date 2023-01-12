@@ -38,7 +38,7 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "phaser": "^3.22.0",
-    "phaser3-rex-plugins": "1.1.8",
+    "phaser3-rex-plugins": "1.1.79",
     "popper": "^1.0.1",
     "randomstring": "^1.1.5",
     "rbush": "^3.0.1",
